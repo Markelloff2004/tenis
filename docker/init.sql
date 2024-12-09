@@ -1,7 +1,9 @@
+CREATE DATABASE IF NOT EXISTS tournament_db;
+
 CREATE TABLE IF NOT EXISTS players (
                                        id INT AUTO_INCREMENT PRIMARY KEY,
                                        name VARCHAR(100) NOT NULL,
-                                       seed INT DEFAULT NULL,
+                                       email VARCHAR(100) NOT NULL,
                                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -10,6 +12,8 @@ CREATE TABLE IF NOT EXISTS tournaments (
                                            name VARCHAR(100) NOT NULL,
                                            max_players INT NOT NULL,
                                            rules VARCHAR(200) NOT NULL,
+                                           status VARCHAR(8) CHECK (status = 'PENDING' OR status = 'ONGOING' OR status = 'FINISHED'),
+                                           type VARCHAR(11) CHECK (type = 'BESTOFTHREE' OR type = 'BESTOFFIVE' OR type = 'BESTOFSEVEN'),
                                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,5 +48,18 @@ CREATE TABLE IF NOT EXISTS brackets (
                                         FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE
 );
 
-INSERT INTO players (name, seed) VALUES ('Player 1', 1), ('Player 2', 2);
-INSERT INTO tournaments (name, max_players, rules) VALUES ('Example Tournament', 16, 'Best of Three');
+CREATE TABLE IF NOT EXISTS characteristics (
+                                        id INT AUTO_INCREMENT PRIMARY KEY,
+                                        rating INT,
+                                        playing_hand char CHECK ( playing_hand = 'RIGHT' or playing_hand = 'LEFT' ),
+                                        winned_matches INT DEFAULT NULL,
+                                        losed_matches INT DEFAULT NULL,
+                                        goals_scored INT DEFAULT NULL,
+                                        player_id INT NOT NULL,
+                                        FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE
+);
+
+# CREATE USER 'admin'@'%' IDENTIFIED BY 'Cedacri132!#@';
+# GRANT ALL PRIVILEGES ON tournament_db.* TO 'admin'@'%';
+#
+# FLUSH PRIVILEGES;

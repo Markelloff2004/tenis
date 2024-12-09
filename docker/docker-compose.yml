@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_tournament_db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD : true
+      MYSQL_DATABASE: tournament_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: Cedacri132!#@
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - mysql_data:/var/lib/mysql
+volumes:
+  mysql_data:
