@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-@Theme(value = "ping-pong-tournament", variant = Lumo.DARK)
+@Theme(value = "ping-pong-tournament", variant = Lumo.LIGHT)
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
