@@ -1,4 +1,4 @@
-package org.cedacri.tt.views.addplayerform;
+package org.cedacri.pingpong.views.tournaments;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -11,21 +11,24 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import org.cedacri.pingpong.views.MainLayout;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
-@PageTitle("AddPlayerForm")
-@Route("players/add")
-@Menu(order = 4, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
-public class AddPlayerFormView extends Composite<VerticalLayout> {
+@PageTitle("TournamentDetailsView")
+@Route(value = "tournaments/details", layout = MainLayout.class)
+//@Menu(order = 2, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
+public class TournamentDetailsView extends Composite<VerticalLayout> {
 
-    public AddPlayerFormView() {
+    public TournamentDetailsView() {
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         HorizontalLayout layoutRow = new HorizontalLayout();
         VerticalLayout layoutColumn2 = new VerticalLayout();
         VerticalLayout layoutColumn3 = new VerticalLayout();
         VerticalLayout layoutColumn4 = new VerticalLayout();
         H1 h1 = new H1();
-
+        Button buttonPrimary = new Button();
+        Button buttonPrimary2 = new Button();
+        Button buttonPrimary3 = new Button();
         VerticalLayout layoutColumn5 = new VerticalLayout();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -41,6 +44,15 @@ public class AddPlayerFormView extends Composite<VerticalLayout> {
         h1.setText("Table Tenis");
         layoutColumn4.setAlignSelf(FlexComponent.Alignment.START, h1);
         h1.setWidth("150px");
+        buttonPrimary.setText("Home");
+        buttonPrimary.setWidth("min-content");
+        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonPrimary2.setText("Tournament");
+        buttonPrimary2.setWidth("min-content");
+        buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        buttonPrimary3.setText("Players");
+        buttonPrimary3.setWidth("min-content");
+        buttonPrimary3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         layoutColumn5.setWidth("100%");
         layoutColumn5.getStyle().set("flex-grow", "1");
         getContent().add(layoutRow2);
@@ -49,6 +61,9 @@ public class AddPlayerFormView extends Composite<VerticalLayout> {
         layoutColumn2.add(layoutColumn3);
         layoutColumn3.add(layoutColumn4);
         layoutColumn4.add(h1);
+        layoutColumn4.add(buttonPrimary);
+        layoutColumn4.add(buttonPrimary2);
+        layoutColumn4.add(buttonPrimary3);
         layoutRow.add(layoutColumn5);
     }
 }

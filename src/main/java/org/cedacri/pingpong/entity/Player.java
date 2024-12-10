@@ -65,4 +65,21 @@ public class Player {
             inverseJoinColumns = @JoinColumn(name = "tournament_id")
     )
     private List<Tournament> tournaments;
+
+    public Player(String name, Integer age, String email, Instant createdAt, Integer rating,
+                  String playingHand, Integer winnedMatches, Integer losedMatches,
+                  Integer goalsScored, Integer goalsLosed)
+    {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+        this.createdAt = createdAt;
+        this.rating = rating;
+        this.playingHand = playingHand;
+        this.winnedMatches = winnedMatches;
+        this.losedMatches = losedMatches;
+        this.goalsScored = goalsScored;
+        this.goalsLosed = goalsLosed;
+    }
+
 }

@@ -35,6 +35,7 @@ public class MainLayout extends AppLayout {
         // For simplicity, just adding HTML as brand area:
         H3 appName = new H3("TOURNAMENT");
         Div logoSection = new Div();
+        logoSection.setWidthFull();
         logoSection.addClassName("logo-section");
         logoSection.getStyle().set("display", "flex");
         logoSection.getStyle().set("align-items", "center");
@@ -50,15 +51,15 @@ public class MainLayout extends AppLayout {
         // Menu items
         homeButton = new Button("Home");
         homeButton.addClassName("transparent-button");
-        homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("home")));
+        homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("main view")));
 
-        turneuButton = new Button("Turneu");
+        turneuButton = new Button("Tournament");
         turneuButton.addClassName("transparent-button");
-        turneuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("turneu")));
+        turneuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("tournaments")));
 
-        jucatoriButton = new Button("Jucatori");
+        jucatoriButton = new Button("Players");
         jucatoriButton.addClassName("transparent-button");
-        jucatoriButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("jucatori")));
+        jucatoriButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("players")));
 
         // A layout for menu items
         VerticalLayout menuItemsLayout = new VerticalLayout(homeButton, turneuButton, jucatoriButton);

@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.views.addtournamentview;
+package org.cedacri.pingpong.views.tournaments;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -25,17 +25,18 @@ import java.util.List;
 
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("AddTournamentView")
-@Route("tournaments/add")
+@Route(value = "tournaments/add", layout = MainLayout.class)
 @Menu(order = 3, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
 @Uses(Icon.class)
-public class AddTournamentViewView extends Composite<VerticalLayout> {
+public class AddTournamentView extends Composite<VerticalLayout> {
 
-    public AddTournamentViewView() {
+    public AddTournamentView() {
         HorizontalLayout layoutRow5 = new HorizontalLayout();
         HorizontalLayout layoutRow = new HorizontalLayout();
         VerticalLayout layoutColumn2 = new VerticalLayout();
