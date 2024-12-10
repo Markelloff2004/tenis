@@ -1,74 +1,68 @@
 package org.cedacri.pingpong.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
+import java.time.Instant;
+import java.util.List;
+
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
-@Table(name = "players") // Specifică numele tablei, dacă diferă de numele clasei
+@Table(name = "players")
 public class Player {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID generat automat de baza de date
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
-    private Integer rank;
+
+    @NotNull
+    @Column(name = "age")
     private Integer age;
-    private String style;
 
-    // Constructor complet
-    public Player(Long id, String name, Integer rank, Integer age, String style) {
-        this.id = id;
-        this.name = name;
-        this.rank = rank;
-        this.age = age;
-        this.style = style;
-    }
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "email", nullable = false, length = 100)
+    private String email;
 
-    // Constructor implicit (necesar pentru JPA)
-    public Player() {}
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
+    private Instant createdAt;
 
-    // Getteri și setteri
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "rating")
+    private Integer rating;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "playing_hand")
+    private String playingHand;
 
-    public String getName() {
-        return name;
-    }
+    @Column(name = "winned_matches")
+    private Integer winnedMatches;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Column(name = "losed_matches")
+    private Integer losedMatches;
 
-    public Integer getRank() {
-        return rank;
-    }
+    @Column(name = "goals_scored")
+    private Integer goalsScored;
 
-    public void setRank(Integer rank) {
-        this.rank = rank;
-    }
+    @Column(name = "goals_losed")
+    private Integer goalsLosed;
 
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "tournament_players", // Таблица связи
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns = @JoinColumn(name = "tournament_id")
+    )
+    private List<Tournament> tournaments;
 }

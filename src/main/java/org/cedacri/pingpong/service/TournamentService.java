@@ -9,36 +9,26 @@ import java.util.Optional;
 
 @Service
 public class TournamentService {
+
     private final TournamentRepository tournamentRepository;
 
     public TournamentService(TournamentRepository tournamentRepository) {
         this.tournamentRepository = tournamentRepository;
     }
 
-    public List<Tournament> getAllTournaments() {
+    public List<Tournament> findAll() {
         return tournamentRepository.findAll();
     }
 
-    public Optional<Tournament> getTournamentById(Long id) {
+    public Optional<Tournament> find(Long id) {
         return tournamentRepository.findById(id);
     }
 
-    public Tournament createTournament(Tournament tournament) {
+    public Tournament create(Tournament tournament) {
         return tournamentRepository.save(tournament);
     }
 
-    public Tournament updateTournament(Long id, Tournament tournamentDetails) {
-        return tournamentRepository.findById(id).map(tournament -> {
-            tournament.setName(tournamentDetails.getName());
-            tournament.setStatus(tournamentDetails.getStatus());
-            tournament.setPlayers(tournamentDetails.getPlayers());
-            tournament.setRules(tournamentDetails.getRules());
-            tournament.setWinner(tournamentDetails.getWinner());
-            return tournamentRepository.save(tournament);
-        }).orElseThrow(() -> new RuntimeException("Tournament not found with id " + id));
-    }
-
-    public void deleteTournament(Long id) {
+    public void delete(Long id) {
         tournamentRepository.deleteById(id);
     }
 }
