@@ -1,50 +1,113 @@
 package org.cedacri.pingpong.views;
 
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.RouterLink;
-import org.cedacri.pingpong.views.players.PlayersView;
-import org.cedacri.pingpong.views.tournament.TournamentView;
 
+import java.util.Optional;
 
+//@CssImport("./styles/main-layout-styles.css")
+@CssImport("./themes/ping-pong-tournament/main-layout.css")
 public class MainLayout extends AppLayout {
+
+    private Button homeButton;
+    private Button turneuButton;
+    private Button jucatoriButton;
+    private Button logoutButton;
+
     public MainLayout() {
+        // Top bar
+//        logoutButton = new Button("Log out", VaadinIcon.SIGN_OUT.create());
+//        logoutButton.addClassName("logout-button");
+//        addToNavbar(logoutButton);
+
+        // Drawer content (side-menu)
         setPrimarySection(Section.DRAWER);
-        // Header
-        H1 appName = new H1("TOURNAMENT APP");
-        appName.getStyle().set("margin", "0");
-        // A placeholder search (not functional)
-        TextField search = new TextField();
-        search.setPlaceholder("Search...");
-        search.setWidth("200px");
-        HorizontalLayout header = new HorizontalLayout(appName, search);
-        header.setPadding(true);
-        header.setAlignItems(FlexComponent.Alignment.CENTER);
-        header.setWidthFull();
-        header.expand(appName);
-        addToNavbar(header);
-        // Drawer
-        Image avatar = new Image("images/user-avatar.png", "User avatar");
-        avatar.setWidth("40px");
-        Span userName = new Span("Nuca Ion");
-        Span role = new Span("Admin");
-        VerticalLayout userSection = new VerticalLayout(avatar, userName, role);
-        userSection.setSpacing(false);
-        userSection.setPadding(false);
-        userSection.setAlignItems(FlexComponent.Alignment.CENTER);
-        RouterLink homeLink = new RouterLink("Home", MainView.class);
-        RouterLink tournamentLink = new RouterLink("Turneu", TournamentView.class);
-        RouterLink playersLink = new RouterLink("Jucatori", PlayersView.class);
-        VerticalLayout drawerLayout = new VerticalLayout(userSection, homeLink, tournamentLink, playersLink);
+
+        // Logo & Admin Name section
+        // This could be a VerticalLayout or Div with assigned classes
+        // For simplicity, just adding HTML as brand area:
+        H3 appName = new H3("TOURNAMENT");
+        Div logoSection = new Div();
+        logoSection.addClassName("logo-section");
+        logoSection.getStyle().set("display", "flex");
+        logoSection.getStyle().set("align-items", "center");
+        logoSection.getStyle().set("justify-content", "center");
+//        Image logo = new Image("src/main/resources/META-INF/resources/images/logo.png", "Logo");
+//        logo.addClassName("app-logo");
+//        Span adminName = new Span("Ciao" );
+//        adminName.addClassName("admin-name");
+
+//        logoSection.add(appName, logo, adminName);
+        logoSection.add(appName);
+
+        // Menu items
+        homeButton = new Button("Home");
+        homeButton.addClassName("transparent-button");
+        homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("home")));
+
+        turneuButton = new Button("Turneu");
+        turneuButton.addClassName("transparent-button");
+        turneuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("turneu")));
+
+        jucatoriButton = new Button("Jucatori");
+        jucatoriButton.addClassName("transparent-button");
+        jucatoriButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("jucatori")));
+
+        // A layout for menu items
+        VerticalLayout menuItemsLayout = new VerticalLayout(homeButton, turneuButton, jucatoriButton);
+        menuItemsLayout.addClassName("menu-items");
+        menuItemsLayout.setPadding(false);
+        menuItemsLayout.setSpacing(false);
+
+        VerticalLayout drawerLayout = new VerticalLayout(logoSection, menuItemsLayout);
+        drawerLayout.addClassName("side-menu");
+        drawerLayout.setPadding(false);
         drawerLayout.setSpacing(true);
-        drawerLayout.setPadding(true);
-        drawerLayout.setSizeFull();
         addToDrawer(drawerLayout);
+    }
+
+    private void highlightActiveMenuItem(String route) {
+        homeButton.removeClassName("active");
+        turneuButton.removeClassName("active");
+        jucatoriButton.removeClassName("active");
+
+        switch (route) {
+            case "home":
+                homeButton.addClassName("active");
+                break;
+            case "turneu":
+                turneuButton.addClassName("active");
+                break;
+            case "jucatori":
+                jucatoriButton.addClassName("active");
+                break;
+            default:
+                // No action
+                break;
+        }
+    }
+
+    @Override
+    protected void afterNavigation() {
+        super.afterNavigation();
+        // The current route can be obtained from the resolved navigation target
+        String currentRoute = getCurrentRoute();
+        highlightActiveMenuItem(currentRoute);
+    }
+
+    private String getCurrentRoute() {
+        // One approach is to look at the page title or the URL:
+        return getUI()
+                .flatMap(ui -> ui.getInternals().getActiveViewLocation() != null
+                        ? Optional.of(ui.getInternals().getActiveViewLocation().getPath())
+                        : Optional.empty())
+                .orElse("");
     }
 }
