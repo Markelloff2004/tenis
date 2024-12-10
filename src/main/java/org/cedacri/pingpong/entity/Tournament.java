@@ -1,84 +1,56 @@
 package org.cedacri.pingpong.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.sql.Timestamp;
+import java.util.List;
+
+@Setter
+@Getter
+@NoArgsConstructor
 @Entity
-@Table(name = "tournaments") // Specifică numele tablei, dacă diferă de numele clasei
+@Table(name = "tournaments")
 public class Tournament {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID generat automat de baza de date
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
+    @NotNull
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
-    private String status;
-    private int players;
+
+    @NotNull
+    @Column(name = "max_players", nullable = false)
+    private Integer maxPlayers;
+
+    @Column(name = "rules", length = 200)
     private String rules;
-    private String winner;
 
-    // Constructor complet
-    public Tournament(Long id, String name, String status, int players, String rules, String winner) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-        this.players = players;
-        this.rules = rules;
-        this.winner = winner;
-    }
+    @NotNull
+    @Column(name = "status", length = 8)
+    private String status;
 
-    // Constructor implicit (necesar pentru JPA)
-    public Tournament() {}
+    @NotNull
+    @Column(name = "type", length = 11)
+    private String type;
 
-    // Getteri și setteri
-    public Long getId() {
-        return id;
-    }
+    @NotNull
+    @Column(name = "created_at", nullable = false)
+    private Timestamp createdAt;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @ManyToMany(mappedBy = "tournaments")
+    private List<Player> players;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(int players) {
-        this.players = players;
-    }
-
-    public String getRules() {
-        return rules;
-    }
-
-    public void setRules(String rules) {
-        this.rules = rules;
-    }
-
-    public String getWinner() {
-        return winner;
-    }
-
-    public void setWinner(String winner) {
-        this.winner = winner;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "brackets",
+            joinColumns = @JoinColumn(name = "tournament_id"),
+            inverseJoinColumns = @JoinColumn(name = "match_id")
+    )
+    private List<Match> matches;
 }
