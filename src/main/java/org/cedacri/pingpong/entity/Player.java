@@ -64,7 +64,7 @@ public class Player {
     @Column(name = "goals_losed")
     private Integer goalsLosed;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "player_id"),
@@ -79,6 +79,18 @@ public class Player {
         this.email = email;
     }
 
+    public Player(String playerName, Integer age, String email, Instant createdAt, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {
+        this.playerName = playerName;
+        this.age = age;
+        this.email = email;
+        this.createdAt = createdAt;
+        this.rating = rating;
+        this.playingHand = playingHand;
+        this.winnedMatches = winnedMatches;
+        this.losedMatches = losedMatches;
+        this.goalsScored = goalsScored;
+        this.goalsLosed = goalsLosed;
+    }
 }
 
 

@@ -245,7 +245,7 @@ public class TournamentsView extends VerticalLayout {
     private void refreshGridData() {
 //        playersGrid.getDataProvider().refreshAll();
         // playerService.getAllPlayers()
-        tournamentsGrid.setItems(tournamentService.findAll());
+        tournamentsGrid.setItems(tournamentService.findAll().toList());
     }
 
 

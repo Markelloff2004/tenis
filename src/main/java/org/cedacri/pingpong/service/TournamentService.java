@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class TournamentService {
@@ -16,11 +17,11 @@ public class TournamentService {
         this.tournamentRepository = tournamentRepository;
     }
 
-    public List<Tournament> findAll() {
+    public Stream<Tournament> findAll() {
         return tournamentRepository.findAll();
     }
 
-    public Optional<Tournament> find(Long id) {
+    public Optional<Tournament> find(Integer id) {
         return tournamentRepository.findById(id);
     }
 
@@ -28,7 +29,7 @@ public class TournamentService {
         return tournamentRepository.save(tournament);
     }
 
-    public void delete(Long id) {
+    public void delete(Integer id) {
         tournamentRepository.deleteById(id);
     }
 }

@@ -41,7 +41,7 @@ public class Tournament {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @ManyToMany(mappedBy = "tournaments")
+    @ManyToMany(mappedBy = "tournaments", fetch = FetchType.EAGER)
     private Set<Player> players = new HashSet<>();
 }
 

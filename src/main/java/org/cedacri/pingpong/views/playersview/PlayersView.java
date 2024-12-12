@@ -125,7 +125,7 @@ public class PlayersView extends VerticalLayout {
             dialog.close();
 
             // Notify success
-            Notification.show("Player added successfully: " + newPlayer.getName());
+            Notification.show("Player added successfully: " + newPlayer.getPlayerName());
         });
         saveButton.setWidth("100px");
         saveButton.addClassName("colored-button");
@@ -150,7 +150,7 @@ public class PlayersView extends VerticalLayout {
 
     private void configureGrid()
     {
-        playersGrid.addColumn(Player::getName).setHeader("Name").setSortable(true);
+        playersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
         playersGrid.addColumn(Player::getAge).setHeader("Age").setSortable(true);
         playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
         playersGrid.addColumn(Player::getPlayingHand).setHeader("Playing Style").setSortable(true);
@@ -220,7 +220,7 @@ public class PlayersView extends VerticalLayout {
         formLayout.getStyle().set("gap", "5px"); // Reduce the gap between rows and columns
 
         // Add player details
-        formLayout.addFormItem(new Label(player.getName()), "Name");
+        formLayout.addFormItem(new Label(player.getPlayerName()), "Name");
         formLayout.addFormItem(new Label(player.getEmail()), "Email");
         formLayout.addFormItem(new Label(player.getAge() != null ? player.getAge().toString() : "N/A"), "Age");
         formLayout.addFormItem(new Label(player.getPlayingHand()), "Playing Hand");
@@ -263,7 +263,7 @@ public class PlayersView extends VerticalLayout {
 
         // Editable fields to display and edit player details
         TextField nameField = new TextField();
-        nameField.setValue(player.getName() != null ? player.getName() : "");
+        nameField.setValue(player.getPlayerName() != null ? player.getPlayerName() : "");
         nameField.setWidth("300px"); // Set field width
 
         TextField emailField = new TextField();
@@ -325,7 +325,7 @@ public class PlayersView extends VerticalLayout {
         // Save button to apply changes
         Button saveButton = new Button("Save", event -> {
             // Update player object with new values
-            player.setName(nameField.getValue());
+            player.setPlayerName(nameField.getValue());
             player.setEmail(emailField.getValue());
             player.setAge(ageField.getValue());
             player.setPlayingHand(playingHandField.getValue());
@@ -339,7 +339,7 @@ public class PlayersView extends VerticalLayout {
             dialog.close();
 
             // Notify success
-            Notification.show("Player updated successfully: " + player.getName());
+            Notification.show("Player updated successfully: " + player.getPlayerName());
         });
         saveButton.addClassName("colored-button"); // Add your custom class for styling
 
@@ -367,13 +367,13 @@ public class PlayersView extends VerticalLayout {
         dialog.setHeaderTitle("Confirm Delete");
 
         // Confirmation text
-        Label confirmationText = new Label("Are you sure you want to delete " + player.getName() + "?");
+        Label confirmationText = new Label("Are you sure you want to delete " + player.getPlayerName() + "?");
         confirmationText.getStyle().set("margin", "10px 0");
 
         // Confirm Delete Button
         Button deleteButton = new Button("Delete", event -> {
             playerService.deleteById(player.getId());
-            Notification.show("Player " + player.getName() + " deleted!");
+            Notification.show("Player " + player.getPlayerName() + " deleted!");
             dialog.close(); // Close the dialog
             // Uncomment this if you want to refresh the grid after deletion
             // refreshGridData();
@@ -400,17 +400,7 @@ public class PlayersView extends VerticalLayout {
     }
 
     private void refreshGridData() {
-//        playersGrid.getDataProvider().refreshAll();
-        // playerService.getAllPlayers()
-        playersGrid.setItems(getDemoPlayers());
+        playersGrid.setItems(query -> playerService.list(query.getPage()));
     }
 
-    // for test only
-    private List<Player> getDemoPlayers() {
-        return Arrays.asList(
-                new Player("John Doe", 25, "john.doe@example.com", Instant.parse("2023-01-01T10:00:00Z"), 1200, "Right-handed", 20, 5, 50, 30),
-                new Player("Jane Smith", 30, "jane.smith@example.com", Instant.parse("2023-02-01T12:00:00Z"), 1400, "Left-handed", 25, 3, 60, 25),
-                new Player("Mike Brown", 27, "mike.brown@example.com", Instant.parse("2023-03-01T14:00:00Z"), 1100, "Ambidextrous", 15, 10, 45, 35)
-        );
-    }
 }
