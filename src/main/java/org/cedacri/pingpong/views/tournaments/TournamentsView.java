@@ -64,8 +64,8 @@ public class TournamentsView extends VerticalLayout {
         addTournamentButton.addClassName("colored-button");
         addTournamentButton.addClickListener(e -> {
 //            openNewTournametDialog();
-            openTournamentDialog();
-//            openAddPlayerDialog();
+//            openTournamentDialog();
+            getUI().ifPresent(ui -> ui.navigate("tournaments/add"));
             System.out.println("Add tournament button clicked");
         });
 

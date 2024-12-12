@@ -12,7 +12,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.Optional;
 
-//@CssImport("./styles/main-layout-styles.css")
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
 public class MainLayout extends AppLayout {
 
@@ -31,8 +30,6 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
 
         // Logo & Admin Name section
-        // This could be a VerticalLayout or Div with assigned classes
-        // For simplicity, just adding HTML as brand area:
         H3 appName = new H3("TOURNAMENT");
         Div logoSection = new Div();
         logoSection.setWidthFull();
@@ -48,7 +45,6 @@ public class MainLayout extends AppLayout {
 //        logoSection.add(appName, logo, adminName);
         logoSection.add(appName);
 
-        // Menu items
         homeButton = new Button("Home");
         homeButton.addClassName("transparent-button");
         homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("main view")));
@@ -61,7 +57,6 @@ public class MainLayout extends AppLayout {
         jucatoriButton.addClassName("transparent-button");
         jucatoriButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("players")));
 
-        // A layout for menu items
         VerticalLayout menuItemsLayout = new VerticalLayout(homeButton, turneuButton, jucatoriButton);
         menuItemsLayout.addClassName("menu-items");
         menuItemsLayout.setPadding(false);
@@ -83,14 +78,13 @@ public class MainLayout extends AppLayout {
             case "home":
                 homeButton.addClassName("active");
                 break;
-            case "turneu":
+            case "tournament":
                 turneuButton.addClassName("active");
                 break;
-            case "jucatori":
+            case "players":
                 jucatoriButton.addClassName("active");
                 break;
             default:
-                // No action
                 break;
         }
     }
@@ -98,13 +92,11 @@ public class MainLayout extends AppLayout {
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        // The current route can be obtained from the resolved navigation target
         String currentRoute = getCurrentRoute();
         highlightActiveMenuItem(currentRoute);
     }
 
     private String getCurrentRoute() {
-        // One approach is to look at the page title or the URL:
         return getUI()
                 .flatMap(ui -> ui.getInternals().getActiveViewLocation() != null
                         ? Optional.of(ui.getInternals().getActiveViewLocation().getPath())

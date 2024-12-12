@@ -242,7 +242,7 @@ public class PlayersView extends VerticalLayout {
 
         // Add Close button
         Button closeButton = new Button("Close", e -> dialog.close());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        closeButton.addClassName("button"); // Add your custom class for styling
         closeButton.getStyle().set("width", "100px"); // Compact button width
 
         // Layout for button
@@ -341,10 +341,13 @@ public class PlayersView extends VerticalLayout {
             // Notify success
             Notification.show("Player updated successfully: " + player.getName());
         });
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClassName("colored-button"); // Add your custom class for styling
+
 
         // Cancel button to discard changes
         Button cancelButton = new Button("Cancel", e -> dialog.close());
+        cancelButton.addClassName("button"); // Add your custom class for styling
+
 
         // Layout for buttons
         HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
