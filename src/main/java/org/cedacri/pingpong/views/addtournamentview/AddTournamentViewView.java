@@ -174,11 +174,9 @@ public class AddTournamentViewView extends Composite<VerticalLayout> {
     }
 
     private void setGridSampleData(Grid grid) {
-        grid.setItems(query -> samplePersonService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
-                .stream());
+        grid.setItems(query -> playerService.list(query.getPage()));
     }
 
     @Autowired()
-    private PlayerService samplePersonService;
+    private PlayerService playerService;
 }

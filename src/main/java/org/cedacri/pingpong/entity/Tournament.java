@@ -41,12 +41,7 @@ public class Tournament {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "tournament_players",
-            joinColumns = @JoinColumn(name = "tournament_id"),
-            inverseJoinColumns = @JoinColumn(name = "player_id")
-    )
+    @ManyToMany(mappedBy = "tournaments")
     private Set<Player> players = new HashSet<>();
 }
 

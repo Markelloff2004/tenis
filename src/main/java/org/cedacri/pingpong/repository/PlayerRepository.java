@@ -1,6 +1,7 @@
 package org.cedacri.pingpong.repository;
 
 import com.speedment.jpastreamer.application.JPAStreamer;
+import com.speedment.jpastreamer.projection.Projection;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Player$;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.entity.Tournament$;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,16 +27,26 @@ public class PlayerRepository {
     private final Integer PAGE_SIZE = 10;
 
     public Optional<Player> findById(Integer id){
-        return jpaStreamer.stream(Player.class)
+        Optional<Player> player = jpaStreamer.stream(Player.class)
                 .filter(Player$.id.equal(id))
                 .findFirst();
+
+        return player;
     }
 
     public Stream<Player> paged(long page){
-        return jpaStreamer.stream(Player.class)
+        List<Player> players =
+                jpaStreamer.stream(
+                        Projection.select(Player$.id, Player$.playerName, Player$.age, Player$.email)
+                        )
                 .sorted(Player$.id.reversed())
                 .skip(page * PAGE_SIZE)
-                .limit(PAGE_SIZE);
+                .limit(PAGE_SIZE)
+                .collect(Collectors.toList());
+
+        players.forEach(player -> Hibernate.initialize(player.getTournaments()));
+
+        return players.stream();
     }
 
     public Player save(Player player){

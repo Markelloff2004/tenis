@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -13,6 +15,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "players")
 public class Player {
@@ -61,8 +64,20 @@ public class Player {
     @Column(name = "goals_losed")
     private Integer goalsLosed;
 
-    @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY)
-    private Set<Tournament> tournaments = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+            name = "tournament_players",
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns =@JoinColumn(name = "tournament_id")
+    )
+    private Set<Tournament> tournaments ;
+
+    public Player(Integer id, String name, Integer age, String email){
+        this.id = id;
+        this.playerName = name;
+        this.age = age;
+        this.email = email;
+    }
 
 }
 

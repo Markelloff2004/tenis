@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.cedacri.pingpong.entity.Tournament;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -20,13 +19,13 @@ public class TournamentRepository {
 
     private final Integer PAGE_SIZE = 10;
 
-    public Optional<Tournament> getById(Integer id) {
+    public Optional<Tournament> findById(Integer id) {
         return jpaStreamer.stream(Tournament.class)
                 .filter(tournament -> tournament.getId().equals(id))
                 .findFirst();
     }
 
-    public Stream<Tournament> getAll() {
+    public Stream<Tournament> findAll() {
         return jpaStreamer.stream(Tournament.class)
                 .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()));
     }
@@ -71,7 +70,7 @@ public class TournamentRepository {
     }
 
     @Transactional
-    public Tournament saveTournament(Tournament tournament) {
+    public Tournament save(Tournament tournament) {
         if (tournament.getId() == null) {
             entityManager.persist(tournament);
         } else {
@@ -80,8 +79,8 @@ public class TournamentRepository {
         return tournament;
     }
 
-    public void deleteTournamentById(Integer tournamentId) {
-        Optional<Tournament> tournamentToDelete = getById(tournamentId);
+    public void deleteById(Integer tournamentId) {
+        Optional<Tournament> tournamentToDelete = findById(tournamentId);
 
         if (tournamentToDelete.isPresent()) {
             entityManager.remove(tournamentToDelete);
