@@ -169,7 +169,6 @@ public class TournamentsView extends VerticalLayout {
         Button saveButton = new Button("Save", event -> {
             // Get form data
             String name = nameField.getValue();
-            String rules = rulesField.getValue();
             String tournamentType = tournamentTypeComboBox.getValue();
 
             // Validate
@@ -179,10 +178,18 @@ public class TournamentsView extends VerticalLayout {
             }
 
             // Create Tournament
-            Tournament newTournament = new Tournament(name, null, rules, null, tournamentType, new ArrayList<>());
+            Tournament newTournament = new Tournament();
+            newTournament.setTournamentName(name);
+            newTournament.setTournamentStatus("PENDING");
+            newTournament.setTournamentType(tournamentType);
+            newTournament.setMaxPlayers(8);
+
+            tournamentService.create(newTournament);
+
+
 
             // Log the result or send to backend
-            Notification.show("Tournament created: " + newTournament.getName() + " (" + tournamentType + ")");
+            Notification.show("Tournament created: " + newTournament.getTournamentType() + " (" + tournamentType + ")");
 
             // Close the dialog
             dialog.close();
@@ -206,10 +213,10 @@ public class TournamentsView extends VerticalLayout {
 
     private void configureGrid()
     {
-        tournamentsGrid.addColumn(Tournament::getName).setHeader("Name").setSortable(true);
+        tournamentsGrid.addColumn(Tournament::getTournamentName).setHeader("Name").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getMaxPlayers).setHeader("MaxPlayers").setSortable(true);
-        tournamentsGrid.addColumn(Tournament::getRules).setHeader("Rules").setSortable(true);
-        tournamentsGrid.addColumn(Tournament::getType).setHeader("Type").setSortable(true);
+        tournamentsGrid.addColumn(Tournament::getTournamentType).setHeader("Type").setSortable(true);
+        tournamentsGrid.addColumn(Tournament::getTournamentStatus).setHeader("Status").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getCreatedAt).setHeader("CreatedAt").setSortable(true);
 
         tournamentsGrid.addColumn(new ComponentRenderer<>(player -> {
@@ -238,15 +245,8 @@ public class TournamentsView extends VerticalLayout {
     private void refreshGridData() {
 //        playersGrid.getDataProvider().refreshAll();
         // playerService.getAllPlayers()
-        tournamentsGrid.setItems(getDemoTournaments());
+        tournamentsGrid.setItems(tournamentService.findAll());
     }
 
-    private List<Tournament> getDemoTournaments() {
-        return Arrays.asList(
-                new Tournament("Summer Cup", 16, "Standard Rules", "Active", "Knockout", Timestamp.valueOf("2022-06-22 2:00:00")),
-                new Tournament("Winter League", 8, "Pro Rules", "Completed", "Round Robin", Timestamp.valueOf("2023-01-15 12:00:00")),
-                new Tournament("Spring Open", 16, "Custom Rules", "Pending", "Double Elimination", Timestamp.valueOf("2023-04-10 14:00:00"))
-        );
-    }
 
 }

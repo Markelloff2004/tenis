@@ -72,13 +72,13 @@ public class AddTournamentView extends VerticalLayout {
         // Two-column player selection layout
         Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
 //        availablePlayersGrid.setItems(playerService.getAllPlayers());
-        availablePlayersGrid.addColumn(Player::getName).setHeader("Name").setSortable(true);
+        availablePlayersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
         availablePlayersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true);
         availablePlayersGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         availablePlayersGrid.setWidth("45%");
 
         Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
-        selectedPlayersGrid.addColumn(Player::getName).setHeader("Name").setSortable(true);
+        selectedPlayersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
         selectedPlayersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true);
         selectedPlayersGrid.setWidth("45%");
 

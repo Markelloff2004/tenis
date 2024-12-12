@@ -3,6 +3,7 @@ package org.cedacri.pingpong.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -11,10 +12,9 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "tournaments")
+@Data
 public class Tournament {
     @Id
     @Column(name = "id", nullable = false)

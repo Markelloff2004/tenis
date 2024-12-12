@@ -17,18 +17,18 @@ public class TournamentService {
     }
 
     public List<Tournament> findAll() {
-        return tournamentRepository.findAll();
+        return tournamentRepository.getAll().toList();
     }
 
-    public Optional<Tournament> find(Long id) {
-        return tournamentRepository.findById(id);
+    public Optional<Tournament> find(Integer id) {
+        return tournamentRepository.getById(id);
     }
 
     public Tournament create(Tournament tournament) {
-        return tournamentRepository.save(tournament);
+        return tournamentRepository.saveTournament(tournament);
     }
 
-    public void delete(Long id) {
-        tournamentRepository.deleteById(id);
+    public void delete(Integer id) {
+        tournamentRepository.deleteTournamentById(id);
     }
 }
