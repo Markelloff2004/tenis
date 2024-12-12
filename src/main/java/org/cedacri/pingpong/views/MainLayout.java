@@ -15,6 +15,8 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.cedacri.pingpong.views.tournament.list.TournamentView;
+
 import java.util.List;
 
 /**
@@ -43,7 +45,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        Span appName = new Span("table-tenis");
+        Span appName = new Span("Table Tennis App");
         appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
         Header header = new Header(appName);
 
@@ -55,6 +57,10 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
+        // Add the TournamentView to the navigation menu
+        nav.addItem(new SideNavItem("Tournaments", TournamentView.class));
+
+        // Dynamically add other entries based on MenuConfiguration
         List<MenuEntry> menuEntries = MenuConfiguration.getMenuEntries();
         menuEntries.forEach(entry -> {
             if (entry.icon() != null) {
@@ -69,6 +75,8 @@ public class MainLayout extends AppLayout {
 
     private Footer createFooter() {
         Footer layout = new Footer();
+
+        // Optional: Add footer content here
 
         return layout;
     }
