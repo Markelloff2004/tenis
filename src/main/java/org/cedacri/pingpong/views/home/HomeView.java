@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.views.mainview;
+package org.cedacri.pingpong.views.home;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.dependency.Uses;
@@ -9,18 +9,17 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.views.MainLayout;
-import org.cedacri.pingpong.views.playersview.AddPlayerFormView;
 
 @PageTitle("MainView")
 @Route(value = "main view", layout = MainLayout.class)
 //@Menu(order = 0, icon = LineAwesomeIconUrl.HOME_SOLID)
 @Uses(Icon.class)
-public class MainView extends Composite<VerticalLayout> {
+public class HomeView extends Composite<VerticalLayout> {
 
 //    @Autowired
 //    private final PlayerService playerService;
 
-    public MainView(PlayerService playerService) {
+    public HomeView(PlayerService playerService) {
 //        HorizontalLayout layoutRow = new HorizontalLayout();
 //        VerticalLayout layoutColumn2 = new VerticalLayout();
 //        H1 h1 = new H1();
@@ -77,15 +76,15 @@ public class MainView extends Composite<VerticalLayout> {
 
     }
 
-     private void openAddPlayerForm() {
-        Dialog dialog = new Dialog();
-        AddPlayerFormView addPlayerForm = new AddPlayerFormView();
-        dialog.add(addPlayerForm);
-        dialog.setWidth("800px");
-        dialog.setHeight("500px");
-        dialog.open();
-     System.out.println("Hello world");
-    }
+//     private void openAddPlayerForm() {
+//        Dialog dialog = new Dialog();
+//        AddPlayerFormView addPlayerForm = new AddPlayerFormView();
+//        dialog.add(addPlayerForm);
+//        dialog.setWidth("800px");
+//        dialog.setHeight("500px");
+//        dialog.open();
+//     System.out.println("Hello world");
+//    }
 
 //    private void setGridSampleData(Grid grid) {
 //        grid.setItems(query -> playerService.list(

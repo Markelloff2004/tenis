@@ -53,4 +53,25 @@ public class Tournament {
             inverseJoinColumns = @JoinColumn(name = "match_id")
     )
     private List<Match> matches;
+
+    // Constructor
+    public Tournament(String name, Integer maxPlayers, String rules, String status, String type, Timestamp createdAt) {
+        this.name = name;
+        this.maxPlayers = maxPlayers;
+        this.rules = rules;
+        this.status = status;
+        this.type = type;
+        this.createdAt = createdAt;
+    }
+
+    public Tournament(String name, Integer maxPlayers, String rules, String status, String type, List<Player> players) {
+        this.name = name;
+        this.maxPlayers = maxPlayers;
+        this.rules = rules;
+        this.status = status;
+        this.type = type;
+        this.players = players;
+        createdAt = new Timestamp(System.currentTimeMillis());
+    }
+
 }

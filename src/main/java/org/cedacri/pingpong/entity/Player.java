@@ -60,7 +60,7 @@ public class Player {
 
     @ManyToMany
     @JoinTable(
-            name = "tournament_players", // Таблица связи
+            name = "tournament_players",
             joinColumns = @JoinColumn(name = "player_id"),
             inverseJoinColumns = @JoinColumn(name = "tournament_id")
     )
@@ -80,6 +80,11 @@ public class Player {
         this.losedMatches = losedMatches;
         this.goalsScored = goalsScored;
         this.goalsLosed = goalsLosed;
+    }
+
+    public Player(String name)
+    {
+        this.name = name;
     }
 
 }

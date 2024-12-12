@@ -1,5 +1,6 @@
 :root {
   --highlight-color: #feaf00;
+  --background-color: #FFFEE2;
   --sidebar-bg: #f2eae1;
   --text-color: #121110;
   --light-bg: #f8f8f8;
@@ -71,6 +72,37 @@ vaadin-side-nav-item vaadin-icon {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+/*.colored-button.clicked */
+.colored-button:hover {
+  background-color: var(--light-bg);
+  color: var(--highlight-color);
+  /*border: 10px;*/
+  /*border-color: var(--highlight-color);*/
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px; /* Set a uniform button width */
+  text-align: left; /* Align text to the left */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /*background-color: var(--highlight-color);*/
+}
+
+.compact-button {
+  background-color: transparent;
+  border: none;
+  color: var(--highlight-color);
+  cursor: pointer;
+  padding: 0.25em 0.5em; /* Smaller padding for compactness */
+  font-size: var(--lumo-font-size-s); /* Smaller font size */
+  line-height: 1.2; /* Reduce vertical spacing */
+  border-radius: 4px; /* Optional: keeps rounded corners */
+}
+
+.compact-button:hover {
+  background-color: var(--background-color); /* Subtle hover effect */
 }
 
 .main-layout {
@@ -166,3 +198,63 @@ vaadin-side-nav-item vaadin-icon {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+.round-header {
+  background-color: #0000AA;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px;
+  border-right: 1px solid white;
+}
+
+.match-container {
+  border: 1px dotted #999;
+  padding: 5px;
+  margin: 20px 0;
+  position: relative;
+  width: 200px;
+}
+
+.seeded-player {
+  font-weight: bold;
+}
+
+.seeded-player span.seed-number {
+  font-weight: normal;
+  font-size: 0.9em;
+  margin-right: 5px;
+}
+
+.score-line {
+  display: flex;
+  gap: 5px;
+  margin: 3px 0;
+}
+
+.score-box {
+  display: inline-block;
+  border: 1px solid #999;
+  padding: 2px 4px;
+  font-size: 0.8em;
+}
+
+.bye {
+  font-style: italic;
+  color: #777;
+}
+
+.connector-line {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  width: 20px;
+  border-bottom: 1px dotted #999;
+}
+
+.winner {
+  font-weight: bold;
+  background-color: #e0ffe0; /* light green background for the winner */
+  border: 2px solid #0a0;   /* a green border around the winner */
+}
+
