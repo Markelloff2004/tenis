@@ -35,10 +35,24 @@ public class PlayerRepository {
     }
 
     public Stream<Player> paged(long page){
-        List<Player> players =
-                jpaStreamer.stream(
-                        Projection.select(Player$.id, Player$.playerName, Player$.age, Player$.email)
-                        )
+//        List<Player> players =
+//                jpaStreamer.stream(
+//                        Projection.select(Player$.id, Player$.playerName, Player$.age, Player$.email)
+//                        )
+//                .sorted(Player$.id.reversed())
+//                .skip(page * PAGE_SIZE)
+//                .limit(PAGE_SIZE)
+//                .collect(Collectors.toList());
+
+        List<Player> players = jpaStreamer.stream(
+                        Projection.select(
+                                Player$.id,
+                                Player$.playerName,
+                                Player$.age, Player$.email, Player$.rating,
+                                Player$.playingHand, Player$.winnedMatches,
+                                Player$.losedMatches, Player$.goalsScored,
+                                Player$.goalsLosed)
+                )
                 .sorted(Player$.id.reversed())
                 .skip(page * PAGE_SIZE)
                 .limit(PAGE_SIZE)
@@ -61,11 +75,11 @@ public class PlayerRepository {
         return player;
     }
 
-    public void delete(Integer id){
-        Optional<Player> player = findById(id);
+    public void delete(Integer id) {
+        Player player = em.find(Player.class, id);
 
-        if(player.isPresent()){
-            em.remove(player.get());
+        if (player != null) {
+            em.remove(player);
         }
     }
 

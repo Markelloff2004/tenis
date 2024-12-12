@@ -15,11 +15,12 @@ import java.util.Set;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "players")
 public class Player {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
@@ -72,11 +73,28 @@ public class Player {
     )
     private Set<Tournament> tournaments ;
 
+    public Player() {
+
+    }
+
     public Player(Integer id, String name, Integer age, String email){
         this.id = id;
         this.playerName = name;
         this.age = age;
         this.email = email;
+    }
+
+    public Player(Integer id, String playerName, Integer age, String email, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {
+        this.id = id;
+        this.playerName = playerName;
+        this.age = age;
+        this.email = email;
+        this.rating = rating;
+        this.playingHand = playingHand;
+        this.winnedMatches = winnedMatches;
+        this.losedMatches = losedMatches;
+        this.goalsScored = goalsScored;
+        this.goalsLosed = goalsLosed;
     }
 
     public Player(String playerName, Integer age, String email, Instant createdAt, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {

@@ -16,7 +16,9 @@ import java.util.Set;
 @Table(name = "tournaments")
 @Data
 public class Tournament {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 

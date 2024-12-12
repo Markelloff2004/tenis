@@ -54,7 +54,6 @@ public class PlayersView extends VerticalLayout {
         addPlayerButton.addClassName("colored-button");
         addPlayerButton.addClickListener(e -> {
             openNewPlayerDialog();
-//            System.out.println("New player button clicked");
         });
 
         pageHeader.setJustifyContentMode(JustifyContentMode.BETWEEN);
@@ -77,54 +76,46 @@ public class PlayersView extends VerticalLayout {
 
     private void openNewPlayerDialog() {
         Dialog dialog = new Dialog();
-        dialog.setWidth("300px"); // Make the dialog smaller
-        dialog.setHeight("auto"); // Adjust height automatically based on content
+        dialog.setWidth("300px");
+        dialog.setHeight("auto");
 
-        // Create form fields
         TextField nameField = new TextField();
         IntegerField ageField = new IntegerField();
         TextField emailField = new TextField();
         TextField playingHandField = new TextField();
 
-        // Validation
         nameField.setRequired(true);
         ageField.setMin(0);
 
-        // Create form layout with labels on top and reduced spacing
         FormLayout formLayout = new FormLayout();
         formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(ageField, "Age").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(emailField, "Email").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(playingHandField, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
 
-        // Resize fields for compactness
-        String fieldWidth = "100%"; // Ensure fields take full available width within the form
+        String fieldWidth = "100%";
         nameField.setWidth(fieldWidth);
         ageField.setWidth(fieldWidth);
         emailField.setWidth(fieldWidth);
         playingHandField.setWidth(fieldWidth);
 
-        // Create Save and Cancel buttons
         Button saveButton = new Button("Save", event -> {
-            // Collect data and create a new Player object
             String name = nameField.getValue();
             Integer age = ageField.getValue();
             String email = emailField.getValue();
             String playingHand = playingHandField.getValue();
 
-            // Validate fields
             if (name.isBlank() || name.isEmpty()) {
                 Notification.show("Please fill in all required fields.");
                 return;
             }
 
-            // Create the Player object (save logic would go here)
             Player newPlayer = new Player(name, age, email, Instant.now(), 0, playingHand, 0, 0, 0, 0);
 
-            // Close the dialog
-            dialog.close();
+            playerService.save(newPlayer);
 
-            // Notify success
+            dialog.close();
+            refreshGridData();
             Notification.show("Player added successfully: " + newPlayer.getPlayerName());
         });
         saveButton.setWidth("100px");
@@ -144,21 +135,20 @@ public class PlayersView extends VerticalLayout {
         // Add form layout and buttons to the dialog
         dialog.add(formLayout, buttonLayout);
 
-        // Open the dialog
         dialog.open();
     }
 
     private void configureGrid()
     {
-        playersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
-        playersGrid.addColumn(Player::getAge).setHeader("Age").setSortable(true);
-        playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
-        playersGrid.addColumn(Player::getPlayingHand).setHeader("Playing Style").setSortable(true);
-        playersGrid.addColumn(Player::getWinnedMatches).setHeader("Won Matches").setSortable(true);
-        playersGrid.addColumn(Player::getLosedMatches).setHeader("Losed Matches").setSortable(true);
-        playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true);
-        playersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true);
-        playersGrid.addColumn(Player::getCreatedAt).setHeader("Created at").setSortable(true);
+        playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true).setKey("rating");
+        playersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true).setKey("playerName");
+        playersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true).setKey("email");
+        playersGrid.addColumn(Player::getAge).setHeader("Age").setSortable(true).setKey("age");
+        playersGrid.addColumn(Player::getPlayingHand).setHeader("Playing Style").setSortable(true).setKey("playingHand");
+        playersGrid.addColumn(Player::getWinnedMatches).setHeader("Won Matches").setSortable(true).setKey("winnedMatches");
+        playersGrid.addColumn(Player::getLosedMatches).setHeader("Losed Matches").setSortable(true).setKey("losedMatches");
+        playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true).setKey("goalsScored");
+        playersGrid.addColumn(Player::getGoalsLosed).setHeader("Goals Losed").setSortable(true).setKey("goalsLosed");
 
         playersGrid.addColumn(new ComponentRenderer<>(player -> {
             HorizontalLayout actionsLayout = new HorizontalLayout();
@@ -183,43 +173,13 @@ public class PlayersView extends VerticalLayout {
         })).setHeader("Actions").setAutoWidth(true).setFlexGrow(0).setTextAlign(ColumnTextAlign.CENTER);
     }
 
-//    private void openDetailsPlayerDialog1(Player player) {
-//        Dialog dialog = new Dialog();
-//        dialog.setHeaderTitle("View Player");
-//
-//        // Display player data in labels
-//        FormLayout formLayout = new FormLayout();
-//
-//        formLayout.addFormItem(new Label(player.getName()), "Name");
-//        formLayout.addFormItem(new Label(player.getAge() != null ? player.getAge().toString() : "N/A"), "Age");
-//        formLayout.addFormItem(new Label(player.getEmail()), "Email");
-//        formLayout.addFormItem(new Label(player.getCreatedAt().toString()), "Created At");
-//        formLayout.addFormItem(new Label(player.getRating() != null ? player.getRating().toString() : "N/A"), "Rating");
-//        formLayout.addFormItem(new Label(player.getPlayingHand()), "Playing Hand");
-//        formLayout.addFormItem(new Label(player.getWinnedMatches() != null ? player.getWinnedMatches().toString() : "N/A"), "Won Matches");
-//        formLayout.addFormItem(new Label(player.getLosedMatches() != null ? player.getLosedMatches().toString() : "N/A"), "Lost Matches");
-//        formLayout.addFormItem(new Label(player.getGoalsScored() != null ? player.getGoalsScored().toString() : "N/A"), "Goals Scored");
-//        formLayout.addFormItem(new Label(player.getGoalsLosed() != null ? player.getGoalsLosed().toString() : "N/A"), "Goals Lost");
-//
-//        // Close button
-//        Button closeButton = new Button("Close", event -> dialog.close());
-//        closeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-//
-//        // Add components to the dialog
-//        dialog.add(formLayout, closeButton);
-//
-//        dialog.open();
-//    }
-
     private void openDetailsPlayerDialog(Player player) {
         Dialog dialog = new Dialog();
-        dialog.setWidth("400px"); // Adjust dialog width to make it more compact
+        dialog.setWidth("400px");
 
-        // FormLayout to display player details
         FormLayout formLayout = new FormLayout();
-        formLayout.getStyle().set("gap", "5px"); // Reduce the gap between rows and columns
+        formLayout.getStyle().set("gap", "5px");
 
-        // Add player details
         formLayout.addFormItem(new Label(player.getPlayerName()), "Name");
         formLayout.addFormItem(new Label(player.getEmail()), "Email");
         formLayout.addFormItem(new Label(player.getAge() != null ? player.getAge().toString() : "N/A"), "Age");
@@ -231,40 +191,34 @@ public class PlayersView extends VerticalLayout {
         formLayout.addFormItem(new Label(player.getGoalsLosed() != null ? player.getGoalsLosed().toString() : "N/A"), "Goals Lost");
         formLayout.addFormItem(new Label(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
 
-        // Adjust labels and text size
         formLayout.getChildren().forEach(child -> {
             if (child instanceof Label) {
                 ((Label) child).getStyle()
-                        .set("font-size", "12px") // Make text smaller
-                        .set("line-height", "16px"); // Adjust line spacing for compactness
+                        .set("font-size", "12px")
+                        .set("line-height", "16px");
             }
         });
 
-        // Add Close button
         Button closeButton = new Button("Close", e -> dialog.close());
-        closeButton.addClassName("button"); // Add your custom class for styling
-        closeButton.getStyle().set("width", "100px"); // Compact button width
+        closeButton.addClassName("button");
+        closeButton.getStyle().set("width", "100px");
 
-        // Layout for button
         HorizontalLayout buttonLayout = new HorizontalLayout(closeButton);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        buttonLayout.getStyle().set("margin-top", "10px"); // Reduced space above the button
+        buttonLayout.getStyle().set("margin-top", "10px");
 
-        // Add everything to dialog
         dialog.add(formLayout, buttonLayout);
 
-        // Open the dialog
         dialog.open();
     }
 
     private void openEditPlayerDialog(Player player) {
         Dialog dialog = new Dialog();
-        dialog.setWidth("600px"); // Adjust dialog width to fit two columns
+        dialog.setWidth("600px");
 
-        // Editable fields to display and edit player details
         TextField nameField = new TextField();
         nameField.setValue(player.getPlayerName() != null ? player.getPlayerName() : "");
-        nameField.setWidth("300px"); // Set field width
+        nameField.setWidth("300px");
 
         TextField emailField = new TextField();
         emailField.setValue(player.getEmail() != null ? player.getEmail() : "");
@@ -300,10 +254,9 @@ public class PlayersView extends VerticalLayout {
 
         TextField createdAtField = new TextField();
         createdAtField.setValue(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A");
-        createdAtField.setReadOnly(true); // Prevent editing for createdAt field
+        createdAtField.setReadOnly(true);
         createdAtField.setWidth("300px");
 
-        // FormLayout for two-column layout
         FormLayout formLayout = new FormLayout();
         formLayout.addFormItem(nameField, "Name");
         formLayout.addFormItem(emailField, "Email");
@@ -316,15 +269,12 @@ public class PlayersView extends VerticalLayout {
         formLayout.addFormItem(goalsLostField, "Goals Lost");
         formLayout.addFormItem(createdAtField, "Created At");
 
-        // Set responsive steps for two columns
         formLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 1), // One column for small screens
-                new FormLayout.ResponsiveStep("600px", 2) // Two columns for larger screens
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("600px", 2)
         );
 
-        // Save button to apply changes
         Button saveButton = new Button("Save", event -> {
-            // Update player object with new values
             player.setPlayerName(nameField.getValue());
             player.setEmail(emailField.getValue());
             player.setAge(ageField.getValue());
@@ -335,67 +285,55 @@ public class PlayersView extends VerticalLayout {
             player.setGoalsScored(goalsScoredField.getValue());
             player.setGoalsLosed(goalsLostField.getValue());
 
-            // Close the dialog
+            playerService.save(player);
+            refreshGridData();
+
             dialog.close();
 
-            // Notify success
             Notification.show("Player updated successfully: " + player.getPlayerName());
         });
-        saveButton.addClassName("colored-button"); // Add your custom class for styling
+        saveButton.addClassName("colored-button");
 
 
-        // Cancel button to discard changes
         Button cancelButton = new Button("Cancel", e -> dialog.close());
-        cancelButton.addClassName("button"); // Add your custom class for styling
-
-
-        // Layout for buttons
+        cancelButton.addClassName("button");
         HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         buttonLayout.getStyle().set("margin-top", "10px"); // Reduced space above the buttons
 
-        // Add everything to dialog
         dialog.add(formLayout, buttonLayout);
 
-        // Open the dialog
         dialog.open();
     }
 
     private void openDeletePlayerDialog(Player player) {
         Dialog dialog = new Dialog();
-        dialog.setWidth("400px"); // Adjust the dialog width
+        dialog.setWidth("400px");
         dialog.setHeaderTitle("Confirm Delete");
 
-        // Confirmation text
         Label confirmationText = new Label("Are you sure you want to delete " + player.getPlayerName() + "?");
         confirmationText.getStyle().set("margin", "10px 0");
 
-        // Confirm Delete Button
         Button deleteButton = new Button("Delete", event -> {
             playerService.deleteById(player.getId());
             Notification.show("Player " + player.getPlayerName() + " deleted!");
-            dialog.close(); // Close the dialog
-            // Uncomment this if you want to refresh the grid after deletion
-            // refreshGridData();
+            dialog.close();
+            refreshGridData();
         });
-        deleteButton.setWidth("100px"); // Set the width to 100px
-        deleteButton.addClassName("colored-button"); // Add your custom class for styling
+        deleteButton.setWidth("100px");
+        deleteButton.addClassName("colored-button");
 
-        // Cancel Button
         Button cancelButton = new Button("Cancel", event -> dialog.close());
-        cancelButton.setWidth("100px"); // Set the width to 100px
-        cancelButton.addClassName("button"); // Add your custom class for styling
+        cancelButton.setWidth("100px");
+        cancelButton.addClassName("button");
 
-        // Horizontal layout for buttons
         HorizontalLayout buttonLayout = new HorizontalLayout(deleteButton, cancelButton);
-        buttonLayout.setSpacing(true); // Add spacing between buttons
-        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END); // Align buttons to the right
-        buttonLayout.getStyle().set("margin-top", "50px"); // Move the buttons 50px lower
+        buttonLayout.setSpacing(true);
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        buttonLayout.getStyle().set("margin-top", "50px");
 
-        // Add components to the dialog
         dialog.add(confirmationText, buttonLayout);
 
-        // Open the dialog
         dialog.open();
     }
 
