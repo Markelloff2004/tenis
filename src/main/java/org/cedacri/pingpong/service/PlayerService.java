@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class PlayerService {
@@ -18,11 +19,11 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
-    public Page<Player> list(Pageable pageable) {
-        return playerRepository.findAll(pageable);
+    public Stream<Player> list(long page) {
+        return playerRepository.paged(page);
     }
 
-    public Optional<Player> findById(Long id) {
+    public Optional<Player> findById(Integer id) {
         return playerRepository.findById(id);
     }
 
@@ -31,6 +32,6 @@ public class PlayerService {
     }
 
     public void deleteById(Integer id) {
-        playerRepository.deleteById((Long.valueOf(id)));
+        playerRepository.delete(id);
     }
 }

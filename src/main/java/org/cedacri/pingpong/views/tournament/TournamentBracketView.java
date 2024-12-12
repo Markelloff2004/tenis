@@ -71,7 +71,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             tournament.setTournamentStatus(tournamentStatus.getValue());
             tournament.setTournamentType(tournamentType.getValue());
 
-            tournamentRepository.saveTournament(tournament);
+            tournamentRepository.save(tournament);
 
             Notification.show("Tournament saved successfully");
         });
@@ -181,7 +181,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     @Override
     public void setParameter(BeforeEvent beforeEvent, Integer tournamentId) {
 
-        Optional<Tournament> tournament = tournamentRepository.getById(tournamentId);
+        Optional<Tournament> tournament = tournamentRepository.findById(tournamentId);
 
         if (!tournament.isPresent()) {
             throw new IllegalArgumentException("Tournament not found with id " + tournamentId);

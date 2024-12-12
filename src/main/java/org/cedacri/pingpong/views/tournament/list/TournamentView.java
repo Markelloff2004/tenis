@@ -8,7 +8,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
-import lombok.RequiredArgsConstructor;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.TournamentRepository;
 
@@ -66,7 +65,7 @@ public class TournamentView extends VerticalLayout {
     }
 
     private void updateGrid() {
-        grid.setItems(tournamentRepository.getAll().collect(Collectors.toList()));
+        grid.setItems(tournamentRepository.findAll().collect(Collectors.toList()));
     }
 
     private void populateForm(Tournament tournament) {
@@ -94,12 +93,12 @@ public class TournamentView extends VerticalLayout {
             tournament.setTournamentType(typeField.getValue());
             tournament.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()).toInstant());
 
-            tournamentRepository.getAll()
+            tournamentRepository.findAll()
                     .filter(existing -> existing.getTournamentName().equalsIgnoreCase(tournament.getTournamentName()))
                     .findAny()
                     .ifPresentOrElse(existing -> Notification.show("Tournament already exists!"),
                             () -> {
-                                tournamentRepository.getAll();
+                                tournamentRepository.findAll();
                             });
 
             Notification.show("Tournament added successfully!");
@@ -143,7 +142,7 @@ public class TournamentView extends VerticalLayout {
         }
 
         try {
-            tournamentRepository.getAll()
+            tournamentRepository.findAll()
                     .filter(t -> !t.getId().equals(tournament.getId()))
                     .collect(Collectors.toList());
 
