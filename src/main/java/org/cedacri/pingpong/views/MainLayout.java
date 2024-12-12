@@ -1,93 +1,106 @@
 package org.cedacri.pingpong.views;
 
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.SvgIcon;
-import com.vaadin.flow.component.orderedlayout.Scroller;
-import com.vaadin.flow.component.sidenav.SideNav;
-import com.vaadin.flow.component.sidenav.SideNavItem;
-import com.vaadin.flow.router.Layout;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.server.menu.MenuConfiguration;
-import com.vaadin.flow.server.menu.MenuEntry;
-import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.cedacri.pingpong.views.tournament.list.TournamentView;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import java.util.List;
+import java.util.Optional;
 
-/**
- * The main view is a top-level placeholder for other views.
- */
-@Layout
-@AnonymousAllowed
+@CssImport("./themes/ping-pong-tournament/main-layout.css")
 public class MainLayout extends AppLayout {
 
-    private H1 viewTitle;
+    private Button homeButton;
+    private Button turneuButton;
+    private Button jucatoriButton;
+    private Button logoutButton;
 
     public MainLayout() {
+        // Top bar
+//        logoutButton = new Button("Log out", VaadinIcon.SIGN_OUT.create());
+//        logoutButton.addClassName("logout-button");
+//        addToNavbar(logoutButton);
+
+        // Drawer content (side-menu)
         setPrimarySection(Section.DRAWER);
-        addDrawerContent();
-        addHeaderContent();
+
+        // Logo & Admin Name section
+        H3 appName = new H3("TOURNAMENT");
+        Div logoSection = new Div();
+        logoSection.setWidthFull();
+        logoSection.addClassName("logo-section");
+        logoSection.getStyle().set("display", "flex");
+        logoSection.getStyle().set("align-items", "center");
+        logoSection.getStyle().set("justify-content", "center");
+//        Image logo = new Image("src/main/resources/META-INF/resources/images/logo.png", "Logo");
+//        logo.addClassName("app-logo");
+//        Span adminName = new Span("Ciao" );
+//        adminName.addClassName("admin-name");
+
+//        logoSection.add(appName, logo, adminName);
+        logoSection.add(appName);
+
+        homeButton = new Button("Home");
+        homeButton.addClassName("transparent-button");
+        homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("main view")));
+
+        turneuButton = new Button("Tournament");
+        turneuButton.addClassName("transparent-button");
+        turneuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("tournaments")));
+
+        jucatoriButton = new Button("Players");
+        jucatoriButton.addClassName("transparent-button");
+        jucatoriButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("players")));
+
+        VerticalLayout menuItemsLayout = new VerticalLayout(homeButton, turneuButton, jucatoriButton);
+        menuItemsLayout.addClassName("menu-items");
+        menuItemsLayout.setPadding(false);
+        menuItemsLayout.setSpacing(false);
+
+        VerticalLayout drawerLayout = new VerticalLayout(logoSection, menuItemsLayout);
+        drawerLayout.addClassName("side-menu");
+        drawerLayout.setPadding(false);
+        drawerLayout.setSpacing(true);
+        addToDrawer(drawerLayout);
     }
 
-    private void addHeaderContent() {
-        DrawerToggle toggle = new DrawerToggle();
-        toggle.setAriaLabel("Menu toggle");
+    private void highlightActiveMenuItem(String route) {
+        homeButton.removeClassName("active");
+        turneuButton.removeClassName("active");
+        jucatoriButton.removeClassName("active");
 
-        viewTitle = new H1();
-        viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-
-        addToNavbar(true, toggle, viewTitle);
-    }
-
-    private void addDrawerContent() {
-        Span appName = new Span("Table Tennis App");
-        appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
-        Header header = new Header(appName);
-
-        Scroller scroller = new Scroller(createNavigation());
-
-        addToDrawer(header, scroller, createFooter());
-    }
-
-    private SideNav createNavigation() {
-        SideNav nav = new SideNav();
-
-        // Add the TournamentView to the navigation menu
-        nav.addItem(new SideNavItem("Tournaments", TournamentView.class));
-
-        // Dynamically add other entries based on MenuConfiguration
-        List<MenuEntry> menuEntries = MenuConfiguration.getMenuEntries();
-        menuEntries.forEach(entry -> {
-            if (entry.icon() != null) {
-                nav.addItem(new SideNavItem(entry.title(), entry.path(), new SvgIcon(entry.icon())));
-            } else {
-                nav.addItem(new SideNavItem(entry.title(), entry.path()));
-            }
-        });
-
-        return nav;
-    }
-
-    private Footer createFooter() {
-        Footer layout = new Footer();
-
-        // Optional: Add footer content here
-
-        return layout;
+        switch (route) {
+            case "home":
+                homeButton.addClassName("active");
+                break;
+            case "tournament":
+                turneuButton.addClassName("active");
+                break;
+            case "players":
+                jucatoriButton.addClassName("active");
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-        viewTitle.setText(getCurrentPageTitle());
+        String currentRoute = getCurrentRoute();
+        highlightActiveMenuItem(currentRoute);
     }
 
-    private String getCurrentPageTitle() {
-        return MenuConfiguration.getPageHeader(getContent()).orElse("");
+    private String getCurrentRoute() {
+        return getUI()
+                .flatMap(ui -> ui.getInternals().getActiveViewLocation() != null
+                        ? Optional.of(ui.getInternals().getActiveViewLocation().getPath())
+                        : Optional.empty())
+                .orElse("");
     }
 }

@@ -1,3 +1,13 @@
+:root {
+  --highlight-color: #feaf00;
+  --background-color: #FFFEE2;
+  --sidebar-bg: #f2eae1;
+  --text-color: #121110;
+  --light-bg: #f8f8f8;
+  --border-color: #E0E0E0;
+  --font-family: 'Open Sans', sans-serif;
+}
+
 vaadin-scroller[slot="drawer"] {
   padding: var(--lumo-space-s);
 }
@@ -15,6 +25,237 @@ vaadin-side-nav-item vaadin-icon {
   box-sizing: border-box;
 }
 
+.menu-items-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align buttons to the left */
+  padding-left: 20px; /* Add consistent padding from the left edge */
+  gap: 10px; /* Add spacing between buttons */
+}
+
+.transparent-button {
+  background-color: transparent;
+  color: black;
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px; /* Set a uniform button width */
+  text-align: left; /* Align text to the left */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.transparent-button:focus,
+.transparent-button:active {
+  background-color: var(--highlight-color);
+}
+
+.button {
+  background-color: transparent;
+  color: var(--highlight-color);
+  border: 2px solid var(--highlight-color);
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px; /* Set a uniform button width */
+  text-align: left; /* Align text to the left */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.colored-button {
+  background-color: var(--highlight-color);
+  color: white;
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px; /* Set a uniform button width */
+  text-align: left; /* Align text to the left */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/*.colored-button.clicked */
+.colored-button:hover {
+  background-color: var(--light-bg);
+  color: var(--highlight-color);
+  /*border: 10px;*/
+  /*border-color: var(--highlight-color);*/
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px; /* Set a uniform button width */
+  text-align: left; /* Align text to the left */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /*background-color: var(--highlight-color);*/
+}
+
+.compact-button {
+  background-color: transparent;
+  border: 2px solid var(--highlight-color);
+  color: var(--highlight-color);
+  cursor: pointer;
+  padding: 0.25em 0.5em; /* Smaller padding for compactness */
+  font-size: var(--lumo-font-size-s); /* Smaller font size */
+  line-height: 1.2; /* Reduce vertical spacing */
+  border-radius: 4px; /* Optional: keeps rounded corners */
+}
+
+.compact-button:hover {
+  background-color: var(--background-color); /* Subtle hover effect */
+}
+
+.main-layout {
+  font-family: var(--font-family);
+  color: var(--text-color);
+}
+
+/* Top Bar */
+.top-bar {
+  background: #FFFFFF;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 1rem;
+  height: 60px;
+}
+
+.logout-button {
+  color: var(--text-color);
+}
+
+/* Side Menu (Drawer) */
+.side-menu {
+  background: var(--sidebar-bg);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.logo-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.app-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.app-name {
+  margin: 0;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.admin-name {
+  font-size: 0.9rem;
+  color: #121110;
+}
+
+/* Menu Items */
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-item {
+  width: 100%;
+  justify-content: flex-start;
+  color: var(--text-color);
+  background: transparent;
+  border-radius: 0;
+  font-weight: 500;
+}
+
+.menu-item:hover {
+  background: #eaeaea;
+}
+
+.menu-item.active {
+  background: var(--highlight-color);
+  color: #000;
+  font-weight: bold;
+}
+
+/* Content Area */
+.content-area {
+  background: var(--light-bg);
+  padding: 2rem;
+}
+
+.view-title {
+  margin-top: 0;
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+.round-header {
+  background-color: #0000AA;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px;
+  border-right: 1px solid white;
+}
+
+.match-container {
+  border: 1px dotted #999;
+  padding: 5px;
+  margin: 20px 0;
+  position: relative;
+  width: 200px;
+}
+
+.seeded-player {
+  font-weight: bold;
+}
+
+.seeded-player span.seed-number {
+  font-weight: normal;
+  font-size: 0.9em;
+  margin-right: 5px;
+}
+
+.score-line {
+  display: flex;
+  gap: 5px;
+  margin: 3px 0;
+}
+
+.score-box {
+  display: inline-block;
+  border: 1px solid #999;
+  padding: 2px 4px;
+  font-size: 0.8em;
+}
+
+.bye {
+  font-style: italic;
+  color: #777;
+}
+
+.connector-line {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  width: 20px;
+  border-bottom: 1px dotted #999;
+}
+
+.winner {
+  font-weight: bold;
+  background-color: #e0ffe0; /* light green background for the winner */
+  border: 2px solid #0a0;   /* a green border around the winner */
+}
+
