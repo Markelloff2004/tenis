@@ -1,37 +1,28 @@
 package org.cedacri.pingpong.views.tournaments;
 
-import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.dependency.Uses;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.Menu;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.vaadin.lineawesome.LineAwesomeIconUrl;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.cedacri.pingpong.utils.TournamentUtils.calculateMaxPlayers;
 
 @PageTitle("Add Tournament")
 @Route(value = "tournaments/add", layout = MainLayout.class)
@@ -40,87 +31,178 @@ public class AddTournamentView extends VerticalLayout {
     private final PlayerService playerService;
     private final TournamentService tournamentService;
 
+    private final TextField tournamentNameField = createTextField("Tournament Name");
+    private final ComboBox<String> tournamentStatusComboBox = createComboBox("Tournament Status", "PENDING", "ONGOING", "FINISHED");
+    private final ComboBox<String> tournamentTypeComboBox = createComboBox("Tournament Type", "BESTOFTHREE", "BESTOFFIVE", "BESTOFSEVEN");
+    private final Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
+    private final Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
+
+    private final Set<Player> availablePlayers;
+    private final Set<Player> selectedPlayers = new HashSet<>();
+
     public AddTournamentView(PlayerService playerService, TournamentService tournamentService) {
         this.playerService = playerService;
         this.tournamentService = tournamentService;
 
+        this.availablePlayers = playerService.getAll().collect(Collectors.toSet());
+
+        configureView();
+        configureGrids();
+    }
+
+    private void configureView() {
         setWidthFull();
         setPadding(true);
         setSpacing(true);
 
-        // Page title
-        H1 title = new H1("Add Tournament");
-        add(title);
+        add(new H1("Add Tournament"), createTournamentDetailsLayout(), createPlayerSelectionLayout(), createButtonLayout());
+        setAlignItems(Alignment.STRETCH);
+    }
 
-        // Fields for tournament details
-        TextField tournamentNameField = new TextField("Tournament Name");
-        tournamentNameField.setWidth("250px");
+    private HorizontalLayout createTournamentDetailsLayout() {
+        HorizontalLayout layout = new HorizontalLayout(tournamentNameField, tournamentStatusComboBox, tournamentTypeComboBox);
+        layout.setSpacing(true);
+        layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        return layout;
+    }
 
-        TextField rulesField = new TextField("Rules");
-        rulesField.setWidth("250px");
+    private HorizontalLayout createPlayerSelectionLayout() {
+        configureAvailablePlayersGrid();
+        configureSelectedPlayersGrid();
 
-        ComboBox<String> tournamentTypeComboBox = new ComboBox<>("Tournament Type");
-        tournamentTypeComboBox.setItems("Knockout", "Round Robin", "Double Elimination", "Swiss System");
-        tournamentTypeComboBox.setWidth("250px");
+        HorizontalLayout layout = new HorizontalLayout(availablePlayersGrid, selectedPlayersGrid);
+        layout.setSpacing(true);
+        layout.setWidthFull();
+        return layout;
+    }
 
-        // Layout for the fields in one line
-        HorizontalLayout tournamentDetailsLayout = new HorizontalLayout(tournamentNameField, rulesField, tournamentTypeComboBox);
-        tournamentDetailsLayout.setSpacing(true);
-        tournamentDetailsLayout.setWidthFull();
-        tournamentDetailsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER); // Center horizontally
+    private void configureAvailablePlayersGrid() {
+        setupGridColumns(availablePlayersGrid);
+        availablePlayersGrid.setItems(availablePlayers);
 
-        // Two-column player selection layout
-        Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
-//        availablePlayersGrid.setItems(playerService.getAllPlayers());
-        availablePlayersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
-        availablePlayersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true);
+        availablePlayersGrid.addColumn(new ComponentRenderer<>(player -> {
+                    Button addButton = new Button("Add", click -> {
+                        availablePlayers.remove(player);
+                        selectedPlayers.add(player);
+                        refreshGrids();
+                    });
+                    addButton.addClassName("compact-button");
+                    return addButton;
+                })).setHeader("Actions")
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.END)
+                .setAutoWidth(true) // Automatically adjusts the column width
+                .setResizable(false); // Ensures the column width doesn't shrink
+    }
+
+    private void configureSelectedPlayersGrid() {
+        setupGridColumns(selectedPlayersGrid);
+        selectedPlayersGrid.setItems(selectedPlayers);
+
+        selectedPlayersGrid.addColumn(new ComponentRenderer<>(player -> {
+                    Button deleteButton = new Button("Delete", click -> {
+                        selectedPlayers.remove(player);
+                        availablePlayers.add(player);
+                        refreshGrids();
+                    });
+                    deleteButton.addClassName("compact-button");
+                    return deleteButton;
+                })).setHeader("Actions")
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.END)
+                .setAutoWidth(true) // Automatically adjusts the column width
+                .setResizable(false); // Ensures the column width doesn't shrink
+    }
+
+
+    private void configureGrids() {
         availablePlayersGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        selectedPlayersGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+
         availablePlayersGrid.setWidth("45%");
-
-        Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
-        selectedPlayersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
-        selectedPlayersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true);
         selectedPlayersGrid.setWidth("45%");
+    }
 
-        List<Player> selectedPlayers = new ArrayList<>();
-        availablePlayersGrid.addSelectionListener(selection -> selection.getFirstSelectedItem().ifPresent(player -> {
-            if (!selectedPlayers.contains(player)) {
-                selectedPlayers.add(player);
-                selectedPlayersGrid.setItems(selectedPlayers);
-            }
-        }));
+    private void setupGridColumns(Grid<Player> grid) {
+        grid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
+        grid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
+    }
 
-        selectedPlayersGrid.addSelectionListener(selection -> selection.getFirstSelectedItem().ifPresent(player -> {
-            selectedPlayers.remove(player);
-            selectedPlayersGrid.setItems(selectedPlayers);
-        }));
+    private HorizontalLayout createButtonLayout() {
+        Button saveButton = new Button("Save", event -> saveTournament());
+        saveButton.addClassName("colored-button");
 
-        HorizontalLayout playerSelectionLayout = new HorizontalLayout(availablePlayersGrid, selectedPlayersGrid);
-        playerSelectionLayout.setSpacing(true);
-        playerSelectionLayout.setWidthFull();
+        Button cancelButton = new Button("Cancel", event -> getUI().ifPresent(ui -> ui.navigate("tournaments")));
+        cancelButton.addClassName("button");
 
-        // Buttons
-        Button saveButton = new Button("Save", event -> {
-            String name = tournamentNameField.getValue();
-            String rules = rulesField.getValue();
-            String type = tournamentTypeComboBox.getValue();
+        HorizontalLayout layout = new HorizontalLayout(saveButton, cancelButton);
+        layout.setSpacing(true);
+        layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER); // Center buttons
+        layout.getStyle().set("margin-top", "auto"); // Push buttons to the bottom of the view
+        return layout;
+    }
 
-            if (name.isEmpty() || type == null || selectedPlayers.isEmpty()) {
-                Notification.show("Please fill in all required fields and select players.");
-                return;
-            }
+    private void saveTournament() {
+        if (!validateFields()) return;
 
-//            tournamentService.save(new Tournament(name, selectedPlayers.size(), rules, "Pending", type, selectedPlayers));
-            Notification.show("Tournament created successfully!");
-        });
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        Tournament newTournament = new Tournament();
+        int maxPlayers = calculateMaxPlayers(selectedPlayers.size());
+        newTournament.setTournamentName(tournamentNameField.getValue());
+        newTournament.setTournamentStatus(tournamentStatusComboBox.getValue());
+        newTournament.setTournamentType(tournamentTypeComboBox.getValue());
+        newTournament.setMaxPlayers(maxPlayers);
+        newTournament.setPlayers(selectedPlayers);
 
-        Button cancelButton = new Button("Cancel", event -> getUI().ifPresent(ui -> ui.navigate(TournamentsView.class)));
+        tournamentService.create(newTournament);
+        Notification.show("Tournament created successfully!");
+        getUI().ifPresent(ui -> ui.navigate("tournaments"));
+    }
 
-        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
-        buttonLayout.setSpacing(true);
+    private boolean validateFields() {
+        if (tournamentNameField.isEmpty()) {
+            showNotification("Tournament name is required!");
+            return false;
+        }
 
-        // Add components to the layout
-        add(tournamentDetailsLayout, playerSelectionLayout, buttonLayout);
+        if (tournamentStatusComboBox.isEmpty()) {
+            showNotification("Tournament status is required!");
+            return false;
+        }
+
+        if (tournamentTypeComboBox.isEmpty()) {
+            showNotification("Tournament type is required!");
+            return false;
+        }
+
+        if (selectedPlayers.isEmpty()) {
+            showNotification("At least one player must be selected!");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void refreshGrids() {
+        availablePlayersGrid.setItems(availablePlayers);
+        selectedPlayersGrid.setItems(selectedPlayers);
+    }
+
+    private void showNotification(String message) {
+        Notification.show(message, 3000, Notification.Position.MIDDLE);
+    }
+
+    private static TextField createTextField(String label) {
+        TextField textField = new TextField(label);
+        textField.setWidth("250px");
+        return textField;
+    }
+
+    private static ComboBox<String> createComboBox(String label, String... items) {
+        ComboBox<String> comboBox = new ComboBox<>(label);
+        comboBox.setItems(items);
+        comboBox.setWidth("250px");
+        return comboBox;
     }
 }

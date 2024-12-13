@@ -25,6 +25,10 @@ public class PlayerService {
         return playerRepository.paged(page);
     }
 
+    public Stream<Player> getAll() {
+        return playerRepository.getAll();
+    }
+
     @Transactional
     public Optional<Player> findById(Integer id) {
         return playerRepository.findById(id);

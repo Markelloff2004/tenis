@@ -83,7 +83,9 @@ public class TournamentRepository {
         Optional<Tournament> tournamentToDelete = findById(tournamentId);
 
         if (tournamentToDelete.isPresent()) {
-            entityManager.remove(tournamentToDelete);
+            entityManager.remove(entityManager.contains(tournamentToDelete.get())
+                    ? tournamentToDelete.get()
+                    : entityManager.merge(tournamentToDelete.get()));
         }
     }
 

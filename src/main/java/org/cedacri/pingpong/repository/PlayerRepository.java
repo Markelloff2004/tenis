@@ -63,6 +63,33 @@ public class PlayerRepository {
         return players.stream();
     }
 
+    public Stream<Player> getAll(){
+//        List<Player> players =
+//                jpaStreamer.stream(
+//                        Projection.select(Player$.id, Player$.playerName, Player$.age, Player$.email)
+//                        )
+//                .sorted(Player$.id.reversed())
+//                .skip(page * PAGE_SIZE)
+//                .limit(PAGE_SIZE)
+//                .collect(Collectors.toList());
+
+        List<Player> players = jpaStreamer.stream(
+                        Projection.select(
+                                Player$.id,
+                                Player$.playerName,
+                                Player$.age, Player$.email, Player$.rating,
+                                Player$.playingHand, Player$.winnedMatches,
+                                Player$.losedMatches, Player$.goalsScored,
+                                Player$.goalsLosed)
+                )
+                .sorted(Player$.id.reversed())
+                .collect(Collectors.toList());
+
+        players.forEach(player -> Hibernate.initialize(player.getTournaments()));
+
+        return players.stream();
+    }
+
     public Player save(Player player){
 
         if(player.getId() == null){

@@ -2,6 +2,7 @@ package org.cedacri.pingpong.views.playersview;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
@@ -28,6 +29,7 @@ import org.cedacri.pingpong.views.MainLayout;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @PageTitle("PlayersView")
 @Route(value = "players", layout = MainLayout.class)
@@ -39,7 +41,8 @@ public class PlayersView extends VerticalLayout {
     private final Button addPlayerButton;
     private final Grid<Player> playersGrid;
 
-    public PlayersView(PlayerService playerService) {
+    public PlayersView(PlayerService playerService)
+    {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -74,7 +77,43 @@ public class PlayersView extends VerticalLayout {
         refreshGridData();
     }
 
-    private void openNewPlayerDialog() {
+    private void configureGrid()
+    {
+        playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true).setKey("rating");
+        playersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true).setKey("playerName");
+//        playersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true).setKey("email");
+        playersGrid.addColumn(Player::getAge).setHeader("Age").setSortable(true).setKey("age");
+        playersGrid.addColumn(Player::getPlayingHand).setHeader("Playing Style").setSortable(true).setKey("playingHand");
+        playersGrid.addColumn(Player::getWinnedMatches).setHeader("Won Matches").setSortable(true).setKey("winnedMatches");
+        playersGrid.addColumn(Player::getLosedMatches).setHeader("Losed Matches").setSortable(true).setKey("losedMatches");
+//        playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true).setKey("goalsScored");
+//        playersGrid.addColumn(Player::getGoalsLosed).setHeader("Goals Losed").setSortable(true).setKey("goalsLosed");
+
+        playersGrid.addColumn(new ComponentRenderer<>(player -> {
+            HorizontalLayout actionsLayout = new HorizontalLayout();
+
+            Button viewButton = new Button("Details", click -> {
+                openDetailsPlayerDialog(player);
+            });
+            viewButton.addClassName("compact-button");
+
+            Button editButton = new Button("Edit", click -> {
+                openEditPlayerDialog(player);
+            });
+            editButton.addClassName("compact-button");
+
+            Button deleteButton = new Button("Delete", click -> {
+                openDeletePlayerDialog(player);
+            });
+            deleteButton.addClassName("compact-button");
+
+            actionsLayout.add(viewButton, editButton, deleteButton);
+            return actionsLayout;
+        })).setHeader("Actions").setAutoWidth(true).setFlexGrow(0).setTextAlign(ColumnTextAlign.CENTER);
+    }
+
+    private void openNewPlayerDialog()
+    {
         Dialog dialog = new Dialog();
         dialog.setWidth("300px");
         dialog.setHeight("auto");
@@ -82,8 +121,9 @@ public class PlayersView extends VerticalLayout {
         TextField nameField = new TextField();
         IntegerField ageField = new IntegerField();
         TextField emailField = new TextField();
-        TextField playingHandField = new TextField();
+        ComboBox<String> playingHandComboBox = new ComboBox<>();
 
+        playingHandComboBox.setItems("Right", "Left");
         nameField.setRequired(true);
         ageField.setMin(0);
 
@@ -91,19 +131,19 @@ public class PlayersView extends VerticalLayout {
         formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(ageField, "Age").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(emailField, "Email").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(playingHandField, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
+        formLayout.addFormItem(playingHandComboBox, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
 
         String fieldWidth = "100%";
         nameField.setWidth(fieldWidth);
         ageField.setWidth(fieldWidth);
         emailField.setWidth(fieldWidth);
-        playingHandField.setWidth(fieldWidth);
+        playingHandComboBox.setWidth(fieldWidth);
 
         Button saveButton = new Button("Save", event -> {
             String name = nameField.getValue();
             Integer age = ageField.getValue();
             String email = emailField.getValue();
-            String playingHand = playingHandField.getValue();
+            String playingHand = playingHandComboBox.getValue();
 
             if (name.isBlank() || name.isEmpty()) {
                 Notification.show("Please fill in all required fields.");
@@ -138,42 +178,8 @@ public class PlayersView extends VerticalLayout {
         dialog.open();
     }
 
-    private void configureGrid()
+    private void openDetailsPlayerDialog(Player player)
     {
-        playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true).setKey("rating");
-        playersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true).setKey("playerName");
-        playersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true).setKey("email");
-        playersGrid.addColumn(Player::getAge).setHeader("Age").setSortable(true).setKey("age");
-        playersGrid.addColumn(Player::getPlayingHand).setHeader("Playing Style").setSortable(true).setKey("playingHand");
-        playersGrid.addColumn(Player::getWinnedMatches).setHeader("Won Matches").setSortable(true).setKey("winnedMatches");
-        playersGrid.addColumn(Player::getLosedMatches).setHeader("Losed Matches").setSortable(true).setKey("losedMatches");
-        playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true).setKey("goalsScored");
-        playersGrid.addColumn(Player::getGoalsLosed).setHeader("Goals Losed").setSortable(true).setKey("goalsLosed");
-
-        playersGrid.addColumn(new ComponentRenderer<>(player -> {
-            HorizontalLayout actionsLayout = new HorizontalLayout();
-
-            Button viewButton = new Button("Details", click -> {
-                openDetailsPlayerDialog(player);
-            });
-            viewButton.addClassName("compact-button");
-
-            Button editButton = new Button("Edit", click -> {
-                openEditPlayerDialog(player);
-            });
-            editButton.addClassName("compact-button");
-
-            Button deleteButton = new Button("Delete", click -> {
-                openDeletePlayerDialog(player);
-            });
-            deleteButton.addClassName("compact-button");
-
-            actionsLayout.add(viewButton, editButton, deleteButton);
-            return actionsLayout;
-        })).setHeader("Actions").setAutoWidth(true).setFlexGrow(0).setTextAlign(ColumnTextAlign.CENTER);
-    }
-
-    private void openDetailsPlayerDialog(Player player) {
         Dialog dialog = new Dialog();
         dialog.setWidth("400px");
 
@@ -212,7 +218,8 @@ public class PlayersView extends VerticalLayout {
         dialog.open();
     }
 
-    private void openEditPlayerDialog(Player player) {
+    private void openEditPlayerDialog(Player player)
+    {
         Dialog dialog = new Dialog();
         dialog.setWidth("600px");
 
@@ -306,7 +313,8 @@ public class PlayersView extends VerticalLayout {
         dialog.open();
     }
 
-    private void openDeletePlayerDialog(Player player) {
+    private void openDeletePlayerDialog(Player player)
+    {
         Dialog dialog = new Dialog();
         dialog.setWidth("400px");
         dialog.setHeaderTitle("Confirm Delete");
@@ -337,8 +345,9 @@ public class PlayersView extends VerticalLayout {
         dialog.open();
     }
 
-    private void refreshGridData() {
-        playersGrid.setItems(query -> playerService.list(query.getPage()));
+    private void refreshGridData()
+    {
+        playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
     }
 
 }
