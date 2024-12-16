@@ -1,69 +1,104 @@
 package org.cedacri.pingpong.views.tournaments;
 
-import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Menu;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
-import org.vaadin.lineawesome.LineAwesomeIconUrl;
+import org.cedacri.pingpong.views.test.TournamentCreationView;
 
-@PageTitle("TournamentDetailsView")
-@Route(value = "tournaments/details", layout = MainLayout.class)
-//@Menu(order = 2, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
-public class TournamentDetailsView extends Composite<VerticalLayout> {
+import java.util.Set;
 
-    public TournamentDetailsView() {
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        VerticalLayout layoutColumn3 = new VerticalLayout();
-        VerticalLayout layoutColumn4 = new VerticalLayout();
-        H1 h1 = new H1();
-        Button buttonPrimary = new Button();
-        Button buttonPrimary2 = new Button();
-        Button buttonPrimary3 = new Button();
-        VerticalLayout layoutColumn5 = new VerticalLayout();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
-        layoutRow2.addClassName(Gap.MEDIUM);
-        layoutRow2.setWidth("100%");
-        layoutRow2.setHeight("min-content");
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.getStyle().set("flex-grow", "1");
-        layoutColumn2.getStyle().set("flex-grow", "1");
-        layoutColumn3.getStyle().set("flex-grow", "1");
-        layoutColumn4.getStyle().set("flex-grow", "1");
-        h1.setText("Table Tenis");
-        layoutColumn4.setAlignSelf(FlexComponent.Alignment.START, h1);
-        h1.setWidth("150px");
-        buttonPrimary.setText("Home");
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonPrimary2.setText("Tournament");
-        buttonPrimary2.setWidth("min-content");
-        buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonPrimary3.setText("Players");
-        buttonPrimary3.setWidth("min-content");
-        buttonPrimary3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        layoutColumn5.setWidth("100%");
-        layoutColumn5.getStyle().set("flex-grow", "1");
-        getContent().add(layoutRow2);
-        getContent().add(layoutRow);
-        layoutRow.add(layoutColumn2);
-        layoutColumn2.add(layoutColumn3);
-        layoutColumn3.add(layoutColumn4);
-        layoutColumn4.add(h1);
-        layoutColumn4.add(buttonPrimary);
-        layoutColumn4.add(buttonPrimary2);
-        layoutColumn4.add(buttonPrimary3);
-        layoutRow.add(layoutColumn5);
+@PageTitle("View Tournament")
+@Route(value = "tournament/general-details", layout = MainLayout.class)
+public class TournamentDetailsView extends VerticalLayout {
+
+    private final TournamentService tournamentService;
+//    private final TournamentCreationView tournament;
+
+    public TournamentDetailsView(TournamentService tournamentService) {
+        this.tournamentService = tournamentService;
+        setWidthFull();
+        setPadding(true);
+        setSpacing(true);
+
+        Tournament tournament = fetchTournamentDetails();
+
+        add(createTournamentNameLabel(tournament));
+        add(createButtonsLayout());
+
+        add(createPlayersGrid(tournament));
+    }
+
+    private Label createTournamentNameLabel(Tournament tournament) {
+        Label tournamentNameLabel = new Label(tournament.getTournamentName());
+        tournamentNameLabel.getStyle()
+                .set("font-size", "24px")
+                .set("font-weight", "bold")
+                .set("margin-bottom", "10px");
+        return tournamentNameLabel;
+    }
+
+    private HorizontalLayout createTournamentDetailsSection(Tournament tournament) {
+        TextField maxPlayersField = createReadOnlyField("Maximum Players", String.valueOf(tournament.getMaxPlayers()));
+        TextField statusField = createReadOnlyField("Status", tournament.getTournamentStatus());
+        TextField typeField = createReadOnlyField("Type", tournament.getTournamentType());
+
+        HorizontalLayout detailsLayout = new HorizontalLayout(maxPlayersField, statusField, typeField);
+        detailsLayout.setSpacing(true);
+        detailsLayout.setPadding(true);
+        detailsLayout.setWidthFull();
+
+        return detailsLayout;
+    }
+
+    private Grid<Player> createPlayersGrid(Tournament tournament) {
+        Grid<Player> playersGrid = new Grid<>(Player.class, false);
+        playersGrid.setItems(tournament.getPlayers());
+
+        playersGrid.addColumn(Player::getPlayerName).setHeader("Player Name").setSortable(true);
+        playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
+        playersGrid.addColumn(Player::getWinnedMatches).setHeader("Matches Won").setSortable(true);
+        playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true);
+
+        return playersGrid;
+    }
+
+    private TextField createReadOnlyField(String label, String value) {
+        TextField textField = new TextField(label);
+        textField.setValue(value != null ? value : "N/A");
+        textField.setReadOnly(true);
+        textField.setWidth("300px");
+        return textField;
+    }
+
+    private Tournament fetchTournamentDetails() {
+        return tournamentService.findAll().findFirst().orElse(null);
+    }
+
+    private HorizontalLayout createButtonsLayout() {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        buttonLayout.setAlignItems(Alignment.BASELINE);
+
+        Button prevoiusPageButton = new Button("Next Page");
+        prevoiusPageButton.addClassName("colored-button");
+        prevoiusPageButton.addClickListener(e -> getUI().ifPresent(ui ->
+                ui.navigate("tournaments/" + fetchTournamentDetails().getId().toString())));
+
+        buttonLayout.add(createTournamentDetailsSection(fetchTournamentDetails()));
+        buttonLayout.add(prevoiusPageButton);
+        return buttonLayout;
     }
 }

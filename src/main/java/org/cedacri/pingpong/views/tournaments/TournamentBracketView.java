@@ -1,14 +1,11 @@
 package org.cedacri.pingpong.views.tournaments;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
@@ -18,8 +15,6 @@ import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,7 +76,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         displayMatches(firstRoundMatches);
     }
 
-    private HorizontalLayout createTournamentInfoLayout(String name, String type, String rule) {
+    private HorizontalLayout createTournamentInfoLayout(String name, String type, String status) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSizeFull();
         layout.setPadding(true);
@@ -90,18 +85,21 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         layout.setAlignItems(Alignment.CENTER);
 
         Div nameDiv = new Div();
-        nameDiv.setText("Name: " + name);
-        nameDiv.getStyle().set("font-size", "18px");
+        nameDiv.setText(name);
+        nameDiv.getStyle()
+                .set("font-size", "24px")
+                .set("font-weight", "bold");
 
-        Div typeDiv = new Div();
-        typeDiv.setText("Type: " + type);
-        typeDiv.getStyle().set("font-size", "18px");
+//        Div typeDiv = new Div();
+//        typeDiv.setText("Type: " + type);
+//        typeDiv.getStyle().set("font-size", "18px");
+//
+//        Div ruleDiv = new Div();
+//        ruleDiv.setText("Status: " + status);
+//        ruleDiv.getStyle().set("font-size", "18px");
 
-        Div ruleDiv = new Div();
-        ruleDiv.setText("Rule: " + rule);
-        ruleDiv.getStyle().set("font-size", "18px");
-
-        layout.add(nameDiv, typeDiv, ruleDiv);
+//        layout.add(nameDiv, typeDiv, ruleDiv);
+        layout.add(nameDiv);
 
         return layout;
     }
@@ -109,15 +107,27 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private HorizontalLayout createRoundButtonsLayout(Set<Integer> rounds) {
         HorizontalLayout buttonLayout = new HorizontalLayout();
-//        buttonLayout.add(new H3("Rounds: " + rounds.size()));
+        buttonLayout.setWidthFull();
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+        HorizontalLayout roundButtons = new HorizontalLayout();
         for (Integer round : rounds) {
             Button button = new Button("Round: " + round.toString());
             button.addClassName("colored-button");
             button.addClickListener(e -> onRoundButtonClick(round));
-            buttonLayout.add(button);
+            roundButtons.add(button);
         }
+
+        Button prevoiusPageButton = new Button("Previous Page");
+        prevoiusPageButton.addClassName("colored-button");
+        prevoiusPageButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("tournament/general-details")));
+
+        buttonLayout.add(roundButtons, prevoiusPageButton);
+        buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
         return buttonLayout;
     }
+
 
     private void onRoundButtonClick(Integer round) {
         matchContainer.removeAll();
