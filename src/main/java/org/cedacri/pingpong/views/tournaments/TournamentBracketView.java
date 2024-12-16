@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -86,7 +87,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         layout.setPadding(true);
         layout.setSpacing(true);
         layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        layout.setAlignItems(Alignment.CENTER); // Centrează elementele vertical
+        layout.setAlignItems(Alignment.CENTER);
 
         Div nameDiv = new Div();
         nameDiv.setText("Name: " + name);
@@ -110,8 +111,8 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         HorizontalLayout buttonLayout = new HorizontalLayout();
 //        buttonLayout.add(new H3("Rounds: " + rounds.size()));
         for (Integer round : rounds) {
-            Button button = new Button("Round:" + round.toString());
-            button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            Button button = new Button("Round: " + round.toString());
+            button.addClassName("colored-button");
             button.addClickListener(e -> onRoundButtonClick(round));
             buttonLayout.add(button);
         }
@@ -131,35 +132,43 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private void displayMatches(Set<Match> matches) {
         for (Match match : matches) {
+            // Main match layout
             HorizontalLayout matchLayout = new HorizontalLayout();
-            matchLayout.setSizeFull();
+            matchLayout.setWidthFull();
             matchLayout.setSpacing(true);
+            matchLayout.setAlignItems(FlexComponent.Alignment.CENTER); // Center everything vertically
             matchLayout.getStyle().set("background-color", "#f8f8f8");
+            matchLayout.setPadding(true);
 
+            // Player Details Layout
             VerticalLayout playerDetails = new VerticalLayout();
-            HorizontalLayout player1Layout = new HorizontalLayout();
-            player1Layout.add(
-                    new Div("#" + match.getRightPlayer().getRating()),
-                    new Div(match.getRightPlayer().getPlayerName())
+            playerDetails.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+            playerDetails.setAlignItems(FlexComponent.Alignment.START); // Align player data to start
+            playerDetails.setPadding(false);
+            playerDetails.setSpacing(false);
+
+            // Player 1 Layout
+            HorizontalLayout player1Layout = createPlayerLayout(
+                    match.getRightPlayer().getRating(),
+                    match.getRightPlayer().getPlayerName()
             );
 
-            HorizontalLayout player2Layout = new HorizontalLayout();
-            player2Layout.add(
-                    new Div("#" + match.getLeftPlayer().getRating()),
-                    new Div(match.getLeftPlayer().getPlayerName())
+            // Player 2 Layout
+            HorizontalLayout player2Layout = createPlayerLayout(
+                    match.getLeftPlayer().getRating(),
+                    match.getLeftPlayer().getPlayerName()
             );
 
             playerDetails.add(player1Layout, player2Layout);
 
-            Div scoreDetails = new Div();
-            scoreDetails.setText("Score Details");
-
-            HorizontalLayout gridLayout = new HorizontalLayout();
-            gridLayout.setSpacing(true);
+            // Score Details
+            HorizontalLayout scoreDetails = new HorizontalLayout();
+            scoreDetails.setSpacing(true);
+            scoreDetails.setAlignItems(FlexComponent.Alignment.CENTER); // Center scores vertically
 
             String scoreString = match.getScore();
             if (scoreString != null && !scoreString.isEmpty()) {
-                String[] setScores = scoreString.split(";"); // Exemplu: "11:6;10:12;11:9"
+                String[] setScores = scoreString.split(";"); // Example: "11:6;10:12;11:9"
 
                 for (String set : setScores) {
                     String[] scores = set.split(":");
@@ -167,33 +176,74 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                     if (scores.length == 2) {
                         VerticalLayout column = new VerticalLayout();
                         column.setSpacing(true);
+                        column.setAlignItems(FlexComponent.Alignment.CENTER); // Center score boxes
 
-                        TextField textField1 = new TextField();
-                        textField1.setWidth("60px");
-                        textField1.setValue(scores[0]);
+                        Div textField1 = new Div(scores[0]);
+                        textField1.getStyle()
+                                .set("width", "40px")
+                                .set("height", "40px")
+                                .set("background", "#e0e0e0")
+                                .set("text-align", "center")
+                                .set("line-height", "40px")
+                                .set("font-weight", "bold");
 
-                        TextField textField2 = new TextField();
-                        textField2.setWidth("60px");
-                        textField2.setValue(scores[1]);
+                        Div textField2 = new Div(scores[1]);
+                        textField2.getStyle()
+                                .set("width", "40px")
+                                .set("height", "40px")
+                                .set("background", "#e0e0e0")
+                                .set("text-align", "center")
+                                .set("line-height", "40px");
 
                         column.add(textField1, textField2);
-                        gridLayout.add(column);
+                        scoreDetails.add(column);
                     }
                 }
             }
 
-            scoreDetails.add(gridLayout);
+            HorizontalLayout winnerLayout = new HorizontalLayout();
+            winnerLayout.setSpacing(false);
+            winnerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+            winnerLayout.getStyle().set("margin-left", "30px");
 
-            Div winnerDetails = new Div();
-            winnerDetails.setText("Winner: #"
-                    + match.getWinner().getRating() + " "
-                    + match.getWinner().getPlayerName());
+            Div winnerText = new Div("Winner: ");
+            winnerText.getStyle()
+                    .set("font-size", "18px")
+                    .set("margin-right", "10px");
+//                    .set("color", "#888");
 
-            matchLayout.add(playerDetails, scoreDetails, winnerDetails);
+            Div winnerDetails = new Div("#" + match.getWinner().getRating()
+                    + " " + match.getWinner().getPlayerName());
+            winnerDetails.getStyle()
+                    .set("font-size", "18px")
+                    .set("font-weight", "bold")
+                    .set("width", "250px");;
 
+            winnerLayout.add(winnerText, winnerDetails);
+
+            matchLayout.add(playerDetails, scoreDetails, winnerLayout);
             matchContainer.add(matchLayout);
         }
+    }
 
+    private HorizontalLayout createPlayerLayout(int rating, String playerName) {
+        HorizontalLayout playerLayout = new HorizontalLayout();
+        playerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        Div playerRating = new Div("#" + rating);
+        playerRating.getStyle()
+                .set("width", "100px")
+                .set("text-align", "center")
+                .set("font-size", "18px")
+                .set("font-weight", "bold");
+
+        Div playerNameDiv = new Div(playerName);
+        playerNameDiv.getStyle()
+                .set("font-size", "18px")
+                .set("padding-left", "10px");
+
+        playerLayout.add(playerRating, playerNameDiv);
+        return playerLayout;
     }
 
 }
