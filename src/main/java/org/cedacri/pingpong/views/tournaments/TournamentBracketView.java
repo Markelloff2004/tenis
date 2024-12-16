@@ -7,6 +7,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
@@ -107,7 +108,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private HorizontalLayout createRoundButtonsLayout(Set<Integer> rounds) {
         HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.add(new H3("Rounds: " + rounds.size()));
+//        buttonLayout.add(new H3("Rounds: " + rounds.size()));
         for (Integer round : rounds) {
             Button button = new Button("Round:" + round.toString());
             button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -135,22 +136,64 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             matchLayout.setSpacing(true);
             matchLayout.getStyle().set("background-color", "#f8f8f8");
 
-
             VerticalLayout playerDetails = new VerticalLayout();
             HorizontalLayout player1Layout = new HorizontalLayout();
-            player1Layout.add(new Div("#" + match.getRightPlayer().getRating()), new Div(match.getRightPlayer().getPlayerName()),
-                    new Div("Score: " + match.getScore()));
+            player1Layout.add(
+                    new Div("#" + match.getRightPlayer().getRating()),
+                    new Div(match.getRightPlayer().getPlayerName())
+            );
+
             HorizontalLayout player2Layout = new HorizontalLayout();
-            player2Layout.add(new Div("#" + match.getLeftPlayer().getRating()), new Div(match.getLeftPlayer().getPlayerName()),
-                    new Div("Score: " + match.getScore()));
+            player2Layout.add(
+                    new Div("#" + match.getLeftPlayer().getRating()),
+                    new Div(match.getLeftPlayer().getPlayerName())
+            );
+
             playerDetails.add(player1Layout, player2Layout);
 
-            Div winnerDetails = new Div();
-            winnerDetails.setText("Winner: #" + match.getWinner().getRating() + " " + match.getWinner().getPlayerName());
+            Div scoreDetails = new Div();
+            scoreDetails.setText("Score Details");
 
-            matchLayout.add(playerDetails, winnerDetails);
+            HorizontalLayout gridLayout = new HorizontalLayout();
+            gridLayout.setSpacing(true);
+
+            String scoreString = match.getScore();
+            if (scoreString != null && !scoreString.isEmpty()) {
+                String[] setScores = scoreString.split(";"); // Exemplu: "11:6;10:12;11:9"
+
+                for (String set : setScores) {
+                    String[] scores = set.split(":");
+
+                    if (scores.length == 2) {
+                        VerticalLayout column = new VerticalLayout();
+                        column.setSpacing(true);
+
+                        TextField textField1 = new TextField();
+                        textField1.setWidth("60px");
+                        textField1.setValue(scores[0]);
+
+                        TextField textField2 = new TextField();
+                        textField2.setWidth("60px");
+                        textField2.setValue(scores[1]);
+
+                        column.add(textField1, textField2);
+                        gridLayout.add(column);
+                    }
+                }
+            }
+
+            scoreDetails.add(gridLayout);
+
+            Div winnerDetails = new Div();
+            winnerDetails.setText("Winner: #"
+                    + match.getWinner().getRating() + " "
+                    + match.getWinner().getPlayerName());
+
+            matchLayout.add(playerDetails, scoreDetails, winnerDetails);
+
             matchContainer.add(matchLayout);
         }
+
     }
 
 }
