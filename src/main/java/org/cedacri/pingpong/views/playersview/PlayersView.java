@@ -11,7 +11,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -178,28 +178,29 @@ public class PlayersView extends VerticalLayout {
         dialog.open();
     }
 
-    private void openDetailsPlayerDialog(Player player)
-    {
+
+
+    private void openDetailsPlayerDialog(Player player) {
         Dialog dialog = new Dialog();
         dialog.setWidth("400px");
 
         FormLayout formLayout = new FormLayout();
         formLayout.getStyle().set("gap", "5px");
 
-        formLayout.addFormItem(new Label(player.getPlayerName()), "Name");
-        formLayout.addFormItem(new Label(player.getEmail()), "Email");
-        formLayout.addFormItem(new Label(player.getAge() != null ? player.getAge().toString() : "N/A"), "Age");
-        formLayout.addFormItem(new Label(player.getPlayingHand()), "Playing Hand");
-        formLayout.addFormItem(new Label(player.getRating() != null ? player.getRating().toString() : "N/A"), "Rating");
-        formLayout.addFormItem(new Label(player.getWinnedMatches() != null ? player.getWinnedMatches().toString() : "N/A"), "Won Matches");
-        formLayout.addFormItem(new Label(player.getLosedMatches() != null ? player.getLosedMatches().toString() : "N/A"), "Lost Matches");
-        formLayout.addFormItem(new Label(player.getGoalsScored() != null ? player.getGoalsScored().toString() : "N/A"), "Goals Scored");
-        formLayout.addFormItem(new Label(player.getGoalsLosed() != null ? player.getGoalsLosed().toString() : "N/A"), "Goals Lost");
-        formLayout.addFormItem(new Label(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
+        formLayout.addFormItem(new Span(player.getPlayerName()), "Name");
+        formLayout.addFormItem(new Span(player.getEmail()), "Email");
+        formLayout.addFormItem(new Span(player.getAge() != null ? player.getAge().toString() : "N/A"), "Age");
+        formLayout.addFormItem(new Span(player.getPlayingHand()), "Playing Hand");
+        formLayout.addFormItem(new Span(player.getRating() != null ? player.getRating().toString() : "N/A"), "Rating");
+        formLayout.addFormItem(new Span(player.getWinnedMatches() != null ? player.getWinnedMatches().toString() : "N/A"), "Won Matches");
+        formLayout.addFormItem(new Span(player.getLosedMatches() != null ? player.getLosedMatches().toString() : "N/A"), "Lost Matches");
+        formLayout.addFormItem(new Span(player.getGoalsScored() != null ? player.getGoalsScored().toString() : "N/A"), "Goals Scored");
+        formLayout.addFormItem(new Span(player.getGoalsLosed() != null ? player.getGoalsLosed().toString() : "N/A"), "Goals Lost");
+        formLayout.addFormItem(new Span(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
 
         formLayout.getChildren().forEach(child -> {
-            if (child instanceof Label) {
-                ((Label) child).getStyle()
+            if (child instanceof Span) {
+                ((Span) child).getStyle()
                         .set("font-size", "12px")
                         .set("line-height", "16px");
             }
@@ -319,7 +320,7 @@ public class PlayersView extends VerticalLayout {
         dialog.setWidth("400px");
         dialog.setHeaderTitle("Confirm Delete");
 
-        Label confirmationText = new Label("Are you sure you want to delete " + player.getPlayerName() + "?");
+        Span confirmationText = new Span("Are you sure you want to delete " + player.getPlayerName() + "?");
         confirmationText.getStyle().set("margin", "10px 0");
 
         Button deleteButton = new Button("Delete", event -> {
