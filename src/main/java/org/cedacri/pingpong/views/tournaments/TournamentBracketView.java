@@ -10,7 +10,9 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Match;
+import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
@@ -19,9 +21,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Route(value = "tournaments", layout = MainLayout.class)
+@Route(value = "tournament/matches", layout = MainLayout.class)
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
 
+    private final PlayerRepository playerRepository;
     private Tournament tournament;
 
     private Set<Match> matches;
@@ -31,17 +34,18 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private final MatchService matchService;
 
 
-    public TournamentBracketView(TournamentService tournamentService, MatchService matchService) {
+    public TournamentBracketView(TournamentService tournamentService, MatchService matchService, PlayerRepository playerRepository) {
         this.tournamentService = tournamentService;
         this.matchService = matchService;
 
-       matchContainer = new VerticalLayout();
-       matchContainer.setSizeFull();
-       matchContainer.setSpacing(true);
-       matchContainer.setPadding(false);
-       matchContainer.setAlignItems(Alignment.CENTER);
-       matchContainer.setJustifyContentMode(JustifyContentMode.CENTER);
-       add(matchContainer);
+        matchContainer = new VerticalLayout();
+        matchContainer.setSizeFull();
+        matchContainer.setSpacing(true);
+        matchContainer.setPadding(false);
+        matchContainer.setAlignItems(Alignment.CENTER);
+        matchContainer.setJustifyContentMode(JustifyContentMode.CENTER);
+        add(matchContainer);
+        this.playerRepository = playerRepository;
     }
 
     @Override
@@ -120,7 +124,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         Button prevoiusPageButton = new Button("Previous Page");
         prevoiusPageButton.addClassName("colored-button");
-        prevoiusPageButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("tournament/general-details")));
+        prevoiusPageButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournament.getId())));
 
         buttonLayout.add(roundButtons, prevoiusPageButton);
         buttonLayout.setAlignItems(FlexComponent.Alignment.CENTER);

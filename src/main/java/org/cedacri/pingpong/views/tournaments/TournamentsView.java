@@ -79,7 +79,7 @@ public class TournamentsView extends VerticalLayout {
             HorizontalLayout actionsLayout = new HorizontalLayout();
 
             Button viewButton = new Button("View", click -> {
-                UI.getCurrent().navigate("tournaments/" + tournament.getId().toString());
+                getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournament.getId()));
             });
             viewButton.addClassName("compact-button");
 

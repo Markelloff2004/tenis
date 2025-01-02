@@ -2,41 +2,50 @@ package org.cedacri.pingpong.views.tournaments;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
-import org.cedacri.pingpong.views.test.TournamentCreationView;
-
-import java.util.Set;
 
 @PageTitle("View Tournament")
 @Route(value = "tournament/general-details", layout = MainLayout.class)
-public class TournamentDetailsView extends VerticalLayout {
+public class TournamentDetailsView extends VerticalLayout implements HasUrlParameter<Integer> {
 
     private final TournamentService tournamentService;
-//    private final TournamentCreationView tournament;
+    private Tournament tournament;
 
     public TournamentDetailsView(TournamentService tournamentService) {
         this.tournamentService = tournamentService;
+
         setWidthFull();
         setPadding(true);
         setSpacing(true);
+    }
 
-        Tournament tournament = fetchTournamentDetails();
+    @Override
+    public void setParameter(BeforeEvent event, Integer tournamentId) {
+        this.tournament = tournamentService.find(tournamentId).orElse(null);
 
+        if (this.tournament != null) {
+            initView();
+        } else {
+            add(new Label("Tournament not found"));
+        }
+    }
+
+    private void initView() {
         add(createTournamentNameLabel(tournament));
+//        add(createTournamentDetailsSection(tournament));
         add(createButtonsLayout());
-
         add(createPlayersGrid(tournament));
     }
 
@@ -56,7 +65,6 @@ public class TournamentDetailsView extends VerticalLayout {
 
         HorizontalLayout detailsLayout = new HorizontalLayout(maxPlayersField, statusField, typeField);
         detailsLayout.setSpacing(true);
-        detailsLayout.setPadding(true);
         detailsLayout.setWidthFull();
 
         return detailsLayout;
@@ -82,10 +90,6 @@ public class TournamentDetailsView extends VerticalLayout {
         return textField;
     }
 
-    private Tournament fetchTournamentDetails() {
-        return tournamentService.findAll().findFirst().orElse(null);
-    }
-
     private HorizontalLayout createButtonsLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
@@ -95,9 +99,9 @@ public class TournamentDetailsView extends VerticalLayout {
         Button prevoiusPageButton = new Button("Next Page");
         prevoiusPageButton.addClassName("colored-button");
         prevoiusPageButton.addClickListener(e -> getUI().ifPresent(ui ->
-                ui.navigate("tournaments/" + fetchTournamentDetails().getId().toString())));
+                ui.navigate("tournament/matches/" + tournament.getId())));
 
-        buttonLayout.add(createTournamentDetailsSection(fetchTournamentDetails()));
+        buttonLayout.add(createTournamentDetailsSection(tournament));
         buttonLayout.add(prevoiusPageButton);
         return buttonLayout;
     }

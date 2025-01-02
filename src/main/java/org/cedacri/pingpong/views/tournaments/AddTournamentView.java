@@ -92,8 +92,8 @@ public class AddTournamentView extends VerticalLayout {
                 })).setHeader("Actions")
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.END)
-                .setAutoWidth(true) // Automatically adjusts the column width
-                .setResizable(false); // Ensures the column width doesn't shrink
+                .setAutoWidth(true)
+                .setResizable(false);
     }
 
     private void configureSelectedPlayersGrid() {
@@ -111,8 +111,8 @@ public class AddTournamentView extends VerticalLayout {
                 })).setHeader("Actions")
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.END)
-                .setAutoWidth(true) // Automatically adjusts the column width
-                .setResizable(false); // Ensures the column width doesn't shrink
+                .setAutoWidth(true)
+                .setResizable(false);
     }
 
 
@@ -139,8 +139,8 @@ public class AddTournamentView extends VerticalLayout {
         HorizontalLayout layout = new HorizontalLayout(saveButton, cancelButton);
         layout.setSpacing(true);
         layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER); // Center buttons
-        layout.getStyle().set("margin-top", "auto"); // Push buttons to the bottom of the view
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.getStyle().set("margin-top", "auto");
         return layout;
     }
 
