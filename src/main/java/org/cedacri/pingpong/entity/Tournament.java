@@ -43,59 +43,6 @@ public class Tournament {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @ManyToMany(mappedBy = "tournaments", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "tournaments", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     private Set<Player> players = new HashSet<>();
 }
-
-
-//package org.cedacri.pingpong.entity;
-//
-//import jakarta.persistence.*;
-//import jakarta.validation.constraints.NotNull;
-//import lombok.Getter;
-//import lombok.NoArgsConstructor;
-//import lombok.Setter;
-//
-//import java.sql.Timestamp;
-//import java.util.List;
-//
-//@Setter
-//@Getter
-//@NoArgsConstructor
-//@Entity
-//@Table(name = "tournaments")
-//public class Tournament {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id", nullable = false)
-//    private Integer id;
-//
-//    @NotNull
-//    @Column(name = "tournament_name", nullable = false, length = 100)
-//    private String tournamentName;
-//
-//    @NotNull
-//    @Column(name = "max_players", nullable = false)
-//    private Integer maxPlayers;
-//
-//    @Column(name = "rules", length = 200)
-//    private String rules;
-//
-//    @NotNull
-//    @Column(name = "tournament_status", length = 8)
-//    private String tournamentStatus;
-//
-//    @NotNull
-//    @Column(name = "tournament_type", length = 11)
-//    private String tournamentType;
-//
-//    @NotNull
-//    @Column(name = "created_at", nullable = false)
-//    private Timestamp createdAt;
-//
-//    @ManyToMany(mappedBy = "tournaments")
-//    private List<Player> players;
-//
-//    @OneToMany(fetch = FetchType.EAGER)
-//    private List<Match> matches;
-//}

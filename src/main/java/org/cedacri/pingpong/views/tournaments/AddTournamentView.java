@@ -156,6 +156,17 @@ public class AddTournamentView extends VerticalLayout {
         newTournament.setPlayers(selectedPlayers);
 
         tournamentService.create(newTournament);
+
+        selectedPlayers.forEach(p -> {
+            p.getTournaments().add(newTournament);
+            playerService.save(p);
+        });
+
+        for(Player p : selectedPlayers) {
+            p.getTournaments().add(newTournament);
+            playerService.save(p);
+        }
+
         Notification.show("Tournament created successfully!");
         getUI().ifPresent(ui -> ui.navigate("tournaments"));
     }
