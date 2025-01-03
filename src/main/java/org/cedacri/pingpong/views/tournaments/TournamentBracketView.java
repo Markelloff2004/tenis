@@ -163,13 +163,13 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
             // Player 1 Layout
             HorizontalLayout player1Layout = createPlayerLayout(
-                    match.getRightPlayer().getRating(),
+                    (match.getRightPlayer().getRating() != null) ? match.getRightPlayer().getRating() : 0,
                     match.getRightPlayer().getPlayerName()
             );
 
             // Player 2 Layout
             HorizontalLayout player2Layout = createPlayerLayout(
-                    match.getLeftPlayer().getRating(),
+                    (match.getLeftPlayer().getRating() != null) ? match.getLeftPlayer().getRating() : 0,
                     match.getLeftPlayer().getPlayerName()
             );
 
@@ -226,8 +226,10 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                     .set("margin-right", "10px");
 //                    .set("color", "#888");
 
-            Div winnerDetails = new Div("#" + match.getWinner().getRating()
-                    + " " + match.getWinner().getPlayerName());
+            Player winner = (match.getWinner()!= null) ? match.getWinner() : null;
+
+            Div winnerDetails = (winner != null ) ? new Div("#" + winner.getRating()
+                    + " " + match.getWinner().getPlayerName()) : new Div("#" + 0 + " " + "--- ---");
             winnerDetails.getStyle()
                     .set("font-size", "18px")
                     .set("font-weight", "bold")

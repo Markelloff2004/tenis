@@ -48,7 +48,6 @@ public class TournamentsView extends VerticalLayout {
 //            openNewTournametDialog();
 //            openTournamentDialog();
             getUI().ifPresent(ui -> ui.navigate("tournaments/add"));
-            System.out.println("Add tournament button clicked");
         });
 
         HorizontalLayout buttonLayout = new HorizontalLayout(addTournamentButton);

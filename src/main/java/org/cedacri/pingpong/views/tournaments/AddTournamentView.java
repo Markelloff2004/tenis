@@ -12,13 +12,16 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,8 +42,9 @@ public class AddTournamentView extends VerticalLayout {
 
     private final Set<Player> availablePlayers;
     private final Set<Player> selectedPlayers = new HashSet<>();
+    private final MatchService matchService;
 
-    public AddTournamentView(PlayerService playerService, TournamentService tournamentService) {
+    public AddTournamentView(PlayerService playerService, TournamentService tournamentService, MatchService matchService) {
         this.playerService = playerService;
         this.tournamentService = tournamentService;
 
@@ -48,6 +52,7 @@ public class AddTournamentView extends VerticalLayout {
 
         configureView();
         configureGrids();
+        this.matchService = matchService;
     }
 
     private void configureView() {
@@ -166,6 +171,8 @@ public class AddTournamentView extends VerticalLayout {
             p.getTournaments().add(newTournament);
             playerService.save(p);
         }
+
+        List<Match> matches = matchService.generateMatches(newTournament);
 
         Notification.show("Tournament created successfully!");
         getUI().ifPresent(ui -> ui.navigate("tournaments"));
