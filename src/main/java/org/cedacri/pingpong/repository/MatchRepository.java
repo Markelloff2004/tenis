@@ -7,6 +7,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Tournament;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -32,6 +33,18 @@ public class MatchRepository {
     public Stream<Match> findByTournament(Tournament tournament) {
         return jpaStreamer.stream(Match.class)
                 .filter(match -> match.getTournament().equals(tournament));
+    }
+
+    @Transactional
+    public Match save(Match match){
+        if(match.getId() == null){
+            em.persist(match);
+        }
+        else {
+            match = em.merge(match);
+        }
+
+        return match;
     }
 
 

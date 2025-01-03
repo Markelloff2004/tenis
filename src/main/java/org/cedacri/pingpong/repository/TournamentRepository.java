@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class TournamentRepository {
 
     private final JPAStreamer jpaStreamer;
-    private final EntityManager entityManager;
+    private final EntityManager em;
 
     private final Integer PAGE_SIZE = 10;
 
@@ -72,9 +72,9 @@ public class TournamentRepository {
     @Transactional
     public Tournament save(Tournament tournament) {
         if (tournament.getId() == null) {
-            entityManager.persist(tournament);
+            em.persist(tournament);
         } else {
-            tournament = entityManager.merge(tournament);
+            tournament = em.merge(tournament);
         }
         return tournament;
     }
@@ -83,9 +83,9 @@ public class TournamentRepository {
         Optional<Tournament> tournamentToDelete = findById(tournamentId);
 
         if (tournamentToDelete.isPresent()) {
-            entityManager.remove(entityManager.contains(tournamentToDelete.get())
+            em.remove(em.contains(tournamentToDelete.get())
                     ? tournamentToDelete.get()
-                    : entityManager.merge(tournamentToDelete.get()));
+                    : em.merge(tournamentToDelete.get()));
         }
     }
 
