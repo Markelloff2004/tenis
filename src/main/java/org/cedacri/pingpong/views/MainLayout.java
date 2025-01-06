@@ -9,10 +9,12 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
 
 import java.util.Optional;
 
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
+@Route("")
 public class MainLayout extends AppLayout {
 
     private Button homeButton;
@@ -47,7 +49,7 @@ public class MainLayout extends AppLayout {
 
         homeButton = new Button("Home");
         homeButton.addClassName("transparent-button");
-        homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("main view")));
+        homeButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("home")));
 
         turneuButton = new Button("Tournament");
         turneuButton.addClassName("transparent-button");

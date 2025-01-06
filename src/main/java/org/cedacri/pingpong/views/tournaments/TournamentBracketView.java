@@ -1,11 +1,19 @@
 package org.cedacri.pingpong.views.tournaments;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
@@ -15,6 +23,7 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.TournamentConstraints;
 import org.cedacri.pingpong.views.MainLayout;
 
 import java.util.Optional;
@@ -192,10 +201,15 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             if (scoreString != null && !scoreString.isEmpty()) {
                 String[] setScores = scoreString.split(";"); // Example: "11:6;10:12;11:9"
 
-                for (String set : setScores) {
-                    String[] scores = set.split(":");
+//                for (String set : setScores) {
+//                    String[] scores = set.split(":");
+                for(int i = 0; i< TournamentConstraints.BEST_OF_THREE_MAX_ROUNDS; i++)
+                {
+                    String set = (i < setScores.length) ? setScores[i] : null;
+                    String[] scores = (set != null && set.contains(":"))
+                            ? set.split(":") : new String[]{"-", "-"};
 
-                    if (scores.length == 2) {
+                    {
                         VerticalLayout column = new VerticalLayout();
                         column.setSpacing(true);
                         column.setAlignItems(FlexComponent.Alignment.CENTER); // Center score boxes
@@ -220,8 +234,17 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                         column.add(textField1, textField2);
                         scoreDetails.add(column);
                     }
-                }
             }
+                Button saveScoreButton = new Button("", new Icon(VaadinIcon.PENCIL));
+                saveScoreButton.addClassName("colored-button");
+                saveScoreButton.setMaxWidth("20px");
+
+                saveScoreButton.addClickListener(e -> {
+                    editMatchScore(match);
+                });
+
+                scoreDetails.add(saveScoreButton);
+        }
 
             HorizontalLayout winnerLayout = new HorizontalLayout();
             winnerLayout.setSpacing(false);
@@ -249,6 +272,80 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             matchContainer.add(matchLayout);
         }
     }
+
+    private void editMatchScore(Match match) {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setAlignItems(Alignment.CENTER);
+
+        Label player1Label = new Label(match.getLeftPlayer().getPlayerName());
+        Label player2Label = new Label(match.getRightPlayer().getPlayerName());
+
+        HorizontalLayout hLayout = new HorizontalLayout();
+        hLayout.setSpacing(false);
+        hLayout.add(player1Label, new Span(" : "), player2Label);
+
+        layout.add(hLayout);
+
+        TextField[] scoreFields = new TextField[3];
+        for (int i = 0; i < TournamentConstraints.BEST_OF_THREE_MAX_ROUNDS; i++) {
+            scoreFields[i] = new TextField("Set " + (i + 1));
+            scoreFields[i].setPlaceholder("11:2 or -:-");
+            scoreFields[i].setPattern("^(\\d{1,2}:\\d{1,2}|-:-)$");
+            scoreFields[i].setErrorMessage("Invalid score format!");
+            scoreFields[i].setWidth("100px");
+            layout.add(scoreFields[i]);
+        }
+
+        // se inscrie scorul actual by default
+        if (match.getScore() != null && !match.getScore().isEmpty()) {
+            String[] setScores = match.getScore().split(";");
+            for (int i = 0; i < setScores.length && i < scoreFields.length; i++) {
+                scoreFields[i].setValue(setScores[i]);
+            }
+        }
+
+        Button saveButton = new Button("Save", event -> {
+            StringBuilder scoreBuilder = new StringBuilder();
+
+            boolean isValid = true;
+            for (TextField scoreField : scoreFields) {
+                String value = scoreField.getValue().trim();
+                if (!value.matches("^(\\d{1,2}:\\d{1,2}|-:-)$") && !value.isEmpty()) {
+                    isValid = false;
+                    scoreField.setInvalid(true);
+                } else {
+                    scoreField.setInvalid(false);
+                    if (scoreBuilder.length() > 0) {
+                        scoreBuilder.append(";");
+                    }
+                    scoreBuilder.append(value.isEmpty() ? "-:-" : value);
+                }
+            }
+
+            if (isValid) {
+                String finalScore = scoreBuilder.toString();
+                match.setScore(finalScore);
+                matchService.save(match);
+                Notification.show("Score saved: " + finalScore, 3000, Notification.Position.MIDDLE);
+            } else {
+                Notification.show("Please fix invalid scores!", 3000, Notification.Position.MIDDLE);
+            }
+
+            UI.getCurrent().refreshCurrentRoute(true);
+        });
+
+        saveButton.getStyle()
+                .set("background-color", "#4CAF50")
+                .set("color", "white");
+
+        layout.add(saveButton);
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Edit Match Score");
+        dialog.add(layout);
+        dialog.open();
+    }
+
 
     private HorizontalLayout createPlayerLayout(int rating, String playerName) {
         HorizontalLayout playerLayout = new HorizontalLayout();

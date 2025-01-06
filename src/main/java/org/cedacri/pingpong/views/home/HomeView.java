@@ -11,7 +11,7 @@ import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.views.MainLayout;
 
 @PageTitle("MainView")
-@Route(value = "main view", layout = MainLayout.class)
+@Route(value = "home", layout = MainLayout.class)
 //@Menu(order = 0, icon = LineAwesomeIconUrl.HOME_SOLID)
 @Uses(Icon.class)
 public class HomeView extends Composite<VerticalLayout> {
