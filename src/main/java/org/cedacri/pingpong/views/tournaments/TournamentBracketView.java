@@ -163,14 +163,22 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
             // Player 1 Layout
             HorizontalLayout player1Layout = createPlayerLayout(
-                    (match.getRightPlayer().getRating() != null) ? match.getRightPlayer().getRating() : 0,
-                    match.getRightPlayer().getPlayerName()
+                    (match.getRightPlayer() != null && match.getRightPlayer().getRating() != null)
+                            ? match.getRightPlayer().getRating()
+                            : 0,
+                    (match.getRightPlayer() != null)
+                            ? match.getRightPlayer().getPlayerName()
+                            : "BYE"
             );
 
             // Player 2 Layout
             HorizontalLayout player2Layout = createPlayerLayout(
-                    (match.getLeftPlayer().getRating() != null) ? match.getLeftPlayer().getRating() : 0,
-                    match.getLeftPlayer().getPlayerName()
+                    (match.getLeftPlayer() != null && match.getLeftPlayer().getRating() != null)
+                            ? match.getLeftPlayer().getRating()
+                            : 0,
+                    (match.getLeftPlayer() != null)
+                            ? match.getLeftPlayer().getPlayerName()
+                            : "BYE"
             );
 
             playerDetails.add(player1Layout, player2Layout);

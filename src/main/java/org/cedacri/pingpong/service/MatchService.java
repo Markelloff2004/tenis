@@ -6,7 +6,12 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +67,31 @@ public class MatchService {
 
         return matches;
     }
+
+    public void randomizeFirstRound(Tournament tournament)
+    {
+        List<Player> players = new ArrayList<>(tournament.getPlayers());
+        Collections.shuffle(players); // or to sort players by rating
+        int totalPlayers = players.size();
+        int matchesNb = tournament.getMaxPlayers()/2;
+        int round = 1;
+
+        for (int playerMatch = 0; playerMatch < matchesNb; playerMatch++)
+        {
+            Match match = new Match();
+
+            match.setTournament(tournament);
+            match.setRound(round);
+            match.setRightPlayer(players.get(playerMatch));
+
+            int leftPlayerMatch = tournament.getMaxPlayers() - playerMatch - 1;
+            if (leftPlayerMatch >= totalPlayers) {
+                match.setWinner(players.get(playerMatch));
+            } else {
+                match.setLeftPlayer(players.get(leftPlayerMatch));
+            }
+
+            save(match);
+        }
+    }
 }
-
-

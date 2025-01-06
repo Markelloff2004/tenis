@@ -1,6 +1,5 @@
 package org.cedacri.pingpong.views.tournaments;
 
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -12,17 +11,12 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.views.MainLayout;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @PageTitle("TournamentsView")
 @Route(value = "tournaments", layout = MainLayout.class)
@@ -35,6 +29,8 @@ public class TournamentsView extends VerticalLayout {
     private final TournamentService tournamentService;
 
     public TournamentsView(TournamentService tournamentService) {
+        this.tournamentService = tournamentService;
+
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -45,8 +41,6 @@ public class TournamentsView extends VerticalLayout {
         addTournamentButton = new Button("Add tournament");
         addTournamentButton.addClassName("colored-button");
         addTournamentButton.addClickListener(e -> {
-//            openNewTournametDialog();
-//            openTournamentDialog();
             getUI().ifPresent(ui -> ui.navigate("tournaments/add"));
         });
 
@@ -60,11 +54,9 @@ public class TournamentsView extends VerticalLayout {
         configureGrid();
 
         add(title, buttonLayout, tournamentsGrid);
-        this.tournamentService = tournamentService;
 
         refreshGridData();
     }
-
 
     private void configureGrid()
     {

@@ -33,13 +33,13 @@ public class Match {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "left_player_id", nullable = false)
-    private Player leftPlayer;
+    @JoinColumn(name = "right_player_id", nullable = false)
+    private Player rightPlayer;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "right_player_id", nullable = false)
-    private Player rightPlayer;
+    @JoinColumn(name = "left_player_id", nullable = true)
+    private Player leftPlayer;
 
     @Size(max = 50)
     @Column(name = "score", length = 50)
