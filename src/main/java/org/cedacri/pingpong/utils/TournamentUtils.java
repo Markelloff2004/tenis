@@ -15,4 +15,18 @@ public class TournamentUtils {
 
         return maxPlayers;
     }
+
+    public static Integer getRoundCount(String type) {
+        if (type == null || type.isEmpty())
+        {
+            throw new IllegalArgumentException("Tournament Type cannot be null or empty");
+        }
+
+        switch (type.toUpperCase()) {
+            case "BESTOFTHREE": return 3;
+            case "BESTOFFIVE": return 5;
+            case "BESTOFSEVEN": return 7;
+            default: return 1;
+        }
+    }
 }

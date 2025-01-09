@@ -17,9 +17,11 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.TournamentConstraints;
 import org.cedacri.pingpong.views.MainLayout;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,8 +35,8 @@ public class AddTournamentView extends VerticalLayout {
     private final TournamentService tournamentService;
 
     private final TextField tournamentNameField = createTextField("Tournament Name");
-    private final ComboBox<String> tournamentStatusComboBox = createComboBox("Tournament Status", "PENDING", "ONGOING", "FINISHED");
-    private final ComboBox<String> tournamentTypeComboBox = createComboBox("Tournament Type", "BESTOFTHREE", "BESTOFFIVE", "BESTOFSEVEN");
+    private final ComboBox<String> tournamentStatusComboBox = createComboBox("Tournament Status", TournamentConstraints.STATUS_OF_TOURNAMENTS);
+    private final ComboBox<String> tournamentTypeComboBox = createComboBox("Tournament Type", TournamentConstraints.TYPES_OF_TOURNAMENTS);
     private final Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
     private final Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
 
@@ -216,7 +218,7 @@ public class AddTournamentView extends VerticalLayout {
         return textField;
     }
 
-    private static ComboBox<String> createComboBox(String label, String... items) {
+    private static ComboBox<String> createComboBox(String label, List<String> items) {
         ComboBox<String> comboBox = new ComboBox<>(label);
         comboBox.setItems(items);
         comboBox.setWidth("250px");

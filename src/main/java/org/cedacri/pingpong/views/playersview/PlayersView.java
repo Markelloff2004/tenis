@@ -1,9 +1,7 @@
 package org.cedacri.pingpong.views.playersview;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -22,110 +20,135 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.utils.TournamentConstraints;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.views.MainLayout;
+import org.cedacri.pingpong.views.interfaces.PlayerViewManagement;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @PageTitle("PlayersView")
 @Route(value = "players", layout = MainLayout.class)
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
 @Uses(Icon.class)
-public class PlayersView extends VerticalLayout {
+public class PlayersView extends VerticalLayout implements PlayerViewManagement
+{
 
     private final PlayerService playerService;
-    private final Button addPlayerButton;
-    private final Grid<Player> playersGrid;
+
+    private Grid<Player> playersGrid;
 
     public PlayersView(PlayerService playerService)
     {
+        this.playerService = playerService;
+
         setSizeFull();
         setPadding(true);
         setSpacing(true);
 
-        HorizontalLayout pageHeader = new HorizontalLayout();
-        pageHeader.setWidthFull();
 
+        configureGrid();
+
+        add(createPageHeader(), playersGrid);
+
+    }
+
+    private HorizontalLayout createPageHeader() {
         H1 title = new H1("Players list");
         title.addClassName("players-title");
 
-        addPlayerButton = new Button("New player");
+        Button addPlayerButton = new Button("New player");
+        addPlayerButton.addClickListener(e -> { showCreatePlayer(); });
         addPlayerButton.addClassName("colored-button");
-        addPlayerButton.addClickListener(e -> {
-            openNewPlayerDialog();
-        });
 
+        HorizontalLayout pageHeader = new HorizontalLayout();
+        pageHeader.setWidthFull();
         pageHeader.setJustifyContentMode(JustifyContentMode.BETWEEN);
+
         pageHeader.add(title, addPlayerButton);
-
-//        HorizontalLayout buttonLayout = new HorizontalLayout(addPlayerButton);
-//        buttonLayout.setWidthFull();
-//        buttonLayout.setJustifyContentMode(JustifyContentMode.END);
-
-        playersGrid = new Grid<>(Player.class, false);
-        playersGrid.addClassName("players-grid");
-        playersGrid.setSizeFull();
-        configureGrid();
-
-        add(pageHeader, playersGrid);
-        this.playerService = playerService;
-
-        refreshGridData();
+        return pageHeader;
     }
 
     private void configureGrid()
     {
+        playersGrid = new Grid<>(Player.class, false);
+        playersGrid.setSizeFull();
+
         playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true).setKey("rating");
         playersGrid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true).setKey("playerName");
-//        playersGrid.addColumn(Player::getEmail).setHeader("Email").setSortable(true).setKey("email");
         playersGrid.addColumn(Player::getAge).setHeader("Age").setSortable(true).setKey("age");
         playersGrid.addColumn(Player::getPlayingHand).setHeader("Playing Style").setSortable(true).setKey("playingHand");
         playersGrid.addColumn(Player::getWinnedMatches).setHeader("Won Matches").setSortable(true).setKey("winnedMatches");
         playersGrid.addColumn(Player::getLosedMatches).setHeader("Losed Matches").setSortable(true).setKey("losedMatches");
-//        playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true).setKey("goalsScored");
-//        playersGrid.addColumn(Player::getGoalsLosed).setHeader("Goals Losed").setSortable(true).setKey("goalsLosed");
 
-        playersGrid.addColumn(new ComponentRenderer<>(player -> {
-            HorizontalLayout actionsLayout = new HorizontalLayout();
+        playersGrid.addColumn(
+                new ComponentRenderer<>(player ->
+                {
+                    HorizontalLayout actionsLayout = new HorizontalLayout();
 
-            Button viewButton = new Button("Details", click -> {
-                openDetailsPlayerDialog(player);
-            });
-            viewButton.addClassName("compact-button");
+                    Button viewButton = new Button("Details", click ->
+                    {
+                        showDetailsPlayer(player);
+                    });
+                    viewButton.addClassName("compact-button");
 
-            Button editButton = new Button("Edit", click -> {
-                openEditPlayerDialog(player);
-            });
-            editButton.addClassName("compact-button");
+                    Button editButton = new Button("Edit", click ->
+                    {
+                        showEditPlayer(player);
+                    });
+                    editButton.addClassName("compact-button");
 
-            Button deleteButton = new Button("Delete", click -> {
-                openDeletePlayerDialog(player);
-            });
-            deleteButton.addClassName("compact-button");
+                    Button deleteButton = new Button("Delete", click ->
+                    {
+                        showDeletePlayer(player);
+                    });
+                    deleteButton.addClassName("compact-button");
 
-            actionsLayout.add(viewButton, editButton, deleteButton);
-            return actionsLayout;
-        })).setHeader("Actions").setAutoWidth(true).setFlexGrow(0).setTextAlign(ColumnTextAlign.CENTER);
+                    actionsLayout.add(viewButton, editButton, deleteButton);
+                return actionsLayout;
+                    })
+                )
+                .setHeader("Actions")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.CENTER);
+
+        refreshGridData();
     }
 
-    private void openNewPlayerDialog()
+    @Override
+    public void showAllPlayers()
+    {
+        refreshGridData();
+    }
+
+    @Override
+    public void showCreatePlayer()
     {
         Dialog dialog = new Dialog();
         dialog.setWidth("300px");
         dialog.setHeight("auto");
 
         TextField nameField = new TextField();
-        IntegerField ageField = new IntegerField();
-        TextField emailField = new TextField();
-        ComboBox<String> playingHandComboBox = new ComboBox<>();
-
-        playingHandComboBox.setItems("Right", "Left");
         nameField.setRequired(true);
+        nameField.setWidthFull();
+
+        IntegerField ageField = new IntegerField();
         ageField.setMin(0);
+        ageField.setMax(99);
+        ageField.setWidthFull();
+
+        TextField emailField = new TextField();
+        emailField.setWidthFull();
+
+        ComboBox<String> playingHandComboBox = new ComboBox<>();
+        playingHandComboBox.setItems(TournamentConstraints.PLAYING_HAND);
+        playingHandComboBox.setWidthFull();
+
 
         FormLayout formLayout = new FormLayout();
         formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
@@ -133,11 +156,6 @@ public class PlayersView extends VerticalLayout {
         formLayout.addFormItem(emailField, "Email").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(playingHandComboBox, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
 
-        String fieldWidth = "100%";
-        nameField.setWidth(fieldWidth);
-        ageField.setWidth(fieldWidth);
-        emailField.setWidth(fieldWidth);
-        playingHandComboBox.setWidth(fieldWidth);
 
         Button saveButton = new Button("Save", event -> {
             String name = nameField.getValue();
@@ -152,12 +170,19 @@ public class PlayersView extends VerticalLayout {
 
             Player newPlayer = new Player(name, age, email, Instant.now(), 0, playingHand, 0, 0, 0, 0);
 
-            playerService.save(newPlayer);
+            try
+            {
+                playerService.save(newPlayer);
 
-            dialog.close();
-            refreshGridData();
-            Notification.show("Player added successfully: " + newPlayer.getPlayerName());
+                dialog.close();
+                refreshGridData();
+                Notification.show("Player added successfully: " + newPlayer.getPlayerName());
+            }catch (Exception e)
+            {
+                Notification.show("Player cannot be added : " + e.getMessage());
+            }
         });
+
         saveButton.setWidth("100px");
         saveButton.addClassName("colored-button");
 
@@ -178,11 +203,12 @@ public class PlayersView extends VerticalLayout {
         dialog.open();
     }
 
+    @Override
+    public void showDetailsPlayer(Player player)
+    {
 
-
-    private void openDetailsPlayerDialog(Player player) {
-        Dialog dialog = new Dialog();
-        dialog.setWidth("400px");
+        Dialog playerDetailsDialog = new Dialog();
+        playerDetailsDialog.setWidth("400px");
 
         FormLayout formLayout = new FormLayout();
         formLayout.getStyle().set("gap", "5px");
@@ -198,31 +224,24 @@ public class PlayersView extends VerticalLayout {
         formLayout.addFormItem(new Span(player.getGoalsLosed() != null ? player.getGoalsLosed().toString() : "N/A"), "Goals Lost");
         formLayout.addFormItem(new Span(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
 
-        formLayout.getChildren().forEach(child -> {
-            if (child instanceof Span) {
-                ((Span) child).getStyle()
-                        .set("font-size", "12px")
-                        .set("line-height", "16px");
-            }
-        });
-
-        Button closeButton = new Button("Close", e -> dialog.close());
+        Button closeButton = new Button("Close", e -> playerDetailsDialog.close());
         closeButton.addClassName("button");
-        closeButton.getStyle().set("width", "100px");
+        closeButton.setWidthFull();
 
         HorizontalLayout buttonLayout = new HorizontalLayout(closeButton);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        buttonLayout.getStyle().set("margin-top", "10px");
+        buttonLayout.setMargin(true);
 
-        dialog.add(formLayout, buttonLayout);
+        playerDetailsDialog.add(formLayout, buttonLayout);
 
-        dialog.open();
+        playerDetailsDialog.open();
     }
 
-    private void openEditPlayerDialog(Player player)
+    @Override
+    public void showEditPlayer(Player player)
     {
-        Dialog dialog = new Dialog();
-        dialog.setWidth("600px");
+        Dialog playerEditDialog = new Dialog();
+        playerEditDialog.setWidth("600px");
 
         TextField nameField = new TextField();
         nameField.setValue(player.getPlayerName() != null ? player.getPlayerName() : "");
@@ -293,46 +312,59 @@ public class PlayersView extends VerticalLayout {
             player.setGoalsScored(goalsScoredField.getValue());
             player.setGoalsLosed(goalsLostField.getValue());
 
-            playerService.save(player);
-            refreshGridData();
+            try {
+                playerService.save(player);
+                refreshGridData();
 
-            dialog.close();
+                playerEditDialog.close();
 
-            Notification.show("Player updated successfully: " + player.getPlayerName());
+                Notification.show("Player updated successfully: " + player.getPlayerName());
+            }
+            catch (Exception e)
+            {
+                Notification.show("Player cannot be updated : " + e.getMessage());
+            }
         });
         saveButton.addClassName("colored-button");
 
 
-        Button cancelButton = new Button("Cancel", e -> dialog.close());
+        Button cancelButton = new Button("Cancel", e -> playerEditDialog.close());
         cancelButton.addClassName("button");
         HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         buttonLayout.getStyle().set("margin-top", "10px"); // Reduced space above the buttons
 
-        dialog.add(formLayout, buttonLayout);
+        playerEditDialog.add(formLayout, buttonLayout);
 
-        dialog.open();
+        playerEditDialog.open();
     }
 
-    private void openDeletePlayerDialog(Player player)
+    @Override
+    public void showDeletePlayer(Player player)
     {
-        Dialog dialog = new Dialog();
-        dialog.setWidth("400px");
-        dialog.setHeaderTitle("Confirm Delete");
+        Dialog playerDeleteDialog = new Dialog();
+        playerDeleteDialog.setWidth("400px");
+        playerDeleteDialog.setHeaderTitle("Confirm Delete");
 
         Span confirmationText = new Span("Are you sure you want to delete " + player.getPlayerName() + "?");
         confirmationText.getStyle().set("margin", "10px 0");
 
         Button deleteButton = new Button("Delete", event -> {
-            playerService.deleteById(player.getId());
-            Notification.show("Player " + player.getPlayerName() + " deleted!");
-            dialog.close();
-            refreshGridData();
+            try {
+                playerService.deleteById(player.getId());
+                Notification.show("Player " + player.getPlayerName() + " deleted!");
+                playerDeleteDialog.close();
+                refreshGridData();
+            }
+            catch (Exception e)
+            {
+                Notification.show("Player cannot be deleted : " + e.getMessage());
+            }
         });
         deleteButton.setWidth("100px");
         deleteButton.addClassName("colored-button");
 
-        Button cancelButton = new Button("Cancel", event -> dialog.close());
+        Button cancelButton = new Button("Cancel", event -> playerDeleteDialog.close());
         cancelButton.setWidth("100px");
         cancelButton.addClassName("button");
 
@@ -341,14 +373,15 @@ public class PlayersView extends VerticalLayout {
         buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         buttonLayout.getStyle().set("margin-top", "50px");
 
-        dialog.add(confirmationText, buttonLayout);
+        playerDeleteDialog.add(confirmationText, buttonLayout);
 
-        dialog.open();
+        playerDeleteDialog.open();
     }
 
     private void refreshGridData()
     {
         playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
     }
+
 
 }

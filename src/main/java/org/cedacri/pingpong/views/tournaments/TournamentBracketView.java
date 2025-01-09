@@ -24,6 +24,7 @@ import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.TournamentConstraints;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.views.MainLayout;
 
 import java.util.Optional;
@@ -127,7 +128,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         for (Integer round : rounds) {
             Button button = new Button("Round: " + round.toString());
             button.addClassName("colored-button");
-            button.addClickListener(e -> onRoundButtonClick(round));
+            button.addClickListener(e -> refreshMatchesInRound(round));
             roundButtons.add(button);
         }
 
@@ -142,7 +143,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
 
-    private void onRoundButtonClick(Integer round) {
+    private void refreshMatchesInRound(Integer round) {
         matchContainer.removeAll();
 
         Set<Match> matchesInRound = this.matches.stream()
@@ -203,7 +204,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
 //                for (String set : setScores) {
 //                    String[] scores = set.split(":");
-                for(int i = 0; i< TournamentConstraints.BEST_OF_THREE_MAX_ROUNDS; i++)
+                for(int i = 0; i< TournamentUtils.getRoundCount(tournament.getTournamentType()); i++)
                 {
                     String set = (i < setScores.length) ? setScores[i] : null;
                     String[] scores = (set != null && set.contains(":"))
@@ -287,7 +288,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         layout.add(hLayout);
 
         TextField[] scoreFields = new TextField[3];
-        for (int i = 0; i < TournamentConstraints.BEST_OF_THREE_MAX_ROUNDS; i++) {
+        for (int i = 0; i < TournamentUtils.getRoundCount(tournament.getTournamentType()); i++) {
             scoreFields[i] = new TextField("Set " + (i + 1));
             scoreFields[i].setPlaceholder("11:2 or -:-");
             scoreFields[i].setPattern("^(\\d{1,2}:\\d{1,2}|-:-)$");
