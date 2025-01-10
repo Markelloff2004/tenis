@@ -16,21 +16,31 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
+import org.cedacri.pingpong.views.interfaces.TournamentManagement;
 
 @PageTitle("TournamentsView")
 @Route(value = "tournaments", layout = MainLayout.class)
 //@Menu(order = 1, icon = LineAwesomeIconUrl.PEOPLE_CARRY_SOLID)
 @Uses(Icon.class)
-public class TournamentsView extends VerticalLayout {
+public class TournamentsView extends VerticalLayout implements TournamentManagement
+{
 
-    private final Button addTournamentButton;
-    private final Grid<Tournament> tournamentsGrid;
+    private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);;
     private final TournamentService tournamentService;
 
     public TournamentsView(TournamentService tournamentService) {
         this.tournamentService = tournamentService;
 
+        configureView();
+        configureGrid();
+
+        refreshGridData();
+    }
+    
+    private void configureView()
+    {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -38,89 +48,95 @@ public class TournamentsView extends VerticalLayout {
         H1 title = new H1("Tournaments list");
         title.addClassName("tournaments-title");
 
-        addTournamentButton = new Button("Add tournament");
-        addTournamentButton.addClassName("colored-button");
-        addTournamentButton.addClickListener(e -> {
-            getUI().ifPresent(ui -> ui.navigate("tournaments/add"));
-        });
+        Button addTournamentButton = ViewUtils.createButton(
+                "Add Tournament",
+                "colored-button",
+                () -> showCreateTournament()
+        );
 
-        HorizontalLayout buttonLayout = new HorizontalLayout(addTournamentButton);
-        buttonLayout.setWidthFull();
-        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-
-        tournamentsGrid = new Grid<>(Tournament.class, false);
-        tournamentsGrid.addClassName("tournaments-grid");
-        tournamentsGrid.setSizeFull();
-        configureGrid();
+        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, addTournamentButton);
 
         add(title, buttonLayout, tournamentsGrid);
 
-        refreshGridData();
     }
 
     private void configureGrid()
     {
+        tournamentsGrid.addClassName("tournaments-grid");
+        tournamentsGrid.setSizeFull();
+        
         tournamentsGrid.addColumn(Tournament::getTournamentName).setHeader("Name").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getMaxPlayers).setHeader("MaxPlayers").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getTournamentType).setHeader("Type").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getTournamentStatus).setHeader("Status").setSortable(true);
 //        tournamentsGrid.addColumn(Tournament::getCreatedAt).setHeader("CreatedAt").setSortable(true);
 
-        tournamentsGrid.addColumn(new ComponentRenderer<>(tournament -> {
-            HorizontalLayout actionsLayout = new HorizontalLayout();
+        tournamentsGrid
+                .addColumn(new ComponentRenderer<>(tournament -> createActionButtons(tournament)))
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setHeader("Actions")
+                .setAutoWidth(true)
+                .setFlexGrow(0);
 
-            Button viewButton = new Button("View", click -> {
-                getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournament.getId()));
-            });
-            viewButton.addClassName("compact-button");
-
-            Button editButton = new Button("Edit", click -> {
-//                openEditPlayerDialog(tournament);
-            });
-            editButton.addClassName("compact-button");
-
-            Button deleteButton = new Button("Delete", click -> {
-                deleteTournament(tournament);
-            });
-            deleteButton.addClassName("compact-button");
-
-            actionsLayout.add(viewButton, editButton, deleteButton);
-            return actionsLayout;
-        })).setHeader("Actions").setAutoWidth(true).setFlexGrow(0).setTextAlign(ColumnTextAlign.CENTER);
+        refreshGridData();
     }
 
-    private void deleteTournament(Tournament tournament) {
-        Dialog confirmDialog = new Dialog();
+    private HorizontalLayout createActionButtons(Tournament tournament)
+    {
+        Button viewButton = ViewUtils.createButton("View", "compact-button", () -> showInfoTournament(tournament));
 
-        confirmDialog.setHeaderTitle("Delete Tournament");
-        confirmDialog.add("Are you sure you want to delete the tournament \"" + tournament.getTournamentName() + "\"?");
+        Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditTournament(tournament));
 
-        Button confirmButton = new Button("Delete", event -> {
-            try {
-                tournamentService.delete(tournament.getId());
-                confirmDialog.close();
-                Notification.show("Tournament \"" + tournament.getTournamentName() + "\" deleted successfully!");
-                refreshGridData();
-            } catch (Exception e) {
-                Notification.show("Error deleting tournament: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
-            }
-        });
-        confirmButton.addClassName("colored-button");
+        Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeleteTournament(tournament));
 
-        Button cancelButton = new Button("Cancel", event -> confirmDialog.close());
-        cancelButton.addClassName("button");
-
-        HorizontalLayout dialogButtons = new HorizontalLayout(confirmButton, cancelButton);
-        dialogButtons.setSpacing(true);
-        dialogButtons.getStyle().set("margin-top", "30px");
-        confirmDialog.add(dialogButtons);
-
-        confirmDialog.open();
+        return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, editButton, deleteButton);
     }
 
     private void refreshGridData() {
-//        tournamentsGrid.getDataProvider().refreshAll();
-        // playerService.getAllPlayers()
         tournamentsGrid.setItems(tournamentService.findAll().toList());
+    }
+
+    @Override
+    public void showCreateTournament()
+    {
+        getUI().ifPresent(ui -> ui.navigate("tournaments/add"));
+    }
+
+    @Override
+    public void showInfoTournament(Tournament tournamentDetails) {
+        getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournamentDetails.getId()));
+    }
+
+    @Override
+    public void showEditTournament(Tournament tournamentEdit) {
+        Notification.show("Edit functional hasn't created yet.", 5000, Notification.Position.MIDDLE );
+    }
+
+    @Override
+    public void showDeleteTournament(Tournament tournamentDelete) {
+        Dialog confirmDeleteTournamentDialog = new Dialog("Delete Tournament");
+        confirmDeleteTournamentDialog.add("Are you sure you want to delete the tournament \"" + tournamentDelete.getTournamentName() + "\"?");
+
+        Button confirmButton = ViewUtils.createButton(
+                "Delete",
+                "colored-button",
+                () -> {
+                    try {
+                        tournamentService.delete(tournamentDelete.getId());
+                        refreshGridData();
+                        confirmDeleteTournamentDialog.close();
+                        Notification.show("Tournament deleted successfully!");
+                    } catch (Exception e) {
+                        Notification.show("Error deleting tournament: " + e.getMessage());
+                    }
+                }
+        );
+
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> confirmDeleteTournamentDialog.close());
+
+        HorizontalLayout dialogButtons = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, confirmButton, cancelButton);
+        confirmDeleteTournamentDialog.add(dialogButtons);
+
+        confirmDeleteTournamentDialog.open();
     }
 }

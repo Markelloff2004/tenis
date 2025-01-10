@@ -25,6 +25,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.TournamentConstraints;
 import org.cedacri.pingpong.utils.TournamentUtils;
+import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.PlayerViewManagement;
 
@@ -52,25 +53,20 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
 
 
         configureGrid();
+        createPageHeader();
 
-        add(createPageHeader(), playersGrid);
+        add(playersGrid);
 
     }
 
-    private HorizontalLayout createPageHeader() {
+    private void createPageHeader() {
         H1 title = new H1("Players list");
         title.addClassName("players-title");
 
-        Button addPlayerButton = new Button("New player");
-        addPlayerButton.addClickListener(e -> { showCreatePlayer(); });
-        addPlayerButton.addClassName("colored-button");
+        Button addPlayerButton = ViewUtils.createButton("New player", "colored-button", () -> showCreatePlayer());
 
-        HorizontalLayout pageHeader = new HorizontalLayout();
-        pageHeader.setWidthFull();
-        pageHeader.setJustifyContentMode(JustifyContentMode.BETWEEN);
-
-        pageHeader.add(title, addPlayerButton);
-        return pageHeader;
+        add(ViewUtils.createHorizontalLayout(JustifyContentMode.START, title));
+        add(ViewUtils.createHorizontalLayout(JustifyContentMode.END, addPlayerButton));
     }
 
     private void configureGrid()
@@ -88,42 +84,27 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         playersGrid.addColumn(
                 new ComponentRenderer<>(player ->
                 {
-                    HorizontalLayout actionsLayout = new HorizontalLayout();
+                    Button detailsButton = ViewUtils.createButton("Details", "compact-button", () -> showDetailsPlayer(player));
+                    Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditPlayer(player));
+                    Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeletePlayer(player));
 
-                    Button viewButton = new Button("Details", click ->
-                    {
-                        showDetailsPlayer(player);
-                    });
-                    viewButton.addClassName("compact-button");
-
-                    Button editButton = new Button("Edit", click ->
-                    {
-                        showEditPlayer(player);
-                    });
-                    editButton.addClassName("compact-button");
-
-                    Button deleteButton = new Button("Delete", click ->
-                    {
-                        showDeletePlayer(player);
-                    });
-                    deleteButton.addClassName("compact-button");
-
-                    actionsLayout.add(viewButton, editButton, deleteButton);
-                return actionsLayout;
-                    })
+                    return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, detailsButton, editButton, deleteButton);
+                })
                 )
                 .setHeader("Actions")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
-        refreshGridData();
+        showAllPlayers();
+//        refreshGridData();
     }
 
     @Override
     public void showAllPlayers()
     {
-        refreshGridData();
+        playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
+//        refreshGridData();
     }
 
     @Override
@@ -157,7 +138,8 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         formLayout.addFormItem(playingHandComboBox, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
 
 
-        Button saveButton = new Button("Save", event -> {
+        Button saveButton = ViewUtils.createButton("Save", "colored-button", () ->
+        {
             String name = nameField.getValue();
             Integer age = ageField.getValue();
             String email = emailField.getValue();
@@ -175,26 +157,25 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 playerService.save(newPlayer);
 
                 dialog.close();
-                refreshGridData();
+                showAllPlayers();
+//                refreshGridData();
                 Notification.show("Player added successfully: " + newPlayer.getPlayerName());
             }catch (Exception e)
             {
                 Notification.show("Player cannot be added : " + e.getMessage());
             }
         });
-
         saveButton.setWidth("100px");
-        saveButton.addClassName("colored-button");
 
-        Button cancelButton = new Button("Cancel", event -> dialog.close());
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> dialog.close());
         cancelButton.setWidth("100px");
-        cancelButton.addClassName("button");
 
 
         // Add buttons to a HorizontalLayout and center them
-        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
-        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER); // Center buttons horizontally
-        buttonLayout.setWidthFull();
+        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, saveButton, cancelButton);
+//                new HorizontalLayout(saveButton, cancelButton);
+//        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER); // Center buttons horizontally
+//        buttonLayout.setWidthFull();
         buttonLayout.getStyle().set("margin-top", "10px"); // Reduced space above buttons
 
         // Add form layout and buttons to the dialog
@@ -224,13 +205,9 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         formLayout.addFormItem(new Span(player.getGoalsLosed() != null ? player.getGoalsLosed().toString() : "N/A"), "Goals Lost");
         formLayout.addFormItem(new Span(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
 
-        Button closeButton = new Button("Close", e -> playerDetailsDialog.close());
-        closeButton.addClassName("button");
-        closeButton.setWidthFull();
+        Button closeButton = ViewUtils.createButton("Close", "button", () -> playerDetailsDialog.close());
 
-        HorizontalLayout buttonLayout = new HorizontalLayout(closeButton);
-        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        buttonLayout.setMargin(true);
+        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER ,closeButton);
 
         playerDetailsDialog.add(formLayout, buttonLayout);
 
@@ -301,7 +278,8 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 new FormLayout.ResponsiveStep("600px", 2)
         );
 
-        Button saveButton = new Button("Save", event -> {
+        Button saveButton = ViewUtils.createButton("Save", "colored-button", () ->
+        {
             player.setPlayerName(nameField.getValue());
             player.setEmail(emailField.getValue());
             player.setAge(ageField.getValue());
@@ -314,7 +292,8 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
 
             try {
                 playerService.save(player);
-                refreshGridData();
+                showAllPlayers();
+//                refreshGridData();
 
                 playerEditDialog.close();
 
@@ -325,17 +304,10 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 Notification.show("Player cannot be updated : " + e.getMessage());
             }
         });
-        saveButton.addClassName("colored-button");
 
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> playerEditDialog.close());
 
-        Button cancelButton = new Button("Cancel", e -> playerEditDialog.close());
-        cancelButton.addClassName("button");
-        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
-        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        buttonLayout.getStyle().set("margin-top", "10px"); // Reduced space above the buttons
-
-        playerEditDialog.add(formLayout, buttonLayout);
-
+        playerEditDialog.add(formLayout, ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, saveButton, cancelButton));
         playerEditDialog.open();
     }
 
@@ -343,45 +315,39 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     public void showDeletePlayer(Player player)
     {
         Dialog playerDeleteDialog = new Dialog();
-        playerDeleteDialog.setWidth("400px");
+        playerDeleteDialog.setWidth("500px");
         playerDeleteDialog.setHeaderTitle("Confirm Delete");
 
         Span confirmationText = new Span("Are you sure you want to delete " + player.getPlayerName() + "?");
         confirmationText.getStyle().set("margin", "10px 0");
 
-        Button deleteButton = new Button("Delete", event -> {
+        Button deleteButton = ViewUtils.createButton("Delete", "colored-button", () ->
+        {
             try {
                 playerService.deleteById(player.getId());
                 Notification.show("Player " + player.getPlayerName() + " deleted!");
                 playerDeleteDialog.close();
-                refreshGridData();
+//                refreshGridData();
+                showAllPlayers();
             }
             catch (Exception e)
             {
                 Notification.show("Player cannot be deleted : " + e.getMessage());
             }
         });
-        deleteButton.setWidth("100px");
-        deleteButton.addClassName("colored-button");
 
-        Button cancelButton = new Button("Cancel", event -> playerDeleteDialog.close());
-        cancelButton.setWidth("100px");
-        cancelButton.addClassName("button");
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> playerDeleteDialog.close());
 
-        HorizontalLayout buttonLayout = new HorizontalLayout(deleteButton, cancelButton);
-        buttonLayout.setSpacing(true);
-        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        buttonLayout.getStyle().set("margin-top", "50px");
+        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, deleteButton, cancelButton);
 
         playerDeleteDialog.add(confirmationText, buttonLayout);
-
         playerDeleteDialog.open();
     }
 
-    private void refreshGridData()
-    {
-        playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
-    }
+//    private void refreshGridData()
+//    {
+//        playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
+//    }
 
 
 }

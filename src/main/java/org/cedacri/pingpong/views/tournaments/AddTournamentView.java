@@ -18,6 +18,7 @@ import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.TournamentConstraints;
+import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.cedacri.pingpong.utils.TournamentUtils.calculateMaxPlayers;
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 @PageTitle("Add Tournament")
 @Route(value = "tournaments/add", layout = MainLayout.class)
@@ -33,94 +35,41 @@ public class AddTournamentView extends VerticalLayout {
 
     private final PlayerService playerService;
     private final TournamentService tournamentService;
+    private final MatchService matchService;
 
-    private final TextField tournamentNameField = createTextField("Tournament Name");
-    private final ComboBox<String> tournamentStatusComboBox = createComboBox("Tournament Status", TournamentConstraints.STATUS_OF_TOURNAMENTS);
-    private final ComboBox<String> tournamentTypeComboBox = createComboBox("Tournament Type", TournamentConstraints.TYPES_OF_TOURNAMENTS);
+    private final TextField tournamentNameField = ViewUtils.createTextField("Tournament Name");
+    private final ComboBox<String> tournamentStatusComboBox = ViewUtils.createComboBox("Tournament Status", TournamentConstraints.STATUS_OF_TOURNAMENTS);
+    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", TournamentConstraints.TYPES_OF_TOURNAMENTS);
     private final Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
     private final Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
 
     private final Set<Player> availablePlayers;
     private final Set<Player> selectedPlayers = new HashSet<>();
-    private final MatchService matchService;
-//    private final TournamentCreationView tournament;
 
     public AddTournamentView(PlayerService playerService, TournamentService tournamentService, MatchService matchService) {
         this.playerService = playerService;
         this.tournamentService = tournamentService;
+        this.matchService = matchService;
 
         this.availablePlayers = playerService.getAll().collect(Collectors.toSet());
 
         configureView();
         configureGrids();
-        this.matchService = matchService;
     }
 
     private void configureView() {
         setWidthFull();
         setPadding(true);
         setSpacing(true);
-
-        add(new H1("Add Tournament"), createTournamentDetailsLayout(), createPlayerSelectionLayout(), createButtonLayout());
         setAlignItems(Alignment.STRETCH);
+
+        add(
+                new H1("Add Tournament"),
+                createTournamentDetailsLayout(),
+                createPlayerSelectionLayout(),
+                createButtonLayout()
+        );
     }
-
-    private HorizontalLayout createTournamentDetailsLayout() {
-        HorizontalLayout layout = new HorizontalLayout(tournamentNameField, tournamentStatusComboBox, tournamentTypeComboBox);
-        layout.setSpacing(true);
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
-        return layout;
-    }
-
-    private HorizontalLayout createPlayerSelectionLayout() {
-        configureAvailablePlayersGrid();
-        configureSelectedPlayersGrid();
-
-        HorizontalLayout layout = new HorizontalLayout(availablePlayersGrid, selectedPlayersGrid);
-        layout.setSpacing(true);
-        layout.setWidthFull();
-        return layout;
-    }
-
-    private void configureAvailablePlayersGrid() {
-        setupGridColumns(availablePlayersGrid);
-        availablePlayersGrid.setItems(availablePlayers);
-
-        availablePlayersGrid.addColumn(new ComponentRenderer<>(player -> {
-                    Button addButton = new Button("Add", click -> {
-                        availablePlayers.remove(player);
-                        selectedPlayers.add(player);
-                        refreshGrids();
-                    });
-                    addButton.addClassName("compact-button");
-                    return addButton;
-                })).setHeader("Actions")
-                .setFlexGrow(0)
-                .setTextAlign(ColumnTextAlign.END)
-                .setAutoWidth(true)
-                .setResizable(false);
-    }
-
-    private void configureSelectedPlayersGrid() {
-        setupGridColumns(selectedPlayersGrid);
-        selectedPlayersGrid.setItems(selectedPlayers);
-
-        selectedPlayersGrid.addColumn(new ComponentRenderer<>(player -> {
-                    Button deleteButton = new Button("Delete", click -> {
-                        selectedPlayers.remove(player);
-                        availablePlayers.add(player);
-                        refreshGrids();
-                    });
-                    deleteButton.addClassName("compact-button");
-                    return deleteButton;
-                })).setHeader("Actions")
-                .setFlexGrow(0)
-                .setTextAlign(ColumnTextAlign.END)
-                .setAutoWidth(true)
-                .setResizable(false);
-    }
-
 
     private void configureGrids() {
         availablePlayersGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -130,24 +79,46 @@ public class AddTournamentView extends VerticalLayout {
         selectedPlayersGrid.setWidth("45%");
     }
 
-    private void setupGridColumns(Grid<Player> grid) {
+    private HorizontalLayout createTournamentDetailsLayout() {
+        return ViewUtils.createHorizontalLayout (JustifyContentMode.BETWEEN, tournamentNameField, tournamentStatusComboBox, tournamentTypeComboBox);
+    }
+
+    private HorizontalLayout createPlayerSelectionLayout()
+    {
+        configurePlayerGrid(availablePlayersGrid, availablePlayers, selectedPlayers, "Add", this::refreshGrids);
+        configurePlayerGrid(selectedPlayersGrid, selectedPlayers, availablePlayers, "Delete", this::refreshGrids);
+
+        return ViewUtils.createHorizontalLayout(JustifyContentMode.BETWEEN, availablePlayersGrid, selectedPlayersGrid);
+    }
+
+    private void configurePlayerGrid(Grid<Player> grid, Set<Player> source, Set<Player> target, String buttonLabel, Runnable refreshAction) {
         grid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
         grid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
+        grid.setItems(source);
+        grid.addColumn(createPlayerActionColumn(source, target, buttonLabel, refreshAction))
+                .setHeader("Actions")
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.END)
+                .setAutoWidth(true)
+                .setResizable(false);
+    }
+
+    private ComponentRenderer<Button, Player> createPlayerActionColumn(Set<Player> source, Set<Player> target, String buttonLabel, Runnable refreshAction) {
+        return new ComponentRenderer<>(player -> {
+            return ViewUtils.createButton(buttonLabel, "compact-button", () ->
+            {
+                source.remove(player);
+                target.add(player);
+                refreshAction.run();
+            });
+        });
     }
 
     private HorizontalLayout createButtonLayout() {
-        Button saveButton = new Button("Save", event -> saveTournament());
-        saveButton.addClassName("colored-button");
+        Button saveButton = ViewUtils.createButton("Save", "colored-button", this::saveTournament);
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> getUI().ifPresent(ui -> ui.navigate("tournaments")));
 
-        Button cancelButton = new Button("Cancel", event -> getUI().ifPresent(ui -> ui.navigate("tournaments")));
-        cancelButton.addClassName("button");
-
-        HorizontalLayout layout = new HorizontalLayout(saveButton, cancelButton);
-        layout.setSpacing(true);
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
-        layout.getStyle().set("margin-top", "auto");
-        return layout;
+        return ViewUtils.createHorizontalLayout(JustifyContentMode.BETWEEN, saveButton, cancelButton);
     }
 
     private void saveTournament() {
@@ -180,48 +151,15 @@ public class AddTournamentView extends VerticalLayout {
     }
 
     private boolean validateFields() {
-        if (tournamentNameField.isEmpty()) {
-            showNotification("Tournament name is required!");
-            return false;
-        }
-
-        if (tournamentStatusComboBox.isEmpty()) {
-            showNotification("Tournament status is required!");
-            return false;
-        }
-
-        if (tournamentTypeComboBox.isEmpty()) {
-            showNotification("Tournament type is required!");
-            return false;
-        }
-
-        if (selectedPlayers.isEmpty()) {
-            showNotification("At least one player must be selected!");
-            return false;
-        }
-
+        if (isEmpty(tournamentNameField)) return ViewUtils.showValidationError ("Tournament name is required!");
+        if (isEmpty(tournamentStatusComboBox)) return ViewUtils.showValidationError("Tournament status is required!");
+        if (isEmpty(tournamentTypeComboBox)) return ViewUtils.showValidationError("Tournament type is required!");
+        if (selectedPlayers.isEmpty()) return ViewUtils.showValidationError("At least one player must be selected!");
         return true;
     }
 
     private void refreshGrids() {
         availablePlayersGrid.setItems(availablePlayers);
         selectedPlayersGrid.setItems(selectedPlayers);
-    }
-
-    private void showNotification(String message) {
-        Notification.show(message, 3000, Notification.Position.MIDDLE);
-    }
-
-    private static TextField createTextField(String label) {
-        TextField textField = new TextField(label);
-        textField.setWidth("250px");
-        return textField;
-    }
-
-    private static ComboBox<String> createComboBox(String label, List<String> items) {
-        ComboBox<String> comboBox = new ComboBox<>(label);
-        comboBox.setItems(items);
-        comboBox.setWidth("250px");
-        return comboBox;
     }
 }

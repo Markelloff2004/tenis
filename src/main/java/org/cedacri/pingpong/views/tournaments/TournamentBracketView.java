@@ -34,14 +34,14 @@ import java.util.stream.Collectors;
 @Route(value = "tournament/matches", layout = MainLayout.class)
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
 
-    private final PlayerRepository playerRepository;
-    private Tournament tournament;
-
-    private Set<Match> matches;
-
-    private VerticalLayout matchContainer;
     private final TournamentService tournamentService;
     private final MatchService matchService;
+
+    private Tournament tournament;
+
+    private VerticalLayout matchContainer;
+    private Set<Match> matches;
+
 
 
     public TournamentBracketView(TournamentService tournamentService, MatchService matchService, PlayerRepository playerRepository) {
@@ -55,7 +55,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         matchContainer.setAlignItems(Alignment.CENTER);
         matchContainer.setJustifyContentMode(JustifyContentMode.CENTER);
         add(matchContainer);
-        this.playerRepository = playerRepository;
     }
 
     @Override
