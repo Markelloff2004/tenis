@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS tournament_players (
 CREATE TABLE IF NOT EXISTS matches (
                                        id INT AUTO_INCREMENT PRIMARY KEY,
                                        tournament_id INT NOT NULL,
-                                       round INT NOT NULL,
+                                       round VARCHAR(15) CHECK (round IN ('Stage 3', 'Stage 2', 'Stage 1', 'Quarterfinals', 'Semifinals', 'Final')) NOT NULL,
+                                       position INT,
                                        left_player_id INT,
                                        right_player_id INT,
                                        score VARCHAR(50) DEFAULT NULL,

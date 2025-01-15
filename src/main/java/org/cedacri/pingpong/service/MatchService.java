@@ -1,18 +1,15 @@
 package org.cedacri.pingpong.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.MatchRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.stream.Collectors;
 
 @Service
 public class MatchService {
@@ -23,75 +20,93 @@ public class MatchService {
         this.matchRepository = matchRepository;
     }
 
-    public List<Match> findAll() {
-        return matchRepository.findAll().collect(Collectors.toList());
-    }
-
-    public Optional<Match> findById(Integer id) {
+    @Transactional(readOnly = true)
+    public Optional<Match> findMatchById(Integer id)
+    {
         return matchRepository.findById(id);
     }
 
-    public List<Match> findAllByTournament(Tournament tournament) {
-        return matchRepository.findByTournament(tournament).collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public List<Match> getMatchesByTournament(Tournament tournament) {
+        return matchRepository.findByTournament(tournament);
     }
 
-    public Match save(Match match) {
+    @Transactional(readOnly = true)
+    public List<Match> getMatchesByTournamentAndRound(Tournament tournament, String round) {
+        return matchRepository.findByTournamentAndRound(tournament, round);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, String round, Integer position) {
+        return matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Match> getMatchesByTopPlayer(Player topPlayer) {
+        return matchRepository.findByTopPlayer(topPlayer);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Match> getMatchesByBottomPlayer(Player bottomPlayer) {
+        return matchRepository.findByBottomPlayer(bottomPlayer);
+    }
+
+    // Găsește toate meciurile câștigate de un anumit jucător
+    @Transactional(readOnly = true)
+    public List<Match> getMatchesByWinner(Player winner) {
+        return matchRepository.findByWinner(winner);
+    }
+
+    @Transactional
+    public Match saveMatch(Match match) {
         return matchRepository.save(match);
     }
 
-
-    public List<Match> generateMatches(Tournament tournament) {
-        List<Player> players = new ArrayList<>(tournament.getPlayers());
-        int playersCount = players.size();
-        int totalRounds = (int) Math.ceil(Math.log(playersCount) / Math.log(2));
-
-        List<Match> matches = new ArrayList<>();
-        Queue<Player> playerQueue = new LinkedList<>(players);
-
-        int round = 1;
-
-        while(!playerQueue.isEmpty()){
-            Player leftPlayer = playerQueue.poll();
-            Player rightPlayer = playerQueue.poll();
-
-            Match match = new Match();
-
-            match.setTournament(tournament);
-            match.setRound(round);
-            match.setLeftPlayer(leftPlayer);
-            match.setRightPlayer(rightPlayer);
-            matches.add(match);
-        }
-
-        matches.forEach(m -> save(m));
-
-        return matches;
+    @Transactional
+    public void deleteMatchById(Integer matchId) {
+        matchRepository.deleteById(matchId);
     }
 
-    public void randomizeFirstRound(Tournament tournament)
+    @Transactional(readOnly = true)
+    public Optional<Match> getMatchById(Integer id) {
+        return matchRepository.findById(id);
+    }
+
+    public String updateMatch(Match updateMatch)
     {
-        List<Player> players = new ArrayList<>(tournament.getPlayers());
-        Collections.shuffle(players); // or to sort players by rating
-        int totalPlayers = players.size();
-        int matchesNb = tournament.getMaxPlayers()/2;
-        int round = 1;
-
-        for (int playerMatch = 0; playerMatch < matchesNb; playerMatch++)
+        if (matchRepository.findById(updateMatch.getId()).isPresent())
         {
-            Match match = new Match();
+            System.out.println("Takoi match exista ");
+            matchRepository.save(updateMatch);
+        }
+        else
+        {
+            System.out.println("Takoi match non exista ");
+        }
+        return updateMatch.toString();
+    }
 
-            match.setTournament(tournament);
-            match.setRound(round);
-            match.setRightPlayer(players.get(playerMatch));
+    @Transactional
+    public void saveOrUpdateMatch(Match nextRoundMatch)
+    {
+        if (nextRoundMatch == null) {
+            throw new IllegalArgumentException("Match cannot be null.");
+        }
 
-            int leftPlayerMatch = tournament.getMaxPlayers() - playerMatch - 1;
-            if (leftPlayerMatch >= totalPlayers) {
-                match.setWinner(players.get(playerMatch));
+        if (nextRoundMatch.getId() != null) {
+            // Verificăm dacă entitatea există deja
+            Optional<Match> existingMatch = matchRepository.findByTournamentAndRoundAndPosition(nextRoundMatch.getTournament(), nextRoundMatch.getRound(), nextRoundMatch.getPosition());
+            if (existingMatch.isPresent()) {
+                // Actualizăm entitatea existentă
+                matchRepository.save(nextRoundMatch);
+                System.out.println("INFO: Match "+nextRoundMatch+" updated successfully.");
             } else {
-                match.setLeftPlayer(players.get(leftPlayerMatch));
+                throw new EntityNotFoundException("Match with ID " + nextRoundMatch.getId() + " not found.");
             }
-
-            save(match);
+        } else {
+            // Salvăm o entitate nouă
+            matchRepository.save(nextRoundMatch);
+            System.out.println("INFO: New match "+nextRoundMatch+" saved successfully.");
         }
     }
 }

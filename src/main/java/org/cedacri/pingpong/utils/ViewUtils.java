@@ -7,6 +7,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.function.ValueProvider;
@@ -42,11 +43,30 @@ public class ViewUtils
         return comboBox;
     }
 
+    public static TextField createReadOnlyField(String label, String value) {
+        TextField textField = new TextField(label);
+        textField.setValue(value != null ? value : "N/A");
+        textField.setReadOnly(true);
+        textField.setWidth("300px");
+        return textField;
+    }
+
     public static HorizontalLayout createHorizontalLayout(FlexComponent.JustifyContentMode justifyContentMode ,com.vaadin.flow.component.Component... components) {
         HorizontalLayout layout = new HorizontalLayout(components);
         layout.setSpacing(true);
         layout.setWidthFull();
         layout.setJustifyContentMode(justifyContentMode);
+        layout.setAlignItems(FlexComponent.Alignment.BASELINE);
+        return layout;
+    }
+
+    public static VerticalLayout createVerticalLayout(com.vaadin.flow.component.Component... components) {
+        VerticalLayout layout = new VerticalLayout(components);
+        layout.setSizeFull();
+        layout.setSpacing(true);
+        layout.setPadding(true);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         return layout;
     }
 

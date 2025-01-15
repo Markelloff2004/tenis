@@ -9,6 +9,8 @@ import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.Objects;
+
 @ToString
 @Getter
 @Setter
@@ -29,20 +31,26 @@ public class Match {
 
     @NotNull
     @Column(name = "round", nullable = false)
-    private Integer round;
+    private String round;
+
+    @Column(name = "position")
+    private Integer position;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "right_player_id", nullable = false)
-    private Player rightPlayer;
+    private Player topPlayer;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "left_player_id", nullable = true)
-    private Player leftPlayer;
+    private Player bottomPlayer;
 
     @Size(max = 50)
     @Column(name = "score", length = 50)
+    /*
+    score is in formate topPlayer-bottomPlayer;topPlayer-bottomPlayer
+     */
     private String score;
 
     @ManyToOne(fetch = FetchType.LAZY)

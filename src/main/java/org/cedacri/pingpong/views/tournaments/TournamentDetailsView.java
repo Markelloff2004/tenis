@@ -1,8 +1,9 @@
 package org.cedacri.pingpong.views.tournaments;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -14,6 +15,7 @@ import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 
 @PageTitle("View Tournament")
@@ -38,19 +40,21 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         if (this.tournament != null) {
             initView();
         } else {
-            add(new Label("Tournament not found"));
+            add(new Span("Tournament not found"));
         }
     }
 
-    private void initView() {
+    private void initView()
+    {
         add(createTournamentNameLabel(tournament));
 //        add(createTournamentDetailsSection(tournament));
         add(createButtonsLayout());
         add(createPlayersGrid(tournament));
     }
 
-    private Label createTournamentNameLabel(Tournament tournament) {
-        Label tournamentNameLabel = new Label(tournament.getTournamentName());
+    private Span createTournamentNameLabel(Tournament tournament)
+    {
+        Span tournamentNameLabel = new Span(tournament.getTournamentName());
         tournamentNameLabel.getStyle()
                 .set("font-size", "24px")
                 .set("font-weight", "bold")
@@ -58,19 +62,21 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         return tournamentNameLabel;
     }
 
-    private HorizontalLayout createTournamentDetailsSection(Tournament tournament) {
-        TextField maxPlayersField = createReadOnlyField("Maximum Players", String.valueOf(tournament.getMaxPlayers()));
-        TextField statusField = createReadOnlyField("Status", tournament.getTournamentStatus());
-        TextField typeField = createReadOnlyField("Type", tournament.getTournamentType());
+    private HorizontalLayout createTournamentDetailsSection(Tournament tournament)
+    {
+        TextField maxPlayersField = ViewUtils.createReadOnlyField("Maximum Players", String.valueOf(tournament.getMaxPlayers()));
+        TextField statusField = ViewUtils.createReadOnlyField("Status", tournament.getTournamentStatus());
+        TextField typeField = ViewUtils.createReadOnlyField("Type", tournament.getTournamentType());
 
-        HorizontalLayout detailsLayout = new HorizontalLayout(maxPlayersField, statusField, typeField);
-        detailsLayout.setSpacing(true);
-        detailsLayout.setWidthFull();
+//        HorizontalLayout detailsLayout = new HorizontalLayout(maxPlayersField, statusField, typeField);
+//        detailsLayout.setSpacing(true);
+//        detailsLayout.setWidthFull();
 
-        return detailsLayout;
+        return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, maxPlayersField, statusField, typeField);
     }
 
-    private Grid<Player> createPlayersGrid(Tournament tournament) {
+    private Grid<Player> createPlayersGrid(Tournament tournament)
+    {
         Grid<Player> playersGrid = new Grid<>(Player.class, false);
         playersGrid.setItems(tournament.getPlayers());
 
@@ -82,27 +88,17 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         return playersGrid;
     }
 
-    private TextField createReadOnlyField(String label, String value) {
-        TextField textField = new TextField(label);
-        textField.setValue(value != null ? value : "N/A");
-        textField.setReadOnly(true);
-        textField.setWidth("300px");
-        return textField;
-    }
+    private HorizontalLayout createButtonsLayout()
+    {
+        Button prevoiusPageButton = ViewUtils.createButton(
+                "Next Page",
+                "colored-button",
+                () -> getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()))
+        );
 
-    private HorizontalLayout createButtonsLayout() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setWidthFull();
-        buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        buttonLayout.setAlignItems(Alignment.BASELINE);
-
-        Button prevoiusPageButton = new Button("Next Page");
-        prevoiusPageButton.addClassName("colored-button");
-        prevoiusPageButton.addClickListener(e -> getUI().ifPresent(ui ->
-                ui.navigate("tournament/matches/" + tournament.getId())));
-
-        buttonLayout.add(createTournamentDetailsSection(tournament));
-        buttonLayout.add(prevoiusPageButton);
-        return buttonLayout;
+        return ViewUtils.createHorizontalLayout(
+                JustifyContentMode.BETWEEN,
+                createTournamentDetailsSection(tournament),
+                prevoiusPageButton);
     }
 }

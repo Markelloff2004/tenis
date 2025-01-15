@@ -33,7 +33,8 @@ public class TournamentService {
     }
 
     @Transactional
-    public void delete(Integer id) {
+    public void delete(Integer id)
+    {
         tournamentRepository.deleteById(id);
     }
 

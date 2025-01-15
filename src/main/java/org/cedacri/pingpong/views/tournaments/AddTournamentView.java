@@ -18,6 +18,7 @@ import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.TournamentConstraints;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 
@@ -80,7 +81,7 @@ public class AddTournamentView extends VerticalLayout {
     }
 
     private HorizontalLayout createTournamentDetailsLayout() {
-        return ViewUtils.createHorizontalLayout (JustifyContentMode.BETWEEN, tournamentNameField, tournamentStatusComboBox, tournamentTypeComboBox);
+        return ViewUtils.createHorizontalLayout (JustifyContentMode.CENTER, tournamentNameField, tournamentStatusComboBox, tournamentTypeComboBox);
     }
 
     private HorizontalLayout createPlayerSelectionLayout()
@@ -88,7 +89,7 @@ public class AddTournamentView extends VerticalLayout {
         configurePlayerGrid(availablePlayersGrid, availablePlayers, selectedPlayers, "Add", this::refreshGrids);
         configurePlayerGrid(selectedPlayersGrid, selectedPlayers, availablePlayers, "Delete", this::refreshGrids);
 
-        return ViewUtils.createHorizontalLayout(JustifyContentMode.BETWEEN, availablePlayersGrid, selectedPlayersGrid);
+        return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, availablePlayersGrid, selectedPlayersGrid);
     }
 
     private void configurePlayerGrid(Grid<Player> grid, Set<Player> source, Set<Player> target, String buttonLabel, Runnable refreshAction) {
@@ -139,12 +140,15 @@ public class AddTournamentView extends VerticalLayout {
             playerService.save(p);
         });
 
-        for(Player p : selectedPlayers) {
-            p.getTournaments().add(newTournament);
-            playerService.save(p);
-        }
 
-        matchService.randomizeFirstRound(newTournament);
+//
+//        for(Player p : selectedPlayers) {
+//            p.getTournaments().add(newTournament);
+//            playerService.save(p);
+//        }
+
+//        matchService.randomizeFirstRound(newTournament);
+        TournamentUtils.generateTournamentMatches(matchService, newTournament);
 
         Notification.show("Tournament created successfully!");
         getUI().ifPresent(ui -> ui.navigate("tournaments"));
