@@ -10,22 +10,11 @@ import java.util.List;
 
 public class TournamentUtils {
 
-//    private final static MatchService matchService = getMatchServiceInstance();
-//
-//    private static MatchService getMatchServiceInstance()
-//    {
-//        return (TournamentUtils.matchService != null)
-//                ? TournamentUtils.matchService
-//                : new MatchService(new MatchRepository());
-//    }
-
-
     public static int calculateMaxPlayers(int num) {
         if (num < 1) {
             throw new IllegalArgumentException("Number of players must be at least 1.");
         }
 
-        // Find the nearest power of 2
         int maxPlayers = 1;
         while (maxPlayers < num) {
             maxPlayers *= 2;
@@ -45,12 +34,12 @@ public class TournamentUtils {
             throw new IllegalArgumentException("Tournament Type cannot be null or empty");
         }
 
-        switch (type.toUpperCase()) {
-            case "BESTOFTHREE": return 3;
-            case "BESTOFFIVE": return 5;
-            case "BESTOFSEVEN": return 7;
-            default: return 1;
-        }
+        return switch (type.toUpperCase()) {
+            case "BESTOFTHREE" -> 3;
+            case "BESTOFFIVE" -> 5;
+            case "BESTOFSEVEN" -> 7;
+            default -> 1;
+        };
     }
 
     // This method is intended to return the number of rounds (sets played) in a match.
@@ -61,13 +50,13 @@ public class TournamentUtils {
             throw new IllegalArgumentException("Tournament cannot be null or have less than 8 players.");
         }
 
-        switch (players) {
-            case 8: return List.of("Quarterfinals", "Semifinals", "Final");
-            case 16: List.of("Stage 1", "Quarterfinals", "Semifinals", "Final");
-            case 32: List.of("Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
-            case 64: List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
-            default: return List.of("Semifinals", "Final");
-        }
+        return switch (players) {
+            case 8 -> List.of("Quarterfinals", "Semifinals", "Final");
+            case 16 -> List.of("Stage 1", "Quarterfinals", "Semifinals", "Final");
+            case 32 -> List.of("Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
+            case 64 -> List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
+            default -> List.of("Semifinals", "Final");
+        };
     }
 
     public static String getNextRound(String currentRound)
@@ -77,26 +66,6 @@ public class TournamentUtils {
         int currentRoundIndex = allRounds.indexOf(currentRound);
 
         return allRounds.get(currentRoundIndex + 1);
-    }
-
-    // This method is intended to return the number of matches in a tournament based on its round name.
-    // Matches consist of multiple sets and determine the winner of the match.
-    public static Integer getMatchCount(String round )
-    {
-        if (round == null || round.isEmpty())
-        {
-            throw new IllegalArgumentException("Tournament round cannot be null or empty.");
-        }
-
-        return switch (round) {
-            case "Final" -> 1;
-            case "Semifinals" -> 2;
-            case "Quarterfinals" -> 4;
-            case "Stage 1" -> 8;
-            case "Stage 2" -> 16;
-            case "Stage 3" -> 32;
-            default -> 0;
-        };
     }
 
     public static void generateTournamentMatches(MatchService matchService, Tournament tournament)
@@ -249,153 +218,11 @@ public class TournamentUtils {
         match.setTournament(tournament);
         match.setRound(round);
         match.setPosition(position);
-        //TODO verificat handling la score - null
-//        match.setScore("");
+        //TODO check handling la score - null
 
         match.setTopPlayer(players.get(position - 1));
         match.setBottomPlayer(players.get(tournament.getMaxPlayers() - position));
 
         return match;
     }
-
-
-//    public static void generateTournamentMatches(MatchService matchService,  Tournament tournament)
-//    {
-//        List<Player> playersIntoTournament = new ArrayList<>(tournament.getPlayers());
-//
-//        Player byePlayer = new Player();
-//            byePlayer.setRating(0);
-//            byePlayer.setPlayerName("BYE");
-//
-//        while (playersIntoTournament.size() < tournament.getMaxPlayers())
-//        {
-//            playersIntoTournament.add(null);
-//        }
-//
-////        Collections.shuffle(playersIntoTournament); // or to sort players by rating
-//
-//        for(Player player : playersIntoTournament)
-//        {
-//            System.out.println(player);
-//        }
-//
-//        System.out.println("Inizio generation of matches");
-//
-//        String round = getRoundsCount(tournament.getMaxPlayers()).get(0);
-//        int matchesNumber = tournament.getMaxPlayers()/2;
-//
-//        for (int playerMatch = 0; playerMatch < matchesNumber; playerMatch++) {
-//
-//            Match match = new Match();
-//
-//            match.setTournament(tournament);
-//            match.setRound(round);
-//            match.setPosition(playerMatch + 1);
-//            //score by default
-//            match.setScore("-:-;-:-;-:-");
-//
-//
-//            match.setTopPlayer(
-//                    playersIntoTournament.get(
-//                            playerMatch
-//                    )
-//            );
-//
-//            match.setBottomPlayer(
-//                    playersIntoTournament.get(
-//                            tournament.getMaxPlayers() - playerMatch - 1
-//                    )
-//            );
-//
-//            whoIsTheWinner(match);
-//
-//            matchService.save(match);
-//
-//            System.out.println(match);
-//
-//        }
-//
-//    }
-//
-//    public static void whoIsTheWinner(Match match)
-//    {
-//        //        // Functional va fi implementat mai tarziu
-//
-//        if (match.getTopPlayer().getPlayerName().equals("BYE"))
-//        {
-//            // yes, left player is the winner
-//            match.setWinner(match.getBottomPlayer());
-//            match.setTopPlayer(null);
-//        }
-//
-//        if (match.getBottomPlayer().getPlayerName().equals("BYE"))
-//        {
-//            match.setWinner(match.getTopPlayer());
-//            match.setBottomPlayer(null);
-//
-//            Match matchNextRound = new Match();
-//            matchNextRound.setTournament(match.getTournament());
-//            matchNextRound.setRound(getNextRound(match.getRound()));
-//
-//            int position = match.getPosition();
-//
-//            if (position/2 + position%2 == 1)
-//            {
-//                match.setTopPlayer(match.getTopPlayer());
-//                match.setPosition(position/2 + position%2);
-//                match.setScore("-:-;-:-;-:-");
-//            }
-//
-//        }
-//
-//        String score = match.getScore();
-//
-//        if (score != null && !score.isEmpty())
-//        {
-//            String[] sets = score.split(";");
-//
-//            int topPlayerWins = 0;
-//            int bottomPlayerWins = 0;
-//
-//            for (String set : sets)
-//            {
-//                if( !set.equals("-:-"))
-//                {
-//                    String[] points = set.split(":");
-//                    int topPlayerPoints = Integer.parseInt(points[0].trim());
-//                    int bottomPlayerPoints = Integer.parseInt(points[1].trim());
-//
-//                    if (topPlayerPoints > bottomPlayerPoints) {
-//                        topPlayerWins++;
-//                    } else if (bottomPlayerPoints > topPlayerPoints) {
-//                        bottomPlayerWins++;
-//                    }
-//
-//                    if (topPlayerWins > bottomPlayerWins) {
-//                        match.setWinner(match.getTopPlayer());
-//                    } else if (bottomPlayerWins > topPlayerWins) {
-//                        match.setWinner(match.getBottomPlayer());
-//                    } else {
-//                        System.out.println("ERROR: during method TournamentUtils.whoIsTheWinner()");
-//                    }
-//                }
-//                else
-//                {
-//                    System.out.println("WARNING: score doesnt have numbers");
-//                }
-//
-//
-//            }
-//
-//            if (topPlayerWins > bottomPlayerWins) {
-//                match.setWinner(match.getTopPlayer());
-//            } else if (bottomPlayerWins > topPlayerWins) {
-//                match.setWinner(match.getBottomPlayer());
-//            } else {
-//                System.out.println("ERROR: during method TournamentUtils.whoIsTheWinner()");
-//            }
-//        }
-//    }
-//
-
 }

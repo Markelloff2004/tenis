@@ -3,9 +3,11 @@ package org.cedacri.pingpong.views.tournaments;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -17,14 +19,13 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Route(value = "tournament/matches", layout = MainLayout.class)
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
@@ -35,8 +36,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private Tournament tournament;
 
     private VerticalLayout matchContainer;
-    private List<Match> matches;
-
 
 
     public TournamentBracketView(TournamentService tournamentService, MatchService matchService) {
@@ -51,8 +50,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         if (searchedTournament.isPresent())
         {
             tournament = searchedTournament.get();
-            matches = matchService.getMatchesByTournament(tournament);
-//            System.out.println("Matches on setParameter: " + matches);
             initView();
         } else
         {
@@ -79,10 +76,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
          */
         add(createRoundButtonsLayout());
 
-        // Container pentru meciuri
-        /*
-        Mathes
-         */
+        // Container for matches
         matchContainer = new VerticalLayout();
         matchContainer.setSpacing(true);
         add(matchContainer);
@@ -125,25 +119,11 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private void refreshMatchesInRound(String round) {
         matchContainer.removeAll();
 
-//        System.out.println("Inizio refresh Matches In Round " + round);
-
-        //get matches in round
-//        List<Match> matchesInRound = this.matches.stream()
-//                .filter(match -> match.getRound().equals(round))
-//                .sorted(Comparator.comparing(Match::getPosition))
-//                .collect(Collectors.toList());
-
-//        System.out.println("Finded Matches In Round " + matchesInRound);
-
         displayMatches(matchService.getMatchesByTournamentAndRound(tournament, round));
     }
 
     private void displayMatches(List<Match> matches)
     {
-
-//        TournamentUtils.generateTournamentMatches(matchService, tournament);
-
-//        System.out.println(matches);
 
         for (Match match : matches) {
             // Main match layout
@@ -163,7 +143,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                     JustifyContentMode.CENTER,
                     (match.getWinner() != null)
                             ? new Div("#" + match.getWinner().getRating() + " " + match.getWinner().getPlayerName() + match.getPosition())
-                            : new Div("#0 Neizvestnyi ->" + match.getPosition())
+                            : new Div("Unknown ->" + match.getPosition())
                     );
 
             matchLayout.add(
@@ -214,7 +194,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         {
             String[] setScore = (i < setScores.length)
                     ? setScores[i].split(":")
-                    // handly if setScore is empty
+                    // handle if setScore is empty
                     : new String[]{"-", "-"};
 
             scoreDetails.add(createScoreColumn(setScore));
@@ -275,7 +255,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             layout.add(scoreFields[i]);
         }
 
-        // se inscrie scorul actual by default
+        // insert default score
         if (match.getScore() != null && !match.getScore().isEmpty()) {
             String[] setScores = match.getScore().split(";");
             for (int i = 0; i < setScores.length && i < scoreFields.length; i++) {
@@ -294,7 +274,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                     scoreField.setInvalid(true);
                 } else {
                     scoreField.setInvalid(false);
-                    if (scoreBuilder.length() > 0) {
+                    if (!scoreBuilder.isEmpty()) {
                         scoreBuilder.append(";");
                     }
                     scoreBuilder.append(value.isEmpty() ? "-:-" : value);
@@ -305,10 +285,10 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 String finalScore = scoreBuilder.toString();
                 match.setScore(finalScore);
                 matchService.saveOrUpdateMatch(match);
-                Notification.show("Score saved: " + finalScore, 3000, Notification.Position.MIDDLE);
+                NotificationManager.showInfoNotification("Score saved: " + finalScore);
                 TournamentUtils.determinateWinner(matchService, match, tournament.getMaxPlayers());
             } else {
-                Notification.show("Please fix invalid scores!", 3000, Notification.Position.MIDDLE);
+                NotificationManager.showInfoNotification("Please fix invalid scores!");
             }
 
             UI.getCurrent().refreshCurrentRoute(true);

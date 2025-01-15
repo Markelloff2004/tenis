@@ -1,12 +1,12 @@
 package org.cedacri.pingpong.service;
 
-import org.cedacri.pingpong.entity.Match;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.repository.MatchRepository;
 import org.cedacri.pingpong.repository.TournamentRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -15,27 +15,42 @@ import java.util.stream.Stream;
 public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
+    private final EntityManager em;
 
-    public TournamentService(TournamentRepository tournamentRepository, MatchRepository matchRepository) {
+    public TournamentService(TournamentRepository tournamentRepository, EntityManager em) {
         this.tournamentRepository = tournamentRepository;
+        this.em = em;
     }
 
     public Stream<Tournament> findAll() {
-        return tournamentRepository.findAll();
+        return tournamentRepository.findAll().stream();
     }
 
     public Optional<Tournament> find(Integer id) {
         return tournamentRepository.findById(id);
     }
 
-    public Tournament create(Tournament tournament) {
-        return tournamentRepository.save(tournament);
+    @Transactional
+    public Tournament saveTournament(Tournament tournament) {
+        Tournament merged = em.merge(tournament);
+        em.flush();
+
+        return merged;
     }
 
     @Transactional
-    public void delete(Integer id)
+    public void deleteById(Integer id)
     {
+        Tournament tournamentToDelete = tournamentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
+
+        for(Player player : tournamentToDelete.getPlayers()){
+            player.getTournaments().remove(tournamentToDelete);
+        }
+
         tournamentRepository.deleteById(id);
     }
+
+
 
 }

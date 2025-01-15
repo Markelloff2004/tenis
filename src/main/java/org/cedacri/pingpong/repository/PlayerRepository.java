@@ -3,18 +3,15 @@ package org.cedacri.pingpong.repository;
 import com.speedment.jpastreamer.application.JPAStreamer;
 import com.speedment.jpastreamer.projection.Projection;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Player$;
-import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.entity.Tournament$;
+import org.cedacri.pingpong.utils.Constraints;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Repository
@@ -24,26 +21,14 @@ public class PlayerRepository {
     private final JPAStreamer jpaStreamer;
     private final EntityManager em;
 
-    private final Integer PAGE_SIZE = 10;
-
     public Optional<Player> findById(Integer id){
-        Optional<Player> player = jpaStreamer.stream(Player.class)
+
+        return jpaStreamer.stream(Player.class)
                 .filter(Player$.id.equal(id))
                 .findFirst();
-
-        return player;
     }
 
     public Stream<Player> paged(long page){
-//        List<Player> players =
-//                jpaStreamer.stream(
-//                        Projection.select(Player$.id, Player$.playerName, Player$.age, Player$.email)
-//                        )
-//                .sorted(Player$.id.reversed())
-//                .skip(page * PAGE_SIZE)
-//                .limit(PAGE_SIZE)
-//                .collect(Collectors.toList());
-
         List<Player> players = jpaStreamer.stream(
                         Projection.select(
                                 Player$.id,
@@ -54,9 +39,9 @@ public class PlayerRepository {
                                 Player$.goalsLosed)
                 )
                 .sorted(Player$.id.reversed())
-                .skip(page * PAGE_SIZE)
-                .limit(PAGE_SIZE)
-                .collect(Collectors.toList());
+                .skip(page * Constraints.PAGE_SIZE)
+                .limit(Constraints.PAGE_SIZE)
+                .toList();
 
         players.forEach(player -> Hibernate.initialize(player.getTournaments()));
 
@@ -64,15 +49,6 @@ public class PlayerRepository {
     }
 
     public Stream<Player> getAll(){
-//        List<Player> players =
-//                jpaStreamer.stream(
-//                        Projection.select(Player$.id, Player$.playerName, Player$.age, Player$.email)
-//                        )
-//                .sorted(Player$.id.reversed())
-//                .skip(page * PAGE_SIZE)
-//                .limit(PAGE_SIZE)
-//                .collect(Collectors.toList());
-
         List<Player> players = jpaStreamer.stream(
                         Projection.select(
                                 Player$.id,
@@ -83,7 +59,7 @@ public class PlayerRepository {
                                 Player$.goalsLosed)
                 )
                 .sorted(Player$.id.reversed())
-                .collect(Collectors.toList());
+                .toList();
 
         players.forEach(player -> Hibernate.initialize(player.getTournaments()));
 

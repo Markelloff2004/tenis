@@ -1,10 +1,8 @@
 package org.cedacri.pingpong.views.tournaments;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -67,10 +65,6 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         TextField maxPlayersField = ViewUtils.createReadOnlyField("Maximum Players", String.valueOf(tournament.getMaxPlayers()));
         TextField statusField = ViewUtils.createReadOnlyField("Status", tournament.getTournamentStatus());
         TextField typeField = ViewUtils.createReadOnlyField("Type", tournament.getTournamentType());
-
-//        HorizontalLayout detailsLayout = new HorizontalLayout(maxPlayersField, statusField, typeField);
-//        detailsLayout.setSpacing(true);
-//        detailsLayout.setWidthFull();
 
         return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, maxPlayersField, statusField, typeField);
     }

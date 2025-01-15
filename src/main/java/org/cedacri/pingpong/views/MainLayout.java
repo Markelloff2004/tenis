@@ -4,9 +4,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -17,10 +14,9 @@ import java.util.Optional;
 @Route("")
 public class MainLayout extends AppLayout {
 
-    private Button homeButton;
-    private Button turneuButton;
-    private Button jucatoriButton;
-    private Button logoutButton;
+    private final Button homeButton;
+    private final Button turneuButton;
+    private final Button jucatoriButton;
 
     public MainLayout() {
         // Top bar
@@ -39,12 +35,6 @@ public class MainLayout extends AppLayout {
         logoSection.getStyle().set("display", "flex");
         logoSection.getStyle().set("align-items", "center");
         logoSection.getStyle().set("justify-content", "center");
-//        Image logo = new Image("src/main/resources/META-INF/resources/images/logo.png", "Logo");
-//        logo.addClassName("app-logo");
-//        Span adminName = new Span("Ciao" );
-//        adminName.addClassName("admin-name");
-
-//        logoSection.add(appName, logo, adminName);
         logoSection.add(appName);
 
         homeButton = new Button("Home");

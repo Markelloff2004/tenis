@@ -9,7 +9,6 @@ import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.Objects;
 
 @ToString
 @Getter
@@ -24,17 +23,24 @@ public class Match {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "tournament_id", nullable = false)
-    private Tournament tournament;
-
-    @NotNull
     @Column(name = "round", nullable = false)
     private String round;
 
     @Column(name = "position")
     private Integer position;
+
+    /*
+    score is in formate topPlayer:bottomPlayer;
+     */
+    @Size(max = 50)
+    @Column(name = "score", length = 50)
+    private String score;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "tournament_id", nullable = false)
+    private Tournament tournament;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -43,15 +49,8 @@ public class Match {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "left_player_id", nullable = true)
+    @JoinColumn(name = "left_player_id")
     private Player bottomPlayer;
-
-    @Size(max = 50)
-    @Column(name = "score", length = 50)
-    /*
-    score is in formate topPlayer-bottomPlayer;topPlayer-bottomPlayer
-     */
-    private String score;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)

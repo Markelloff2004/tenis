@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import org.cedacri.pingpong.interfaces.ITournament;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
@@ -15,7 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "tournaments")
 @Data
-public class Tournament {
+public class Tournament implements ITournament {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +42,11 @@ public class Tournament {
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @ManyToMany(mappedBy = "tournaments", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "tournament_players",
+            joinColumns = @JoinColumn(name = "tournament_id"),
+            inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
     private Set<Player> players = new HashSet<>();
 }
