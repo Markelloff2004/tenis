@@ -4,13 +4,20 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TournamentUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(TournamentUtils.class);
+
     public static int calculateMaxPlayers(int num) {
+
+        logger.debug("TournamentUtils -> calculateMaxPlayers with arg: {}", num);
+
         if (num < 1) {
             throw new IllegalArgumentException("Number of players must be at least 1.");
         }
@@ -20,11 +27,11 @@ public class TournamentUtils {
             maxPlayers *= 2;
         }
 
+        logger.debug("Returning max players: {}", maxPlayers);
         return maxPlayers;
     }
 
     // This method returns the number of sets required to win a match based on the tournament type.
-    // For example:
     // - BESTOFTHREE means a match is played as the best of 3 sets.
     // - BESTOFFIVE means a match is played as the best of 5 sets.
     // - BESTOFSEVEN means a match is played as the best of 7 sets.

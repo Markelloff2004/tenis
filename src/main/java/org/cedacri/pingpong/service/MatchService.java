@@ -1,11 +1,12 @@
 package org.cedacri.pingpong.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.MatchRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,40 +15,57 @@ import java.util.Optional;
 public class MatchService {
 
     private final MatchRepository matchRepository;
+    private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
     public MatchService(MatchRepository matchRepository) {
         this.matchRepository = matchRepository;
     }
 
     public List<Match> getMatchesByTournamentAndRound(Tournament tournament, String round) {
-        return matchRepository.findByTournamentAndRound(tournament, round);
+        logger.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
+        List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round);
+        logger.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournament, round);
+        return matches;
     }
 
     public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, String round, Integer position) {
-        return matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
+        logger.debug("Fetching match for tournament: {}, round: {} and position: {}", tournament, round, position);
+        Optional<Match> match = matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
+        if(match.isPresent()) {
+            logger.info("Match found: {}", match.get());
+        }
+        else{
+            logger.warn("Match not found!");
+        }
+        return match;
+
     }
 
     @Transactional
     public void saveOrUpdateMatch(Match nextRoundMatch)
     {
         if (nextRoundMatch == null) {
+            logger.error("Attempted to save or update a null Match");
             throw new IllegalArgumentException("Match cannot be null.");
         }
 
-        if (nextRoundMatch.getId() != null) {
-            // Check if entity exists
-            Optional<Match> existingMatch = matchRepository.findByTournamentAndRoundAndPosition(nextRoundMatch.getTournament(), nextRoundMatch.getRound(), nextRoundMatch.getPosition());
-            if (existingMatch.isPresent()) {
-                // Update actual entity
-                matchRepository.save(nextRoundMatch);
-                System.out.println("INFO: Match "+nextRoundMatch+" updated successfully.");
-            } else {
-                throw new EntityNotFoundException("Match with ID " + nextRoundMatch.getId() + " not found.");
-            }
-        } else {
-            // Saving new entity
-            matchRepository.save(nextRoundMatch);
-            System.out.println("INFO: New match "+nextRoundMatch+" saved successfully.");
+        logger.debug("Attempting to save or update match: {}", nextRoundMatch);
+
+        // Saving new entity
+        matchRepository.save(nextRoundMatch);
+        logger.debug("Match saved: {}", nextRoundMatch);
+    }
+
+    @Transactional
+    public void deleteMatch(Match match) {
+        if(match == null || match.getId() == null) {
+            logger.error("Attempted to delete a null Match");
+            throw new IllegalArgumentException("Match cannot be null.");
         }
+
+        logger.debug("Attempting to delete match: {}", match);
+
+        matchRepository.deleteById(match.getId());
+        logger.debug("Match deleted: {}", match);
     }
 }
