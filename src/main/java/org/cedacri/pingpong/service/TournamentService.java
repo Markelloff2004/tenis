@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.TournamentRepository;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,6 @@ public class TournamentService {
     }
 
     public Stream<Tournament> findAll() {
-        logger.
         return tournamentRepository.findAll().stream();
     }
 
