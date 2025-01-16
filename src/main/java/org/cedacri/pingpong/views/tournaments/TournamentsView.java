@@ -25,6 +25,8 @@ import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.TournamentManagement;
 import org.cedacri.pingpong.views.util.GridUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,10 +35,11 @@ import java.util.stream.Collectors;
 
 @PageTitle("TournamentsView")
 @Route(value = "tournaments", layout = MainLayout.class)
-//@Menu(order = 1, icon = LineAwesomeIconUrl.PEOPLE_CARRY_SOLID)
 @Uses(Icon.class)
 public class TournamentsView extends VerticalLayout implements TournamentManagement
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(TournamentsView.class);
 
     private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);
     private final TournamentService tournamentService;
@@ -50,6 +53,8 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
         refreshGridData();
         this.playerService = playerService;
+
+        logger.info("TournamentsView initialized");
     }
 
     private void configureView()
@@ -70,6 +75,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, addTournamentButton);
 
         add(title, buttonLayout, tournamentsGrid);
+        logger.debug("TournamentsView configured: title and button added");
 
     }
 
@@ -93,6 +99,8 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
                 .setFlexGrow(0);
 
         refreshGridData();
+
+        logger.debug("TournamentsView grid configured with columns and actions");
     }
 
     private HorizontalLayout createActionButtons(Tournament tournament)
@@ -116,17 +124,22 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     private void refreshGridData() {
         tournamentsGrid.setItems(tournamentService.findAll().toList());
+        logger.info("Grid data refreshed, tournaments loaded.");
     }
 
     @Override
     public void showCreateTournament()
     {
-        getUI().ifPresent(ui -> ui.navigate("tournaments/add"));
+        getUI().ifPresent(ui -> {
+            logger.info("Navigating to create tournament page");
+            ui.navigate("tournaments/add");
+        });
     }
 
     @Override
     public void showInfoTournament(Tournament tournamentDetails) {
         getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournamentDetails.getId()));
+        logger.info("Navigating to tournament details page, id: {}", tournamentDetails.getId());
     }
 
     @Override
@@ -144,8 +157,10 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
                         refreshGridData();
                         confirmDeleteTournamentDialog.close();
                         NotificationManager.showInfoNotification("Tournament deleted successfully! id: " + id);
+                        logger.info("Tournament deleted successfully! id: " + id);
                     } catch (Exception e) {
                         NotificationManager.showInfoNotification("Error deleting tournament: " + e.getMessage());
+                        logger.error("Error deleting tournament: {}, {}", id, e.getMessage());
                     }
                 }
         );
@@ -180,6 +195,8 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             Set<Player> availablePlayersSet = playerService.getAll()
                     .filter(p -> !selectedPlayersSet.contains(p))
                     .collect(Collectors.toSet());
+
+            logger.debug("Edit tournament dialog initialized for tournament: {}", tournament.getId());
 
             Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
             Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
@@ -222,10 +239,13 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
                     Notification.show(Constraints.TOURNAMENT_UPDATE_SUCCESS,
                             5000, Notification.Position.BOTTOM_CENTER);
                     refreshGridData();
+
+                    logger.info("Tournament updated successfully: {}", tournament.getId());
                 }
                 catch (Exception e){
                     Notification.show(Constraints.TOURNAMENT_UPDATE_ERROR
                             + "\n" + e.getMessage(), 5000, Notification.Position.BOTTOM_CENTER);
+                    logger.error("Error updating tournament: {}", tournament.getId());
                 }
             });
             saveButton.addClassName("button");
