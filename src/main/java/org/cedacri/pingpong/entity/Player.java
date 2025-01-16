@@ -1,0 +1,124 @@
+package org.cedacri.pingpong.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "players")
+public class Player {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "player_name", nullable = false, length = 100)
+    private String playerName;
+
+    @Column(name = "age")
+    private Integer age;
+
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "email", nullable = false, length = 100)
+    private String email;
+
+    @ColumnDefault("CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @ColumnDefault("0")
+    @Column(name = "rating")
+    private Integer rating;
+
+    @Size(max = 5)
+    @Column(name = "playing_hand", length = 5)
+    private String playingHand;
+
+    @ColumnDefault("0")
+    @Column(name = "winned_matches")
+    private Integer winnedMatches;
+
+    @ColumnDefault("0")
+    @Column(name = "losed_matches")
+    private Integer losedMatches;
+
+    @ColumnDefault("0")
+    @Column(name = "goals_scored")
+    private Integer goalsScored;
+
+    @ColumnDefault("0")
+    @Column(name = "goals_losed")
+    private Integer goalsLosed;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "tournament_players",
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns =@JoinColumn(name = "tournament_id")
+    )
+    private Set<Tournament> tournaments = new HashSet<>();
+
+    public Player() {
+
+    }
+
+    public Player(Integer id, String name, Integer age, String email){
+        this.id = id;
+        this.playerName = name;
+        this.age = age;
+        this.email = email;
+    }
+
+    public Player(Integer id, String playerName, Integer age, String email, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {
+        this.id = id;
+        this.playerName = playerName;
+        this.age = age;
+        this.email = email;
+        this.rating = rating;
+        this.playingHand = playingHand;
+        this.winnedMatches = winnedMatches;
+        this.losedMatches = losedMatches;
+        this.goalsScored = goalsScored;
+        this.goalsLosed = goalsLosed;
+    }
+
+    public Player(String playerName, Integer age, String email, Instant createdAt, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {
+        this.playerName = playerName;
+        this.age = age;
+        this.email = email;
+        this.createdAt = createdAt;
+        this.rating = rating;
+        this.playingHand = playingHand;
+        this.winnedMatches = winnedMatches;
+        this.losedMatches = losedMatches;
+        this.goalsScored = goalsScored;
+        this.goalsLosed = goalsLosed;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return Objects.equals(id, player.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+}

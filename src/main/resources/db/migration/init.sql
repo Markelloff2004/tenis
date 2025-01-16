@@ -5,7 +5,7 @@ USE tournament_db;
 
 CREATE TABLE IF NOT EXISTS players (
                                        id INT AUTO_INCREMENT PRIMARY KEY,
-                                       name VARCHAR(100) NOT NULL,
+                                       player_name VARCHAR(100) NOT NULL,
                                        age INT DEFAULT NULL,
                                        email VARCHAR(100) NOT NULL,
                                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -19,11 +19,11 @@ CREATE TABLE IF NOT EXISTS players (
 
 CREATE TABLE IF NOT EXISTS tournaments (
                                            id INT AUTO_INCREMENT PRIMARY KEY,
-                                           name VARCHAR(100) NOT NULL,
+                                           tournament_name VARCHAR(100) NOT NULL,
                                            max_players INT NOT NULL,
-                                           rules VARCHAR(200) NOT NULL,
-                                           status VARCHAR(8) CHECK (status = 'PENDING' OR status = 'ONGOING' OR status = 'FINISHED'),
-                                           type VARCHAR(11) CHECK (type = 'BESTOFTHREE' OR type = 'BESTOFFIVE' OR type = 'BESTOFSEVEN'),
+#                                            rules VARCHAR(200) NOT NULL,
+                                           tournament_status VARCHAR(15) CHECK (tournament_status = 'PENDING' OR tournament_status = 'ONGOING' OR tournament_status = 'FINISHED'),
+                                           tournament_type VARCHAR(15) CHECK (tournament_type = 'BESTOFTHREE' OR tournament_type = 'BESTOFFIVE' OR tournament_type = 'BESTOFSEVEN'),
                                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -38,35 +38,16 @@ CREATE TABLE IF NOT EXISTS tournament_players (
 CREATE TABLE IF NOT EXISTS matches (
                                        id INT AUTO_INCREMENT PRIMARY KEY,
                                        tournament_id INT NOT NULL,
-                                       round INT NOT NULL,
-                                       left_player_id INT NOT NULL,
-                                       right_player_id INT NOT NULL,
+                                       round VARCHAR(15) CHECK (round IN ('Stage 3', 'Stage 2', 'Stage 1', 'Quarterfinals', 'Semifinals', 'Final')) NOT NULL,
+                                       position INT,
+                                       left_player_id INT,
+                                       right_player_id INT,
                                        score VARCHAR(50) DEFAULT NULL,
                                        winner_id INT DEFAULT NULL,
                                        FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
                                        FOREIGN KEY (left_player_id) REFERENCES players(id) ON DELETE CASCADE,
                                        FOREIGN KEY (right_player_id) REFERENCES players(id) ON DELETE CASCADE,
                                        FOREIGN KEY (winner_id) REFERENCES players(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS brackets (
-                                        id INT AUTO_INCREMENT PRIMARY KEY,
-                                        tournament_id INT NOT NULL,
-                                        match_id INT NOT NULL,
-                                        position INT NOT NULL,
-                                        FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
-                                        FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS characteristics (
-                                        id INT AUTO_INCREMENT PRIMARY KEY,
-                                        rating INT,
-                                        playing_hand char CHECK ( playing_hand = 'RIGHT' or playing_hand = 'LEFT' ),
-                                        winned_matches INT DEFAULT NULL,
-                                        losed_matches INT DEFAULT NULL,
-                                        goals_scored INT DEFAULT NULL,
-                                        player_id INT NOT NULL,
-                                        FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE
 );
 
 # CREATE USER 'admin'@'%' IDENTIFIED BY 'Cedacri132!#@';
