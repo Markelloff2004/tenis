@@ -25,6 +25,8 @@ import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.PlayerViewManagement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
 @Uses(Icon.class)
 public class PlayersView extends VerticalLayout implements PlayerViewManagement
 {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlayersView.class);
 
     private final PlayerService playerService;
 
@@ -53,6 +57,8 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         createPageHeader();
 
         add(playersGrid);
+
+        logger.info("PlayersView initialized");
 
     }
 
@@ -100,13 +106,15 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showAllPlayers()
     {
+        logger.info("Loading all players");
         playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
-//        refreshGridData();
     }
 
     @Override
     public void showCreatePlayer()
     {
+        logger.info("Opening dialog to create new player");
+
         Dialog dialog = new Dialog();
         dialog.setWidth("300px");
         dialog.setHeight("auto");
@@ -142,8 +150,9 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
             String email = emailField.getValue();
             String playingHand = playingHandComboBox.getValue();
 
-            if (name.isBlank() || name.isEmpty()) {
+            if (name.isBlank() || name.isEmpty() || age.toString().isEmpty() || email.isEmpty() || playingHand.isEmpty()) {
                 NotificationManager.showInfoNotification("Please fill in all required fields.");
+                logger.warn("Player creation failed: Empty fields are present");
                 return;
             }
 
@@ -157,9 +166,11 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 showAllPlayers();
 //                refreshGridData();
                 NotificationManager.showInfoNotification("Player added successfully: " + newPlayer.getPlayerName());
+                logger.info("Player added successfully: " + newPlayer.getPlayerName());
             }catch (Exception e)
             {
                NotificationManager.showInfoNotification("Player cannot be added : " + e.getMessage());
+               logger.error("Error creating player : " + e.getMessage(), e);
             }
         });
         saveButton.setWidth("100px");
@@ -181,6 +192,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showDetailsPlayer(Player player)
     {
+        logger.info("Showing details player : " + player.getPlayerName());
 
         Dialog playerDetailsDialog = new Dialog();
         playerDetailsDialog.setWidth("400px");
@@ -211,6 +223,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showEditPlayer(Player player)
     {
+        logger.info("Editing player: {} with Id: ", player.getPlayerName(), player.getId());
         Dialog playerEditDialog = new Dialog();
         playerEditDialog.setWidth("600px");
 
@@ -308,6 +321,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showDeletePlayer(Player player)
     {
+        logger.info("Preparing to delete player: {}, Id: {}", player.getPlayerName(), player.getId());
         Dialog playerDeleteDialog = new Dialog();
         playerDeleteDialog.setWidth("500px");
         playerDeleteDialog.setHeaderTitle("Confirm Delete");
@@ -323,6 +337,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 playerDeleteDialog.close();
 //                refreshGridData();
                 showAllPlayers();
+                logger.info("Player deleted successfully: {}, Id: {} " + player.getPlayerName(), player.getId());
             }
             catch (Exception e)
             {

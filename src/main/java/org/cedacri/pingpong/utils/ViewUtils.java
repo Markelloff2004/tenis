@@ -31,7 +31,7 @@ public class ViewUtils
     }
 
     public static TextField createTextField(String label) {
-        logger.debug("Creating TextField with label: '{}' and width: '{}'", label, width);
+        logger.debug("Creating TextField with label: '{}' and width: '{}'", label);
 
         TextField textField = new TextField(label);
         textField.setWidth("250px");
