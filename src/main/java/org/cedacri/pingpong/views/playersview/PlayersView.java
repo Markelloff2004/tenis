@@ -52,7 +52,6 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         setPadding(true);
         setSpacing(true);
 
-
         configureGrid();
         createPageHeader();
 
@@ -134,7 +133,6 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         ComboBox<String> playingHandComboBox = new ComboBox<>();
         playingHandComboBox.setItems(Constraints.PLAYING_HAND);
         playingHandComboBox.setWidthFull();
-
 
         FormLayout formLayout = new FormLayout();
         formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
@@ -335,7 +333,6 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 playerService.deleteById(player.getId());
                 NotificationManager.showInfoNotification("Player " + player.getPlayerName() + " deleted!");
                 playerDeleteDialog.close();
-//                refreshGridData();
                 showAllPlayers();
                 logger.info("Player deleted successfully: {}, Id: {} " + player.getPlayerName(), player.getId());
             }
