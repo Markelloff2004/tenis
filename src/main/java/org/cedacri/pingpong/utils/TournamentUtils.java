@@ -16,9 +16,10 @@ public class TournamentUtils {
 
     public static int calculateMaxPlayers(int num) {
 
-        logger.debug("TournamentUtils -> calculateMaxPlayers with arg: {}", num);
+        logger.debug("calculateMaxPlayers called with arg: {}", num);
 
         if (num < 1) {
+            logger.error("Invalid number of players: {}", num);
             throw new IllegalArgumentException("Number of players must be at least 1.");
         }
 
@@ -27,7 +28,7 @@ public class TournamentUtils {
             maxPlayers *= 2;
         }
 
-        logger.debug("Returning max players: {}", maxPlayers);
+        logger.debug("Calculated max players: {}", maxPlayers);
         return maxPlayers;
     }
 
@@ -38,8 +39,11 @@ public class TournamentUtils {
     public static Integer getSetsCount(String type) {
         if (type == null || type.isEmpty())
         {
+            logger.error("Tournament type cannot be null or empty");
             throw new IllegalArgumentException("Tournament Type cannot be null or empty");
         }
+
+        logger.debug("getSetsCount called with type: {}", type);
 
         return switch (type.toUpperCase()) {
             case "BESTOFTHREE" -> 3;
@@ -54,8 +58,11 @@ public class TournamentUtils {
     public static List<String> getRoundsCount(Integer players) {
         if (players == null || players < 4)
         {
+            logger.error("Invalid number of players: {}", players);
             throw new IllegalArgumentException("Tournament cannot be null or have less than 8 players.");
         }
+
+        logger.debug("getRoundsCount called with players: {}", players);
 
         return switch (players) {
             case 8 -> List.of("Quarterfinals", "Semifinals", "Final");
@@ -72,11 +79,14 @@ public class TournamentUtils {
 
         int currentRoundIndex = allRounds.indexOf(currentRound);
 
+        logger.debug("getNextRound called with currentRound: {}, returning: {}", currentRoundIndex, allRounds.get(currentRoundIndex + 1));
+
         return allRounds.get(currentRoundIndex + 1);
     }
 
     public static void generateTournamentMatches(MatchService matchService, Tournament tournament)
     {
+        logger.info("Generating tournament matches for tournament: {}", tournament);
 
         //Prepare players for tournament
         List<Player> players = new ArrayList<>(tournament.getPlayers());
@@ -87,8 +97,9 @@ public class TournamentUtils {
         }
 
         String initialRound = getRoundsCount(tournament.getMaxPlayers()).get(0);
-//        int matchCount = getMatchCount(initialRound);
         int matchCount = tournament.getMaxPlayers() / 2;
+
+        logger.debug("Generating {} matches for round: {}", matchCount, initialRound);
 
         for (int position = 1; position <= matchCount; position++)
         {
@@ -97,18 +108,22 @@ public class TournamentUtils {
             if ( match.getTopPlayer() == null )
             {
                 match.setWinner(match.getBottomPlayer());
+                logger.debug("Match {}: No top player, winner set to bottom player", match.getId());
             }
             if ( match.getBottomPlayer() == null )
             {
                 match.setWinner(match.getTopPlayer());
+                logger.debug("Match {}: No bottom player, winner set to top player", match.getId());
             }
 
             try
             {
                 matchService.saveOrUpdateMatch(match);
+                logger.info("Match {} saved or updated successfully", match.getId());
             }
             catch (Exception e)
             {
+                logger.error("Error saving or updating match {}: {}", match.getId(), e.getMessage());
                 System.out.println(e.getMessage());
             }
 
@@ -118,6 +133,7 @@ public class TournamentUtils {
 
     public static void determinateWinner(MatchService matchService, Match match, Integer maxPlayers)
     {
+        logger.debug("Determining winner for match: {} in round {}", match.getId(), match.getRound());
         if ( getRoundsCount(maxPlayers).indexOf(match.getRound()) == 0 )
         {
             if (match.getTopPlayer() == null && match.getBottomPlayer() != null)
@@ -142,6 +158,9 @@ public class TournamentUtils {
         {
             moveWinnerToNextRound(matchService, match);
         }
+        else {
+            logger.error("Match {} ended in a tie, no winner determined", match.getId());
+        }
 
     }
 
@@ -149,6 +168,8 @@ public class TournamentUtils {
     {
         String nextRound = getNextRound(match.getRound());
         int nextPosition = match.getPosition()/2 + match.getPosition()%2;
+
+        logger.debug("Moving winner of match {} to next round: {}", match.getId(), nextRound);
 
         Match nextRoundMatch = matchService.getMatchByTournamentRoundAndPosition(match.getTournament(), nextRound, nextPosition).orElse(null);
 
@@ -163,6 +184,8 @@ public class TournamentUtils {
             {
                 nextRoundMatch.setBottomPlayer(match.getWinner());
             }
+
+            logger.debug("Updated next round match: {}", nextRoundMatch);
 
         }
         else
@@ -180,9 +203,12 @@ public class TournamentUtils {
             {
                 nextRoundMatch.setBottomPlayer(match.getWinner());
             }
+
+            logger.debug("Created new next round match: {}", nextRoundMatch);
         }
 
         matchService.saveOrUpdateMatch(nextRoundMatch);
+        logger.info("Next round match saved or updated successfully: {}", nextRoundMatch);
     }
 
     private static Player calculateWinnerFromScore(Match match)
@@ -210,17 +236,18 @@ public class TournamentUtils {
             } else if (bottomPlayerWins > topPlayerWins) {
                 return match.getBottomPlayer();
             } else {
-                System.out.println("ERROR: Tie detected, no winner decided");
+                logger.error("ERROR: Tie detected, no winner decided for match {}", match);
                 return null;
             }
-
         }
         // Cannot find the winner
+        logger.error("ERROR: Score not available for match {}", match);
         return null;
     }
 
     private static Match createMatch(Tournament tournament, String round, int position, List<Player> players)
     {
+        logger.debug("Creating match for tournament {} in round {} at position {}", tournament, round, position);
         Match match = new Match();
         match.setTournament(tournament);
         match.setRound(round);
@@ -230,6 +257,7 @@ public class TournamentUtils {
         match.setTopPlayer(players.get(position - 1));
         match.setBottomPlayer(players.get(tournament.getMaxPlayers() - position));
 
+        logger.debug("Match created: {}", match);
         return match;
     }
 }
