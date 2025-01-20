@@ -20,6 +20,8 @@ import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.util.GridUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +33,8 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @PageTitle("Add Tournament")
 @Route(value = "tournaments/add", layout = MainLayout.class)
 public class AddTournamentView extends VerticalLayout {
+
+    private static final Logger logger = LoggerFactory.getLogger(AddTournamentView.class);
 
     private final TournamentService tournamentService;
     private final MatchService matchService;
@@ -50,9 +54,12 @@ public class AddTournamentView extends VerticalLayout {
 
         this.availablePlayers = playerService.getAll().collect(Collectors.toSet());
 
+        logger.info("Initialized AddTournamentView");
+
         configureView();
         GridUtils.configureGrid(availablePlayersGrid);
         GridUtils.configureGrid(selectedPlayersGrid);
+        logger.debug("Grids for available and selected players have been configured");
     }
 
     private void configureView() {
@@ -67,14 +74,17 @@ public class AddTournamentView extends VerticalLayout {
                 createPlayerSelectionLayout(),
                 createButtonLayout()
         );
+        logger.info("AddTournamentView UI components have been set up.");
     }
 
     private HorizontalLayout createTournamentDetailsLayout() {
+        logger.debug("Creating tournament details layout.");
         return ViewUtils.createHorizontalLayout (JustifyContentMode.CENTER, tournamentNameField, tournamentStatusComboBox, tournamentTypeComboBox);
     }
 
     private HorizontalLayout createPlayerSelectionLayout()
     {
+        logger.debug("Creating player selection layout.");
         GridUtils.configurePlayerGrid(availablePlayersGrid, availablePlayers, selectedPlayers, "Add", this::refreshGrids);
         GridUtils.configurePlayerGrid(selectedPlayersGrid, selectedPlayers, availablePlayers, "Delete", this::refreshGrids);
 
@@ -82,14 +92,22 @@ public class AddTournamentView extends VerticalLayout {
     }
 
     private HorizontalLayout createButtonLayout() {
+        logger.debug("Setting up button layout.");
         Button saveButton = ViewUtils.createButton("Save", "colored-button", this::saveTournament);
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> getUI().ifPresent(ui -> ui.navigate("tournaments")));
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
+            logger.info("Cancel button clicked. Redirecting to TournamentView.");
+            getUI().ifPresent(ui -> ui.navigate("tournaments"));
+        });
 
         return ViewUtils.createHorizontalLayout(JustifyContentMode.BETWEEN, saveButton, cancelButton);
     }
 
     private void saveTournament() {
-        if (!validateFields()) return;
+        logger.info("Attempting to save tournament.");
+        if (!validateFields()) {
+            logger.warn("Tournament saving aborted due to validation error.");
+            return;
+        }
 
         Tournament newTournament = new Tournament();
         int maxPlayers = calculateMaxPlayers(selectedPlayers.size());
@@ -99,23 +117,44 @@ public class AddTournamentView extends VerticalLayout {
         newTournament.setMaxPlayers(maxPlayers);
         newTournament.setPlayers(selectedPlayers);
 
-        newTournament = tournamentService.saveTournament(newTournament);
+        try {
+            newTournament = tournamentService.saveTournament(newTournament);
+            logger.info("Tournament successfully saved with ID: {}:", newTournament.getId());
 
-        TournamentUtils.generateTournamentMatches(matchService, newTournament);
+            TournamentUtils.generateTournamentMatches(matchService, newTournament);
+            logger.info("Matches generated successfully");
 
-        NotificationManager.showInfoNotification("Tournament created successfully! id: ");
-        getUI().ifPresent(ui -> ui.navigate("tournaments"));
+            NotificationManager.showInfoNotification("Tournament created successfully! id: ");
+            getUI().ifPresent(ui -> ui.navigate("tournaments"));
+
+        } catch (Exception e) {
+            logger.error("Failed to save tournament. Error: {}", e.getMessage(), e);
+            NotificationManager.showInfoNotification("Failed to save tournament. Please try again.");
+        }
     }
 
     private boolean validateFields() {
-        if (isEmpty(tournamentNameField)) return ViewUtils.showValidationError ("Tournament name is required!");
-        if (isEmpty(tournamentStatusComboBox)) return ViewUtils.showValidationError("Tournament status is required!");
-        if (isEmpty(tournamentTypeComboBox)) return ViewUtils.showValidationError("Tournament type is required!");
-        if (selectedPlayers.isEmpty()) return ViewUtils.showValidationError("At least one player must be selected!");
+        if (isEmpty(tournamentNameField)) {
+            logger.warn("Validation failed: Tournament name is empty.");
+            return ViewUtils.showValidationError ("Tournament name is required!");
+        }
+        if (isEmpty(tournamentStatusComboBox)) {
+            logger.warn("Validation failed: Tournament status is empty.");
+            return ViewUtils.showValidationError("Tournament status is required!");
+        }
+        if (isEmpty(tournamentTypeComboBox)) {
+            logger.warn("Validation failed: Tournament type is empty.");
+            return ViewUtils.showValidationError("Tournament type is required!");
+        }
+        if (selectedPlayers.isEmpty()) {
+            logger.warn("Validation failed: No players selected for the tournament");
+            return ViewUtils.showValidationError("At least one player must be selected!");
+        }
         return true;
     }
 
     private void refreshGrids() {
+        logger.debug("Refreshing player grids.");
         availablePlayersGrid.setItems(availablePlayers);
         selectedPlayersGrid.setItems(selectedPlayers);
     }

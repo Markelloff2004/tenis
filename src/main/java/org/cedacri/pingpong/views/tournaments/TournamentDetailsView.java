@@ -15,10 +15,14 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @PageTitle("View Tournament")
 @Route(value = "tournament/general-details", layout = MainLayout.class)
 public class TournamentDetailsView extends VerticalLayout implements HasUrlParameter<Integer> {
+
+    private static final Logger logger = LoggerFactory.getLogger(TournamentDetailsView.class);
 
     private final TournamentService tournamentService;
     private Tournament tournament;
@@ -29,29 +33,36 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         setWidthFull();
         setPadding(true);
         setSpacing(true);
+        logger.debug("TournamentDetailsView initialized");
     }
 
     @Override
     public void setParameter(BeforeEvent event, Integer tournamentId) {
+        logger.info("Received request to load tournament with ID: {}: ", tournamentId);
         this.tournament = tournamentService.find(tournamentId).orElse(null);
 
         if (this.tournament != null) {
+            logger.info("Tournament found: {}", tournament.getTournamentName());
             initView();
         } else {
+            logger.info("Tournament with ID {} not found", tournamentId);
             add(new Span("Tournament not found"));
         }
     }
 
     private void initView()
     {
+        logger.debug("Initializing view for tournament {}", tournament.getTournamentName());
         add(createTournamentNameLabel(tournament));
 //        add(createTournamentDetailsSection(tournament));
         add(createButtonsLayout());
         add(createPlayersGrid(tournament));
+        logger.debug("View initialization completed for tournament {}", tournament.getTournamentName());
     }
 
     private Span createTournamentNameLabel(Tournament tournament)
     {
+        logger.debug("Creating tournament name label for: {}", tournament.getTournamentName());
         Span tournamentNameLabel = new Span(tournament.getTournamentName());
         tournamentNameLabel.getStyle()
                 .set("font-size", "24px")
@@ -62,6 +73,7 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
 
     private HorizontalLayout createTournamentDetailsSection(Tournament tournament)
     {
+        logger.debug("Creating tournament details section");
         TextField maxPlayersField = ViewUtils.createReadOnlyField("Maximum Players", String.valueOf(tournament.getMaxPlayers()));
         TextField statusField = ViewUtils.createReadOnlyField("Status", tournament.getTournamentStatus());
         TextField typeField = ViewUtils.createReadOnlyField("Type", tournament.getTournamentType());
@@ -71,6 +83,7 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
 
     private Grid<Player> createPlayersGrid(Tournament tournament)
     {
+        logger.debug("Creating players grid for: {}", tournament.getTournamentName());
         Grid<Player> playersGrid = new Grid<>(Player.class, false);
         playersGrid.setItems(tournament.getPlayers());
 
@@ -79,15 +92,21 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         playersGrid.addColumn(Player::getWonMatches).setHeader("Matches Won").setSortable(true);
         playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true);
 
+        logger.debug("Players grid initialized");
+
         return playersGrid;
     }
 
     private HorizontalLayout createButtonsLayout()
     {
+        logger.debug("Creating buttons layout for tournament {}", tournament.getTournamentName());
         Button prevoiusPageButton = ViewUtils.createButton(
                 "Next Page",
                 "colored-button",
-                () -> getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()))
+                () -> {
+                    logger.info("Navigating to matches page for tournament: {}", tournament.getTournamentName());
+                    getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()));
+                }
         );
 
         return ViewUtils.createHorizontalLayout(

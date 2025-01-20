@@ -23,12 +23,16 @@ import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 @Route(value = "tournament/matches", layout = MainLayout.class)
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
+
+    private static final Logger logger = LoggerFactory.getLogger(TournamentBracketView.class);
 
     private final TournamentService tournamentService;
     private final MatchService matchService;
@@ -41,24 +45,29 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     public TournamentBracketView(TournamentService tournamentService, MatchService matchService) {
         this.tournamentService = tournamentService;
         this.matchService = matchService;
+        logger.info("TournamentBracketView initialized.");
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, Integer tournamentId) {
+        logger.info("Received request to load tournament with ID {}", tournamentId);
         Optional<Tournament> searchedTournament = tournamentService.find(tournamentId);
 
         if (searchedTournament.isPresent())
         {
             tournament = searchedTournament.get();
+            logger.info("Tournament found : {}", tournament);
             initView();
         } else
         {
+            logger.warn("Tournament with ID {} not found", tournamentId);
             add(new H2("Tournament not found"));
         }
     }
 
     private void initView()
     {
+        logger.info("Initializing view for tournament {}", tournament.getTournamentName());
 
         /*
         Title view
@@ -88,10 +97,12 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
     private HorizontalLayout createRoundButtonsLayout() {
+        logger.info("Creating layout for Round buttons.");
         HorizontalLayout roundButtons = new HorizontalLayout();
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
 
         for (String round : TournamentUtils.getRoundsCount(tournament.getMaxPlayers())) {
+            logger.debug("Adding button for round {}", round);
             roundButtons.add(
                     ViewUtils.createButton(round, "colored-button",
                             () -> refreshMatchesInRound(round)
@@ -104,7 +115,10 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 "colored-button",
                 () -> getUI().
                         ifPresent(ui ->
-                                ui.navigate("tournament/general-details/" + tournament.getId())
+                                {
+                                    logger.info("Navigating to general details page for Tournament with ID: {}", tournament.getId());
+                                    ui.navigate("tournament/general-details/" + tournament.getId());
+                                }
                         )
         );
 
@@ -117,6 +131,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
 
     private void refreshMatchesInRound(String round) {
+        logger.info("Refreshing matches for round {}", round);
         matchContainer.removeAll();
 
         displayMatches(matchService.getMatchesByTournamentAndRound(tournament, round));
@@ -124,8 +139,11 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private void displayMatches(List<Match> matches)
     {
+        logger.info("Displaying {} matches", matches.size() );
 
         for (Match match : matches) {
+            logger.debug("Processed match {}", match);
+
             // Main match layout
             HorizontalLayout matchLayout = new HorizontalLayout();
             matchLayout.setWidthFull();
@@ -159,6 +177,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private VerticalLayout createPlayersDetails(Match match)
     {
+        logger.debug("Creating players details for match {}", match);
         VerticalLayout playerDetails = new VerticalLayout();
         playerDetails.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         playerDetails.setAlignItems(FlexComponent.Alignment.START);
@@ -180,6 +199,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private HorizontalLayout createScoreDetails(Match match)
     {
+        logger.debug("Creating score details for match {}", match);
         HorizontalLayout scoreDetails = new HorizontalLayout();
         scoreDetails.setSpacing(false);
         scoreDetails.setAlignItems(FlexComponent.Alignment.CENTER);
