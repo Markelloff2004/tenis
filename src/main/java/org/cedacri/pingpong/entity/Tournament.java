@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.cedacri.pingpong.interfaces.ITournament;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -16,7 +15,7 @@ import java.util.Set;
 @Data
 public class Tournament implements ITournament {
 
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
@@ -38,15 +37,17 @@ public class Tournament implements ITournament {
     @Column(name = "tournament_type", length = 15)
     private String tournamentType;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt = Instant.now();
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "tournament_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id")
     )
     private Set<Player> players = new HashSet<>();
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Match> matches = new HashSet<>();
 }

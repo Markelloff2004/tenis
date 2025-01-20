@@ -32,11 +32,12 @@ public class PlayerRepository {
         List<Player> players = jpaStreamer.stream(
                         Projection.select(
                                 Player$.id,
-                                Player$.playerName,
-                                Player$.age, Player$.email, Player$.rating,
-                                Player$.playingHand, Player$.winnedMatches,
-                                Player$.losedMatches, Player$.goalsScored,
-                                Player$.goalsLosed)
+                                Player$.name,
+                                Player$.surname,
+                                Player$.birthDate, Player$.email, Player$.rating,
+                                Player$.hand, Player$.wonMatches,
+                                Player$.lostMatches, Player$.goalsScored,
+                                Player$.goalsLost)
                 )
                 .sorted(Player$.id.reversed())
                 .skip(page * Constraints.PAGE_SIZE)
@@ -52,11 +53,12 @@ public class PlayerRepository {
         List<Player> players = jpaStreamer.stream(
                         Projection.select(
                                 Player$.id,
-                                Player$.playerName,
-                                Player$.age, Player$.email, Player$.rating,
-                                Player$.playingHand, Player$.winnedMatches,
-                                Player$.losedMatches, Player$.goalsScored,
-                                Player$.goalsLosed)
+                                Player$.name,
+                                Player$.surname,
+                                Player$.birthDate, Player$.email, Player$.rating,
+                                Player$.hand, Player$.wonMatches,
+                                Player$.lostMatches, Player$.goalsScored,
+                                Player$.goalsLost)
                 )
                 .sorted(Player$.id.reversed())
                 .toList();

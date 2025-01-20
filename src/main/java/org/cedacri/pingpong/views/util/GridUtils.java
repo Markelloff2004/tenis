@@ -13,7 +13,7 @@ public class GridUtils {
 
     public static void configurePlayerGrid(Grid<Player> grid, Set<Player> source, Set<Player> target, String buttonLabel, Runnable refreshAction) {
         grid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
-        grid.addColumn(Player::getPlayerName).setHeader("Name").setSortable(true);
+        grid.addColumn(Player::getName).setHeader("Name").setSortable(true);
         grid.setItems(source);
         grid.addColumn(createPlayerActionColumn(source, target, buttonLabel, refreshAction))
                 .setHeader("Action")

@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -89,7 +90,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         tournamentsGrid.addColumn(Tournament::getMaxPlayers).setHeader("MaxPlayers").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getTournamentType).setHeader("Type").setSortable(true);
         tournamentsGrid.addColumn(Tournament::getTournamentStatus).setHeader("Status").setSortable(true);
-//        tournamentsGrid.addColumn(Tournament::getCreatedAt).setHeader("CreatedAt").setSortable(true);
+        tournamentsGrid.addColumn(Tournament::getCreatedAt).setHeader("CreatedAt").setSortable(true);
 
         tournamentsGrid
                 .addColumn(new ComponentRenderer<>(this::createActionButtons))
@@ -123,7 +124,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     private void refreshGridData() {
-        tournamentsGrid.setItems(tournamentService.findAll().toList());
+        tournamentsGrid.setItems();
         logger.info("Grid data refreshed, tournaments loaded.");
     }
 

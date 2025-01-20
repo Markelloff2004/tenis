@@ -142,7 +142,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             HorizontalLayout winnerDetails = ViewUtils.createHorizontalLayout(
                     JustifyContentMode.CENTER,
                     (match.getWinner() != null)
-                            ? new Div("#" + match.getWinner().getRating() + " " + match.getWinner().getPlayerName() + match.getPosition())
+                            ? new Div("#" + match.getWinner().getRating() + " " + match.getWinner().getName() + " " + match.getWinner().getSurname() + match.getPosition())
                             : new Div("Unknown ->" + match.getPosition())
                     );
 
@@ -167,10 +167,10 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
             playerDetails.add(
                     match.getTopPlayer() != null
-                            ? createPlayerLayout(match.getTopPlayer().getRating(), match.getTopPlayer().getPlayerName())
+                            ? createPlayerLayout(match.getTopPlayer().getRating(), match.getTopPlayer().getName() + " " + match.getTopPlayer().getSurname())
                             : createPlayerLayout(0, "Null"),
                     match.getBottomPlayer() != null
-                            ? createPlayerLayout(match.getBottomPlayer().getRating(), match.getBottomPlayer().getPlayerName())
+                            ? createPlayerLayout(match.getBottomPlayer().getRating(), match.getBottomPlayer().getName() + " "  + match.getBottomPlayer().getSurname())
                             : createPlayerLayout(0, "Null")
             );
 
@@ -236,8 +236,8 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.CENTER);
 
-        Span player1Label = new Span(match.getBottomPlayer().getPlayerName());
-        Span player2Label = new Span(match.getTopPlayer().getPlayerName());
+        Span player1Label = new Span(match.getBottomPlayer().getName() + " " + match.getBottomPlayer().getSurname());
+        Span player2Label = new Span(match.getTopPlayer().getName() + " " + match.getTopPlayer().getSurname());
 
         HorizontalLayout hLayout = new HorizontalLayout();
         hLayout.setSpacing(false);

@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,57 +18,56 @@ import java.util.Set;
 @Table(name = "players")
 public class Player {
 
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "player_name", nullable = false, length = 100)
-    private String playerName;
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
 
-    @Column(name = "age")
-    private Integer age;
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "surname", nullable = false, length = 100)
+    private String surname;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Size(max = 100)
     @NotNull
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
-    private Instant createdAt;
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt = Instant.now();
 
-    @ColumnDefault("0")
-    @Column(name = "rating")
-    private Integer rating;
+    @Column(name = "rating", nullable = false, columnDefinition = "int default 0")
+    private Integer rating = 0;
 
     @Size(max = 5)
-    @Column(name = "playing_hand", length = 5)
-    private String playingHand;
+    @Column(name = "hand", length = 5)
+    private String hand;
 
-    @ColumnDefault("0")
-    @Column(name = "winned_matches")
-    private Integer winnedMatches;
+    @Column(name = "won_matches", nullable = false, columnDefinition = "int default 0")
+    private Integer wonMatches = 0;
 
-    @ColumnDefault("0")
-    @Column(name = "losed_matches")
-    private Integer losedMatches;
+    @Column(name = "lost_matches", nullable = false, columnDefinition = "int default 0")
+    private Integer lostMatches = 0;
 
-    @ColumnDefault("0")
-    @Column(name = "goals_scored")
-    private Integer goalsScored;
+    @Column(name = "goals_scored", nullable = false, columnDefinition = "int default 0")
+    private Integer goalsScored = 0;
 
-    @ColumnDefault("0")
-    @Column(name = "goals_losed")
-    private Integer goalsLosed;
+    @Column(name = "goals_lost", nullable = false, columnDefinition = "int default 0")
+    private Integer goalsLost = 0;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "player_id"),
-            inverseJoinColumns =@JoinColumn(name = "tournament_id")
+            inverseJoinColumns = @JoinColumn(name = "tournament_id")
     )
     private Set<Tournament> tournaments = new HashSet<>();
 
@@ -76,37 +75,40 @@ public class Player {
 
     }
 
-    public Player(Integer id, String name, Integer age, String email){
+    public Player(Integer id, String name, String surname, LocalDate birthDate, String email){
         this.id = id;
-        this.playerName = name;
-        this.age = age;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
         this.email = email;
     }
 
-    public Player(Integer id, String playerName, Integer age, String email, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {
+    public Player(Integer id, String name, String surname, LocalDate birthDate, String email, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
         this.id = id;
-        this.playerName = playerName;
-        this.age = age;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
         this.email = email;
         this.rating = rating;
-        this.playingHand = playingHand;
-        this.winnedMatches = winnedMatches;
-        this.losedMatches = losedMatches;
+        this.hand = hand;
+        this.wonMatches = wonMatches;
+        this.lostMatches = lostMatches;
         this.goalsScored = goalsScored;
-        this.goalsLosed = goalsLosed;
+        this.goalsLost = goalsLosed;
     }
 
-    public Player(String playerName, Integer age, String email, Instant createdAt, Integer rating, String playingHand, Integer winnedMatches, Integer losedMatches, Integer goalsScored, Integer goalsLosed) {
-        this.playerName = playerName;
-        this.age = age;
+    public Player(String name, String surname, LocalDate birthDate, String email, Instant createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
         this.email = email;
         this.createdAt = createdAt;
         this.rating = rating;
-        this.playingHand = playingHand;
-        this.winnedMatches = winnedMatches;
-        this.losedMatches = losedMatches;
+        this.hand = hand;
+        this.wonMatches = wonMatches;
+        this.lostMatches = lostMatches;
         this.goalsScored = goalsScored;
-        this.goalsLosed = goalsLosed;
+        this.goalsLost= goalsLosed;
     }
 
     @Override

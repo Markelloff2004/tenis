@@ -74,9 +74,9 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
         Grid<Player> playersGrid = new Grid<>(Player.class, false);
         playersGrid.setItems(tournament.getPlayers());
 
-        playersGrid.addColumn(Player::getPlayerName).setHeader("Player Name").setSortable(true);
+        playersGrid.addColumn(Player::getName).setHeader("Player Name").setSortable(true);
         playersGrid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
-        playersGrid.addColumn(Player::getWinnedMatches).setHeader("Matches Won").setSortable(true);
+        playersGrid.addColumn(Player::getWonMatches).setHeader("Matches Won").setSortable(true);
         playersGrid.addColumn(Player::getGoalsScored).setHeader("Goals Scored").setSortable(true);
 
         return playersGrid;
