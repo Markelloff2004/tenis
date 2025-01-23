@@ -115,253 +115,32 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showCreatePlayer()
     {
-        logger.info("Opening dialog to create new player");
-
-        Dialog dialog = new Dialog();
-        dialog.setWidth("300px");
-        dialog.setHeight("auto");
-
-        TextField nameField = new TextField();
-        nameField.setRequired(true);
-        nameField.setWidthFull();
-
-        TextField surnameField = new TextField();
-        surnameField.setRequired(true);
-        surnameField.setWidthFull();
-
-        DatePicker birthDateTimePicker = new DatePicker();
-        birthDateTimePicker.setWidthFull();
-
-        TextField emailField = new TextField();
-        emailField.setWidthFull();
-
-        ComboBox<String> handComboBox = new ComboBox<>();
-        handComboBox.setItems(Constraints.PLAYING_HAND);
-        handComboBox.setWidthFull();
-
-        FormLayout formLayout = new FormLayout();
-        formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(surnameField, "Surname").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(birthDateTimePicker, "Birth Date").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(emailField, "Email").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(handComboBox, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-
-
-        Button saveButton = ViewUtils.createButton("Save", "colored-button", () ->
-        {
-            String name = nameField.getValue();
-            String surname = surnameField.getValue();
-            LocalDate birthDate = birthDateTimePicker.getValue();
-            String email = emailField.getValue();
-            String hand = handComboBox.getValue();
-
-            if (name.isBlank() || name.isEmpty() || surname.isEmpty() || birthDate.toString().isEmpty() || email.isEmpty() || hand.isEmpty()) {
-                NotificationManager.showInfoNotification("Please fill in all required fields.");
-                logger.warn("Player creation failed: Empty fields are present");
-                return;
-            }
-
-            Player newPlayer = new Player(name, surname, birthDate, email, Date.from(Instant.now()), 0, hand, 0, 0, 0, 0);
-
-            try
-            {
-                playerService.save(newPlayer);
-
-                dialog.close();
-                showAllPlayers();
-                NotificationManager.showInfoNotification("Player added successfully: " + newPlayer.getName() + " " + newPlayer.getSurname());
-                logger.info("Player added successfully: {} {}", newPlayer.getName(), newPlayer.getSurname());
-            }catch (Exception e)
-            {
-               NotificationManager.showInfoNotification("Player cannot be added : " + e.getMessage());
-                logger.error("Error creating player : {}", e.getMessage(), e);
-            }
-        });
-        saveButton.setWidth("100px");
-
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", dialog::close);
-        cancelButton.setWidth("100px");
-
-
-        // Add buttons to a HorizontalLayout and center them
-        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, saveButton, cancelButton);
-        buttonLayout.getStyle().set("margin-top", "10px"); // Reduced space above buttons
-
-        // Add form layout and buttons to the dialog
-        dialog.add(formLayout, buttonLayout);
-
-        dialog.open();
+        logger.info("Creating new player");
+        PlayerSaveDialog playerSaveDialog = new PlayerSaveDialog(playerService, this::showCreatePlayer);
+        playerSaveDialog.open();
     }
 
     @Override
     public void showDetailsPlayer(Player player)
     {
-        logger.info("Showing details player : {} {}:{}", player.getName(), player.getSurname(), getId());
-
-        Dialog playerDetailsDialog = new Dialog();
-        playerDetailsDialog.setWidth("400px");
-
-        FormLayout formLayout = new FormLayout();
-        formLayout.getStyle().set("gap", "5px");
-
-        formLayout.addFormItem(new Span(player.getName()), "Name");
-        formLayout.addFormItem(new Span(player.getSurname()), "Surname");
-        formLayout.addFormItem(new Span(player.getEmail()), "Email");
-        formLayout.addFormItem(new Span(player.getBirthDate() != null ? player.getBirthDate().toString() : "N/A"), "Age");
-        formLayout.addFormItem(new Span(player.getHand()), "Playing Hand");
-        formLayout.addFormItem(new Span(player.getRating() != null ? player.getRating().toString() : "N/A"), "Rating");
-        formLayout.addFormItem(new Span(player.getWonMatches() != null ? player.getWonMatches().toString() : "N/A"), "Won Matches");
-        formLayout.addFormItem(new Span(player.getLostMatches() != null ? player.getLostMatches().toString() : "N/A"), "Lost Matches");
-        formLayout.addFormItem(new Span(player.getGoalsScored() != null ? player.getGoalsScored().toString() : "N/A"), "Goals Scored");
-        formLayout.addFormItem(new Span(player.getGoalsLost() != null ? player.getGoalsLost().toString() : "N/A"), "Goals Lost");
-        formLayout.addFormItem(new Span(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
-
-        Button closeButton = ViewUtils.createButton("Close", "button", playerDetailsDialog::close);
-
-        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER ,closeButton);
-
-        playerDetailsDialog.add(formLayout, buttonLayout);
-
-        playerDetailsDialog.open();
+        logger.info("Loading player details for {} {}", player.getName(), player.getSurname());
+        PlayerInfoDialog playerInfoDialog = new PlayerInfoDialog(player);
+        playerInfoDialog.open();
     }
 
     @Override
     public void showEditPlayer(Player player)
     {
         logger.info("Editing player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
-        Dialog playerEditDialog = new Dialog();
-        playerEditDialog.setWidth("600px");
-
-        TextField nameField = new TextField();
-        nameField.setValue(player.getName() != null ? player.getName() : "");
-        nameField.setWidth("300px");
-
-        TextField surnameField = new TextField();
-        nameField.setValue(player.getSurname() != null ? player.getSurname() : "");
-        nameField.setWidth("300px");
-
-        TextField emailField = new TextField();
-        emailField.setValue(player.getEmail() != null ? player.getEmail() : "");
-        emailField.setWidth("300px");
-
-        DatePicker birthDatePicker = new DatePicker();
-        birthDatePicker.setValue(player.getBirthDate() != null ? player.getBirthDate() : LocalDate.now());
-        birthDatePicker.setWidth("300px");
-
-        TextField handField = new TextField();
-        handField.setValue(player.getHand() != null ? player.getHand() : "");
-        handField.setWidth("300px");
-
-        IntegerField ratingField = new IntegerField();
-        ratingField.setValue(player.getRating() != null ? player.getRating() : 0);
-        ratingField.setWidth("300px");
-
-        IntegerField wonMatchesField = new IntegerField();
-        wonMatchesField.setValue(player.getWonMatches() != null ? player.getWonMatches() : 0);
-        wonMatchesField.setWidth("300px");
-
-        IntegerField lostMatchesField = new IntegerField();
-        lostMatchesField.setValue(player.getLostMatches() != null ? player.getLostMatches() : 0);
-        lostMatchesField.setWidth("300px");
-
-        IntegerField goalsScoredField = new IntegerField();
-        goalsScoredField.setValue(player.getGoalsScored() != null ? player.getGoalsScored() : 0);
-        goalsScoredField.setWidth("300px");
-
-        IntegerField goalsLostField = new IntegerField();
-        goalsLostField.setValue(player.getGoalsLost() != null ? player.getGoalsLost() : 0);
-        goalsLostField.setWidth("300px");
-
-        TextField createdAtField = new TextField();
-        createdAtField.setValue(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A");
-        createdAtField.setReadOnly(true);
-        createdAtField.setWidth("300px");
-
-        FormLayout formLayout = new FormLayout();
-        formLayout.addFormItem(nameField, "Name");
-        formLayout.addFormItem(surnameField, "Surname");
-        formLayout.addFormItem(emailField, "Email");
-        formLayout.addFormItem(birthDatePicker, "Birth");
-        formLayout.addFormItem(handField, "Playing Hand");
-        formLayout.addFormItem(ratingField, "Rating");
-        formLayout.addFormItem(wonMatchesField, "Won Matches");
-        formLayout.addFormItem(lostMatchesField, "Lost Matches");
-        formLayout.addFormItem(goalsScoredField, "Goals Scored");
-        formLayout.addFormItem(goalsLostField, "Goals Lost");
-        formLayout.addFormItem(createdAtField, "Created At");
-
-        formLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("600px", 2)
-        );
-
-        Button saveButton = ViewUtils.createButton("Save", "colored-button", () ->
-        {
-            player.setName(nameField.getValue());
-            player.setSurname(surnameField.getValue());
-            player.setEmail(emailField.getValue());
-            player.setBirthDate(birthDatePicker.getValue());
-            player.setHand(handField.getValue());
-            player.setRating(ratingField.getValue());
-            player.setWonMatches(wonMatchesField.getValue());
-            player.setLostMatches(lostMatchesField.getValue());
-            player.setGoalsScored(goalsScoredField.getValue());
-            player.setGoalsLost(goalsLostField.getValue());
-
-            try {
-                playerService.save(player);
-                showAllPlayers();
-
-                playerEditDialog.close();
-
-                NotificationManager.showInfoNotification("Player updated successfully: " + player.getName() + " " +
-                        player.getSurname() + ": " + player.getId());
-            }
-            catch (Exception e)
-            {
-                NotificationManager.showInfoNotification("Player cannot be updated : " + e.getMessage());
-            }
-        });
-
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", playerEditDialog::close);
-
-        playerEditDialog.add(formLayout, ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, saveButton, cancelButton));
+        Dialog playerEditDialog = new PlayerEditDialog(player, playerService, this::showAllPlayers);
         playerEditDialog.open();
     }
 
     @Override
     public void showDeletePlayer(Player player)
     {
-        logger.info("Preparing to delete player: {}, Id: {}", player.getName() + " " + player.getSurname(), player.getId());
-        Dialog playerDeleteDialog = new Dialog();
-        playerDeleteDialog.setWidth("500px");
-        playerDeleteDialog.setHeaderTitle("Confirm Delete");
-
-        Span confirmationText = new Span("Are you sure you want to delete " + player.getName() + " " +
-                player.getSurname() + ": " + player.getId() + "?");
-        confirmationText.getStyle().set("margin", "10px 0");
-
-        Button deleteButton = ViewUtils.createButton("Delete", "colored-button", () ->
-        {
-            try {
-                playerService.deleteById(player.getId());
-                NotificationManager.showInfoNotification("Player " + player.getName() + " " + player.getSurname() +
-                        ": " + player.getId() + " deleted!");
-                playerDeleteDialog.close();
-                showAllPlayers();
-                logger.info("Player deleted successfully: {}, Id: {} {}", player.getId(), player.getName(), player.getSurname());
-            }
-            catch (Exception e)
-            {
-                NotificationManager.showInfoNotification("Player cannot be deleted : " + e.getMessage());
-            }
-        });
-
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", playerDeleteDialog::close);
-
-        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, deleteButton, cancelButton);
-
-        playerDeleteDialog.add(confirmationText, buttonLayout);
+        logger.info("Deleting player: {} with Id: {}", player.getName(), player.getId());
+        Dialog playerDeleteDialog = new PlayerDeleteDialog(player, playerService, this::showAllPlayers);
         playerDeleteDialog.open();
     }
 }
