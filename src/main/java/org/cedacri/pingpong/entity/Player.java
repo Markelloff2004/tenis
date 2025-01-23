@@ -37,6 +37,10 @@ public class Player {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Column(name = "address", nullable = false)
+    @Size(50)
+    private
+
     @Size(max = 100)
     @NotNull
     @Column(name = "email", nullable = false, length = 100)
