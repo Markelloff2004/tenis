@@ -74,7 +74,7 @@ public class PlayerSaveDialog extends Dialog {
                 return;
             }
 
-            Player newPlayer = new Player(name, surname, birthDate, email, Instant.now(), 0, hand, 0, 0, 0, 0);
+            Player newPlayer = new Player(name, surname, birthDate, email, "", LocalDate.now(),  0, hand, 0, 0, 0, 0);
 
             try
             {
