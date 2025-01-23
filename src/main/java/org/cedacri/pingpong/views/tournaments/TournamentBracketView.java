@@ -210,7 +210,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 ? defaultScore.split(";")
                 : "-:-;-:-;-:-".split(";");
 
-        for (int i = 0; i < TournamentUtils.getSetsCount(tournament.getTournamentType()); i++)
+        for (int i = 0; i < TournamentUtils.getSetsCount(tournament.getTournamentType().toString()); i++)
         {
             String[] setScore = (i < setScores.length)
                     ? setScores[i].split(":")
@@ -266,7 +266,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         layout.add(hLayout);
 
         TextField[] scoreFields = new TextField[3];
-        for (int i = 0; i < TournamentUtils.getSetsCount(tournament.getTournamentType()); i++) {
+        for (int i = 0; i < TournamentUtils.getSetsCount(tournament.getTournamentType().toString()); i++) {
             scoreFields[i] = new TextField("Set " + (i + 1));
             scoreFields[i].setPlaceholder("11:2 or -:-");
             scoreFields[i].setPattern("^(\\d{1,2}:\\d{1,2}|-:-)$");

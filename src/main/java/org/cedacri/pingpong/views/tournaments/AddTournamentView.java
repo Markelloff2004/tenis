@@ -11,6 +11,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentType;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
@@ -23,6 +24,7 @@ import org.cedacri.pingpong.views.util.GridUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,7 +43,9 @@ public class AddTournamentView extends VerticalLayout {
 
     private final TextField tournamentNameField = ViewUtils.createTextField("Tournament Name");
     private final ComboBox<String> tournamentStatusComboBox = ViewUtils.createComboBox("Tournament Status", Constraints.STATUS_OF_TOURNAMENTS);
-    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", Constraints.TYPES_OF_TOURNAMENTS);
+    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", Arrays.asList(TournamentType.values()).stream()
+            .map(v -> v.toString())
+            .collect(Collectors.toList()));
     private final Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
     private final Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
 
@@ -113,7 +117,7 @@ public class AddTournamentView extends VerticalLayout {
         int maxPlayers = calculateMaxPlayers(selectedPlayers.size());
         newTournament.setTournamentName(tournamentNameField.getValue());
         newTournament.setTournamentStatus(tournamentStatusComboBox.getValue());
-        newTournament.setTournamentType(tournamentTypeComboBox.getValue());
+        newTournament.setTournamentType(TournamentType.valueOf(tournamentTypeComboBox.getValue().toUpperCase()));
         newTournament.setMaxPlayers(maxPlayers);
         newTournament.setPlayers(selectedPlayers);
 
@@ -121,10 +125,10 @@ public class AddTournamentView extends VerticalLayout {
             newTournament = tournamentService.saveTournament(newTournament);
             logger.info("Tournament successfully saved with ID: {}:", newTournament.getId());
 
-            TournamentUtils.generateTournamentMatches(matchService, newTournament);
+//            TournamentUtils.generateTournamentMatches(matchService, newTournament);
             logger.info("Matches generated successfully");
 
-            NotificationManager.showInfoNotification("Tournament created successfully! id: ");
+            NotificationManager.showInfoNotification("Tournament created successfully! id: " + newTournament.getId());
             getUI().ifPresent(ui -> ui.navigate("tournaments"));
 
         } catch (Exception e) {

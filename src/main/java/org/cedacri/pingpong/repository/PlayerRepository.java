@@ -21,7 +21,7 @@ public class PlayerRepository {
     private final JPAStreamer jpaStreamer;
     private final EntityManager em;
 
-    public Optional<Player> findById(Integer id){
+    public Optional<Player> findById(Long id){
 
         return jpaStreamer.stream(Player.class)
                 .filter(Player$.id.equal(id))
@@ -80,7 +80,7 @@ public class PlayerRepository {
         return player;
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         Player player = em.find(Player.class, id);
 
         if (player != null) {

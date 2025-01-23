@@ -1,8 +1,9 @@
 package org.cedacri.pingpong.interfaces;
 
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.enums.TournamentType;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Set;
 
 public interface ITournament {
@@ -11,8 +12,8 @@ public interface ITournament {
     Integer getId();
     String getTournamentName();
     String getTournamentStatus();
-    String getTournamentType();
-    Instant getCreatedAt();
+    TournamentType getTournamentType();
+    LocalDate getCreatedAt();
     Set<Player> getPlayers();
 
 }

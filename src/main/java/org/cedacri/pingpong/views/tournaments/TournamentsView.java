@@ -17,6 +17,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.SetTypes;
+import org.cedacri.pingpong.enums.TournamentType;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
@@ -28,8 +30,8 @@ import org.cedacri.pingpong.views.util.GridUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -124,7 +126,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     private void refreshGridData() {
-        tournamentsGrid.setItems();
+        tournamentsGrid.setItems(tournamentService.findAll().collect(Collectors.toSet()));
         logger.info("Grid data refreshed, tournaments loaded.");
     }
 
@@ -158,7 +160,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
                         refreshGridData();
                         confirmDeleteTournamentDialog.close();
                         NotificationManager.showInfoNotification("Tournament deleted successfully! id: " + id);
-                        logger.info("Tournament deleted successfully! id: " + id);
+                        logger.info("Tournament deleted successfully! id: {}", id);
                     } catch (Exception e) {
                         NotificationManager.showInfoNotification("Error deleting tournament: " + e.getMessage());
                         logger.error("Error deleting tournament: {}, {}", id, e.getMessage());
@@ -183,9 +185,36 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             nameField.setValue(tournament.getTournamentName());
 
             ComboBox<String> typeComboBox = new ComboBox<>("Type");
-            typeComboBox.setItems(Constraints.TOURNAMENT_TYPES);
-            typeComboBox.setValue(tournament.getTournamentType());
+            typeComboBox.setItems(Arrays.asList(TournamentType.values())
+                    .stream()
+                    .map(v -> v.toString())
+                    .collect(Collectors.toSet()));
+            typeComboBox.setValue(tournament.getTournamentType().toString());
             typeComboBox.setWidthFull();
+
+            ComboBox<String> setsCountComboBox = new ComboBox<>("Sets Count");
+            setsCountComboBox.setItems(Arrays.asList(SetTypes.values())
+                    .stream()
+                    .map(st -> st.toString())
+                    .collect(Collectors.toSet()));
+            setsCountComboBox.setValue(tournament.getSetsToWin().toString());
+            setsCountComboBox.setWidthFull();
+
+        ComboBox<String> semifinalsSetsCountComboBox= new ComboBox<>("Semifinals Sets Count");
+        semifinalsSetsCountComboBox.setItems(Arrays.asList(SetTypes.values())
+                .stream()
+                .map(st -> st.toString())
+                .collect(Collectors.toSet()));
+        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin().toString());
+        semifinalsSetsCountComboBox.setWidthFull();
+
+        ComboBox<String> finalsSetsCountComboBox = new ComboBox<>("Finals Sets Count");
+        finalsSetsCountComboBox.setItems(Arrays.asList(SetTypes.values())
+                .stream()
+                .map(st -> st.toString())
+                .collect(Collectors.toSet()));
+        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin().toString());
+        finalsSetsCountComboBox.setWidthFull();
 
             ComboBox<String> statusComboBox = new ComboBox<>("Status");
             statusComboBox.setItems(Constraints.TOURNAMENT_STATUSES);
@@ -216,7 +245,8 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             HorizontalLayout playersLayout = ViewUtils.
                     createHorizontalLayout(JustifyContentMode.BETWEEN, selectedPlayersGrid, availablePlayersGrid);
 
-            VerticalLayout dialogLayout = new VerticalLayout(nameField, typeComboBox, statusComboBox, playersLayout);
+            VerticalLayout dialogLayout = new VerticalLayout(nameField, typeComboBox, statusComboBox, setsCountComboBox,
+                    semifinalsSetsCountComboBox, finalsSetsCountComboBox, playersLayout);
             dialogLayout.setSpacing(true);
 
             if(tournament.getTournamentStatus().equals(Constraints.STATUS_PENDING)){
@@ -231,9 +261,12 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             Button saveButton = new Button("Save", event -> {
                 try{
                     tournament.setTournamentName(nameField.getValue());
-                    tournament.setTournamentType(typeComboBox.getValue());
+                    tournament.setTournamentType(TournamentType.valueOf(typeComboBox.getValue().toUpperCase()));
                     tournament.setTournamentStatus(statusComboBox.getValue());
                     tournament.setPlayers(selectedPlayersSet);
+                    tournament.setSetsToWin(SetTypes.valueOf(setsCountComboBox.getValue().toUpperCase()));
+                    tournament.setSemifinalsSetsToWin(SetTypes.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
+                    tournament.setFinalsSetsToWin(SetTypes.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
 
                     tournamentService.saveTournament(tournament);
                     editDialog.close();

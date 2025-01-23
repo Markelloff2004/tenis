@@ -6,6 +6,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import org.cedacri.pingpong.enums.TournamentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,16 @@ public class ViewUtils
         logger.debug("ComboBox created: {}", comboBox);
         return comboBox;
     }
+
+    /*public static ComboBox<TournamentType> createComboBox(String label, TournamentType type) {
+        logger.debug("Creating ComboBox with label: '{}' and type: '{}'", label, type);
+
+        ComboBox<TournamentType> comboBox = new ComboBox<>(label);
+        comboBox.setItems(TournamentType.values());
+        comboBox.setWidth("250px");
+        logger.debug("ComboBox created: {}", comboBox);
+        return comboBox;
+    }*/
 
     public static TextField createReadOnlyField(String label, String value) {
         logger.debug("Creating ReadOnly TextField with label: '{}' and value: '{}'", label, value);

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @PageTitle("PlayersView")
@@ -160,7 +161,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 return;
             }
 
-            Player newPlayer = new Player(name, surname, birthDate, email, Instant.now(), 0, hand, 0, 0, 0, 0);
+            Player newPlayer = new Player(name, surname, birthDate, email, Date.from(Instant.now()), 0, hand, 0, 0, 0, 0);
 
             try
             {
@@ -169,11 +170,11 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                 dialog.close();
                 showAllPlayers();
                 NotificationManager.showInfoNotification("Player added successfully: " + newPlayer.getName() + " " + newPlayer.getSurname());
-                logger.info("Player added successfully: " + newPlayer.getName() + " " + newPlayer.getSurname());
+                logger.info("Player added successfully: {} {}", newPlayer.getName(), newPlayer.getSurname());
             }catch (Exception e)
             {
                NotificationManager.showInfoNotification("Player cannot be added : " + e.getMessage());
-               logger.error("Error creating player : " + e.getMessage(), e);
+                logger.error("Error creating player : {}", e.getMessage(), e);
             }
         });
         saveButton.setWidth("100px");
@@ -195,7 +196,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showDetailsPlayer(Player player)
     {
-        logger.info("Showing details player : " + player.getName() + " " + player.getSurname() + ":" + getId());
+        logger.info("Showing details player : {} {}:{}", player.getName(), player.getSurname(), getId());
 
         Dialog playerDetailsDialog = new Dialog();
         playerDetailsDialog.setWidth("400px");
@@ -348,7 +349,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
                         ": " + player.getId() + " deleted!");
                 playerDeleteDialog.close();
                 showAllPlayers();
-                logger.info("Player deleted successfully: {}, Id: {} " + player.getName() + " " + player.getSurname(), player.getId());
+                logger.info("Player deleted successfully: {}, Id: {} {}", player.getId(), player.getName(), player.getSurname());
             }
             catch (Exception e)
             {

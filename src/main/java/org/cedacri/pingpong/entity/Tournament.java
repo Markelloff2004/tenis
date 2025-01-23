@@ -3,16 +3,22 @@ package org.cedacri.pingpong.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.cedacri.pingpong.enums.SetTypes;
+import org.cedacri.pingpong.enums.TournamentType;
 import org.cedacri.pingpong.interfaces.ITournament;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Table(name = "tournaments")
-@Data
 public class Tournament implements ITournament {
 
    @Id
@@ -33,14 +39,26 @@ public class Tournament implements ITournament {
     @Column(name = "tournament_status", length = 15)
     private String tournamentStatus;
 
-    @Size(max = 15)
-    @Column(name = "tournament_type", length = 15)
-    private String tournamentType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tournament_type", nullable = false)
+    private TournamentType tournamentType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sets_to_win", nullable = false)
+    private SetTypes setsToWin;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "semifinals_sets_to_win", nullable = false)
+    private SetTypes semifinalsSetsToWin;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "finals_sets_to_win", nullable = false)
+    private SetTypes finalsSetsToWin;
 
     @Column(name = "created_at", updatable = false)
-    private Instant createdAt = Instant.now();
+    private LocalDate createdAt = LocalDate.now();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "tournament_id"),

@@ -4,6 +4,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
+import org.cedacri.pingpong.service.PlayerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,8 +255,8 @@ public class TournamentUtils {
         match.setPosition(position);
         //TODO check handling la score - null
 
-        match.setTopPlayer(players.get(position - 1));
-        match.setBottomPlayer(players.get(tournament.getMaxPlayers() - position));
+            match.setTopPlayer(players.get(position - 1));
+            match.setBottomPlayer(players.get(tournament.getMaxPlayers() - position));
 
         logger.debug("Match created: {}", match);
         return match;

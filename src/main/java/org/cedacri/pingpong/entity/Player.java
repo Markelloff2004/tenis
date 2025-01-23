@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class Player {
    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 100)
     @NotNull
@@ -42,7 +43,7 @@ public class Player {
     private String email;
 
     @Column(name = "created_at", updatable = false)
-    private Instant createdAt = Instant.now();
+    private Date createdAt = Date.from(Instant.now());
 
     @Column(name = "rating", nullable = false, columnDefinition = "int default 0")
     private Integer rating = 0;
@@ -75,7 +76,7 @@ public class Player {
 
     }
 
-    public Player(Integer id, String name, String surname, LocalDate birthDate, String email){
+    public Player(Long id, String name, String surname, LocalDate birthDate, String email){
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -83,7 +84,7 @@ public class Player {
         this.email = email;
     }
 
-    public Player(Integer id, String name, String surname, LocalDate birthDate, String email, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
+    public Player(Long id, String name, String surname, LocalDate birthDate, String email, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -97,7 +98,7 @@ public class Player {
         this.goalsLost = goalsLosed;
     }
 
-    public Player(String name, String surname, LocalDate birthDate, String email, Instant createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
+    public Player(String name, String surname, LocalDate birthDate, String email, Date createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
         this.name = name;
         this.surname = surname;
         this.birthDate = birthDate;

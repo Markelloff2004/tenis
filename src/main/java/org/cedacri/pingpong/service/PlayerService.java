@@ -20,6 +20,9 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
+    public Player findById(long id) {
+        return playerRepository.findById(id).orElse(null);
+    }
     public Stream<Player> list(long page) {
         logger.info("Fetching list of players for page {}", page);
         return playerRepository.paged(page);
@@ -45,7 +48,7 @@ public class PlayerService {
 
     @Modifying
     @Transactional
-    public void deleteById(Integer id) {
+    public void deleteById(Long id) {
         if (id != null){
             logger.debug("Attempting to delete player with id {}", id);
 
