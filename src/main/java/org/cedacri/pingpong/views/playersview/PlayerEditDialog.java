@@ -47,6 +47,10 @@ public class PlayerEditDialog extends Dialog {
         birthDatePicker.setValue(player.getBirthDate() != null ? player.getBirthDate() : LocalDate.now());
         birthDatePicker.setWidth("300px");
 
+        TextField addressField = new TextField();
+        addressField.setValue(player.getAddress() != null ? player.getAddress() : "");
+        addressField.setWidth("300px");
+
         TextField handField = new TextField();
         handField.setValue(player.getHand() != null ? player.getHand() : "");
         handField.setWidth("300px");
@@ -83,6 +87,7 @@ public class PlayerEditDialog extends Dialog {
         formLayout.addFormItem(surnameField, "Surname");
         formLayout.addFormItem(emailField, "Email");
         formLayout.addFormItem(birthDatePicker, "Birth");
+        formLayout.addFormItem(addressField, "Address");
         formLayout.addFormItem(handField, "Playing Hand");
         formLayout.addFormItem(ratingField, "Rating");
         formLayout.addFormItem(wonMatchesField, "Won Matches");
@@ -102,6 +107,7 @@ public class PlayerEditDialog extends Dialog {
             player.setName(nameField.getValue());
             player.setSurname(surnameField.getValue());
             player.setEmail(emailField.getValue());
+            player.setAddress(addressField.getValue());
             player.setBirthDate(birthDatePicker.getValue());
             player.setHand(handField.getValue());
             player.setRating(ratingField.getValue());

@@ -38,8 +38,8 @@ public class Player {
     private LocalDate birthDate;
 
     @Column(name = "address", nullable = false)
-    @Size(50)
-    private
+    @Size(max = 50)
+    private String address;
 
     @Size(max = 100)
     @NotNull
@@ -102,11 +102,12 @@ public class Player {
         this.goalsLost = goalsLosed;
     }
 
-    public Player(String name, String surname, LocalDate birthDate, String email, Date createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
+    public Player(String name, String surname, LocalDate birthDate, String email, String address, Date createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
         this.name = name;
         this.surname = surname;
         this.birthDate = birthDate;
         this.email = email;
+        this.address = address;
         this.createdAt = createdAt;
         this.rating = rating;
         this.hand = hand;

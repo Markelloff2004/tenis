@@ -29,6 +29,7 @@ public class PlayerInfoDialog extends Dialog {
         formLayout.addFormItem(new Span(player.getSurname()), "Surname");
         formLayout.addFormItem(new Span(player.getEmail()), "Email");
         formLayout.addFormItem(new Span(player.getBirthDate() != null ? player.getBirthDate().toString() : "N/A"), "Age");
+        formLayout.addFormItem(new Span(player.getAddress()), "Address");
         formLayout.addFormItem(new Span(player.getHand()), "Playing Hand");
         formLayout.addFormItem(new Span(player.getRating() != null ? player.getRating().toString() : "N/A"), "Rating");
         formLayout.addFormItem(new Span(player.getWonMatches() != null ? player.getWonMatches().toString() : "N/A"), "Won Matches");
