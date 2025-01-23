@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Date;
 
 public class PlayerSaveDialog extends Dialog {
 
@@ -46,6 +47,9 @@ public class PlayerSaveDialog extends Dialog {
         TextField emailField = new TextField();
         emailField.setWidthFull();
 
+        TextField addressField = new TextField();
+        addressField.setWidthFull();
+
         ComboBox<String> handComboBox = new ComboBox<>();
         handComboBox.setItems(Constraints.PLAYING_HAND);
         handComboBox.setWidthFull();
@@ -54,6 +58,7 @@ public class PlayerSaveDialog extends Dialog {
         formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(surnameField, "Surname").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(birthDateTimePicker, "Birth Date").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
+        formLayout.addFormItem(addressField, "Address").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(emailField, "Email").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
         formLayout.addFormItem(handComboBox, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
 
@@ -64,15 +69,16 @@ public class PlayerSaveDialog extends Dialog {
 
             String name = nameField.getValue();
             String surname = surnameField.getValue();
-            LocalDate birthDate = birthDateTimePicker.getValue();
             String email = emailField.getValue();
+            LocalDate birthDate = birthDateTimePicker.getValue();
+            String address = addressField.getValue();
             String hand = handComboBox.getValue();
 
-            if (name.isBlank() || name.isEmpty() || surname.isEmpty() || birthDate.toString().isEmpty() || email.isEmpty() || hand.isEmpty()) {
-                NotificationManager.showInfoNotification("Please fill in all required fields.");
-                logger.warn("Player creation failed: Empty fields are present");
-                return;
-            }
+//            if (name.isBlank() || name.isEmpty() || surname.isEmpty() || birthDate.toString().isEmpty() || email.isEmpty() || hand.isEmpty()) {
+//                NotificationManager.showInfoNotification("Please fill in all required fields.");
+//                logger.warn("Player creation failed: Empty fields are present");
+//                return;
+//            }
 
             Player newPlayer = new Player(name, surname, birthDate, email, "", LocalDate.now(),  0, hand, 0, 0, 0, 0);
 
