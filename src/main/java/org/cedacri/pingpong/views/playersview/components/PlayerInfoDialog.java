@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.views.playersview;
+package org.cedacri.pingpong.views.playersview.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;

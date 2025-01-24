@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.views.playersview;
+package org.cedacri.pingpong.views.playersview.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -35,24 +35,24 @@ public class PlayerSaveDialog extends Dialog {
 
         TextField nameField = new TextField();
         nameField.setRequired(true);
-        nameField.setWidthFull();
+        nameField.setWidth("300px");
 
         TextField surnameField = new TextField();
         surnameField.setRequired(true);
-        surnameField.setWidthFull();
+        surnameField.setWidth("300px");
 
         DatePicker birthDateTimePicker = new DatePicker();
-        birthDateTimePicker.setWidthFull();
+        birthDateTimePicker.setWidth("300px");
 
         TextField emailField = new TextField();
-        emailField.setWidthFull();
+        emailField.setWidth("300px");
 
         TextField addressField = new TextField();
-        addressField.setWidthFull();
+        addressField.setWidth("300px");
 
         ComboBox<String> handComboBox = new ComboBox<>();
         handComboBox.setItems(Constraints.PLAYING_HAND);
-        handComboBox.setWidthFull();
+        handComboBox.setWidth("300px");
 
         FormLayout formLayout = new FormLayout();
         formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
@@ -103,7 +103,7 @@ public class PlayerSaveDialog extends Dialog {
 
         Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
             logger.info("Cancel button clicked. Closing PlayerSaveDialog.");
-            close();
+            this.close();
         } );
 
         cancelButton.setWidth("100px");

@@ -1,37 +1,29 @@
 package org.cedacri.pingpong.views.playersview;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.PlayerViewManagement;
+import org.cedacri.pingpong.views.playersview.components.PlayerDeleteDialog;
+import org.cedacri.pingpong.views.playersview.components.PlayerEditDialog;
+import org.cedacri.pingpong.views.playersview.components.PlayerInfoDialog;
+import org.cedacri.pingpong.views.playersview.components.PlayerSaveDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.stream.Collectors;
 
 @PageTitle("PlayersView")
@@ -116,7 +108,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     public void showCreatePlayer()
     {
         logger.info("Creating new player");
-        PlayerSaveDialog playerSaveDialog = new PlayerSaveDialog(playerService, this::showCreatePlayer);
+        PlayerSaveDialog playerSaveDialog = new PlayerSaveDialog(playerService, this::showAllPlayers);
         playerSaveDialog.open();
     }
 

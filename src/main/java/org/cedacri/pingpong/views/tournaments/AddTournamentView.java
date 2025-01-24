@@ -122,14 +122,15 @@ public class AddTournamentView extends VerticalLayout {
         newTournament.setPlayers(selectedPlayers);
 
         try {
-            newTournament = tournamentService.saveTournament(newTournament);
+//            newTournament =
+                    tournamentService.saveTournament(newTournament);
             logger.info("Tournament successfully saved with ID: {}:", newTournament.getId());
 
 //            TournamentUtils.generateTournamentMatches(matchService, newTournament);
             logger.info("Matches generated successfully");
 
             NotificationManager.showInfoNotification("Tournament created successfully! id: " + newTournament.getId());
-            getUI().ifPresent(ui -> ui.navigate("tournaments"));
+            getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + newTournament.getId()));
 
         } catch (Exception e) {
             logger.error("Failed to save tournament. Error: {}", e.getMessage(), e);

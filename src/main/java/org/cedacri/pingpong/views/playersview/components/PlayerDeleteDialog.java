@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.views.playersview;
+package org.cedacri.pingpong.views.playersview.components;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -11,7 +11,6 @@ import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.LoggerFactoryFriend;
 
 public class PlayerDeleteDialog extends Dialog {
 
@@ -32,11 +31,12 @@ public class PlayerDeleteDialog extends Dialog {
             logger.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
             try {
                 playerService.deleteById(player.getId());
-                NotificationManager.showInfoNotification("Player " + player.getName() + " " + player.getSurname() +
-                        ": " + player.getId() + " deleted!");
+                logger.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
+
                 close();
 
-                logger.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
+                NotificationManager.showInfoNotification("Player " + player.getName() + " " + player.getSurname() +
+                        ": " + player.getId() + " deleted!");
 
                 onDeleteCallback.run();
             }
