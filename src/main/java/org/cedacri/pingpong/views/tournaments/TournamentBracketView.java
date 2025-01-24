@@ -134,7 +134,10 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         logger.info("Refreshing matches for round {}", round);
         matchContainer.removeAll();
 
-        displayMatches(matchService.getMatchesByTournamentAndRound(tournament, round));
+        displayMatches(tournament.getMatches()
+                .stream()
+                .filter(m -> m.getRound().equals(round))
+                .toList());
     }
 
     private void displayMatches(List<Match> matches)

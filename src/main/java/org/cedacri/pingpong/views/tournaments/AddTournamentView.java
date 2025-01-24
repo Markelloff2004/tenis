@@ -11,13 +11,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.TournamentType;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.util.GridUtils;
@@ -43,7 +43,7 @@ public class AddTournamentView extends VerticalLayout {
 
     private final TextField tournamentNameField = ViewUtils.createTextField("Tournament Name");
     private final ComboBox<String> tournamentStatusComboBox = ViewUtils.createComboBox("Tournament Status", Constraints.STATUS_OF_TOURNAMENTS);
-    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", Arrays.asList(TournamentType.values()).stream()
+    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", Arrays.asList(TournamentTypeEnum.values()).stream()
             .map(v -> v.toString())
             .collect(Collectors.toList()));
     private final Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
@@ -116,8 +116,8 @@ public class AddTournamentView extends VerticalLayout {
         Tournament newTournament = new Tournament();
         int maxPlayers = calculateMaxPlayers(selectedPlayers.size());
         newTournament.setTournamentName(tournamentNameField.getValue());
-        newTournament.setTournamentStatus(tournamentStatusComboBox.getValue());
-        newTournament.setTournamentType(TournamentType.valueOf(tournamentTypeComboBox.getValue().toUpperCase()));
+        newTournament.setTournamentStatus(TournamentStatusEnum.valueOf(tournamentStatusComboBox.getValue().toUpperCase()));
+        newTournament.setTournamentType(TournamentTypeEnum.valueOf(tournamentTypeComboBox.getValue().toUpperCase()));
         newTournament.setMaxPlayers(maxPlayers);
         newTournament.setPlayers(selectedPlayers);
 

@@ -4,22 +4,22 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@RequiredArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "players")
 public class Player {
 
-   @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
@@ -47,7 +47,7 @@ public class Player {
     private String email;
 
     @Column(name = "created_at", updatable = false)
-    private Date createdAt = Date.from(Instant.now());
+    private LocalDate createdAt = LocalDate.now();
 
     @Column(name = "rating", nullable = false, columnDefinition = "int default 0")
     private Integer rating = 0;
@@ -76,45 +76,46 @@ public class Player {
     )
     private Set<Tournament> tournaments = new HashSet<>();
 
-    public Player() {
+    public Player(String name, String surname, LocalDate birthDate, String email, String address, LocalDate createdAt, Integer rating, String hand,
+                  Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
 
-    }
-
-    public Player(Long id, String name, String surname, LocalDate birthDate, String email){
-        this.id = id;
         this.name = name;
         this.surname = surname;
         this.birthDate = birthDate;
-        this.email = email;
-    }
-
-    public Player(Long id, String name, String surname, LocalDate birthDate, String email, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.rating = rating;
-        this.hand = hand;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-        this.goalsScored = goalsScored;
-        this.goalsLost = goalsLosed;
-    }
-
-    public Player(String name, String surname, LocalDate birthDate, String email, String address, Date createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLosed) {
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.email = email;
         this.address = address;
+        this.email = email;
         this.createdAt = createdAt;
         this.rating = rating;
         this.hand = hand;
         this.wonMatches = wonMatches;
         this.lostMatches = lostMatches;
         this.goalsScored = goalsScored;
-        this.goalsLost= goalsLosed;
+        this.goalsLost = goalsLost;
+    }
+
+    public Player(Integer rating, String name, String surname, LocalDate birthDate, Integer wonMatches, Integer lostMatches) {
+        this.rating = rating;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
+        this.wonMatches = wonMatches;
+        this.lostMatches = lostMatches;
+    }
+
+    public Player(Long id, String name, String surname, LocalDate birthDate, String email, String address, Integer rating,
+                  String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
+        this.email = email;
+        this.address = address;
+        this.rating = rating;
+        this.hand = hand;
+        this.wonMatches = wonMatches;
+        this.lostMatches = lostMatches;
+        this.goalsScored = goalsScored;
+        this.goalsLost = goalsLost;
     }
 
     @Override

@@ -6,8 +6,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cedacri.pingpong.enums.SetTypes;
-import org.cedacri.pingpong.enums.TournamentType;
+import org.cedacri.pingpong.enums.SetTypesEnum;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.interfaces.ITournament;
 
 import java.time.LocalDate;
@@ -35,25 +36,25 @@ public class Tournament implements ITournament {
     @Column(name = "max_players", nullable = false)
     private Integer maxPlayers;
 
-    @Size(max = 15)
+    @Enumerated(EnumType.STRING)
     @Column(name = "tournament_status", length = 15)
-    private String tournamentStatus;
+    private TournamentStatusEnum tournamentStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tournament_type", nullable = false)
-    private TournamentType tournamentType;
+    private TournamentTypeEnum tournamentType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sets_to_win", nullable = false)
-    private SetTypes setsToWin;
+    private SetTypesEnum setsToWin;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "semifinals_sets_to_win", nullable = false)
-    private SetTypes semifinalsSetsToWin;
+    private SetTypesEnum semifinalsSetsToWin;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "finals_sets_to_win", nullable = false)
-    private SetTypes finalsSetsToWin;
+    private SetTypesEnum finalsSetsToWin;
 
     @Column(name = "created_at", updatable = false)
     private LocalDate createdAt = LocalDate.now();
@@ -66,6 +67,6 @@ public class Tournament implements ITournament {
     )
     private Set<Player> players = new HashSet<>();
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "tournament", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Match> matches = new HashSet<>();
 }

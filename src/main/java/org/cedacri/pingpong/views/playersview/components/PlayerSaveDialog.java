@@ -16,9 +16,7 @@ import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 
 public class PlayerSaveDialog extends Dialog {
 
@@ -80,7 +78,7 @@ public class PlayerSaveDialog extends Dialog {
 //                return;
 //            }
 
-            Player newPlayer = new Player(name, surname, birthDate, email, address, Date.from(Instant.now()), 0, hand, 0, 0, 0, 0);
+            Player newPlayer = new Player(name, surname, birthDate, email, "", LocalDate.now(),  0, hand, 0, 0, 0, 0);
 
             try
             {

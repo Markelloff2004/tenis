@@ -55,7 +55,8 @@ public class PlayerRepository {
                                 Player$.id,
                                 Player$.name,
                                 Player$.surname,
-                                Player$.birthDate, Player$.email, Player$.rating,
+                                Player$.birthDate, Player$.email,
+                                Player$.address, Player$.rating,
                                 Player$.hand, Player$.wonMatches,
                                 Player$.lostMatches, Player$.goalsScored,
                                 Player$.goalsLost)

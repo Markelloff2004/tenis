@@ -6,7 +6,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import org.cedacri.pingpong.enums.TournamentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

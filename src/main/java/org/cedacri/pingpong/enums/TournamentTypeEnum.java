@@ -1,6 +1,6 @@
 package org.cedacri.pingpong.enums;
 
-public enum TournamentType {
+public enum TournamentTypeEnum {
     OLIMPIC,
     ROBIN_ROUND
 }

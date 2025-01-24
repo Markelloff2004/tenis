@@ -75,7 +75,7 @@ public class TournamentDetailsView extends VerticalLayout implements HasUrlParam
     {
         logger.debug("Creating tournament details section");
         TextField maxPlayersField = ViewUtils.createReadOnlyField("Maximum Players", String.valueOf(tournament.getMaxPlayers()));
-        TextField statusField = ViewUtils.createReadOnlyField("Status", tournament.getTournamentStatus());
+        TextField statusField = ViewUtils.createReadOnlyField("Status", tournament.getTournamentStatus().toString());
         TextField typeField = ViewUtils.createReadOnlyField("Type", tournament.getTournamentType().toString());
 
         return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, maxPlayersField, statusField, typeField);

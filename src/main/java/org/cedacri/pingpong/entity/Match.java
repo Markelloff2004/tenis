@@ -39,8 +39,8 @@ public class Match {
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "top_player_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "top_player_id")
     private Player topPlayer;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
