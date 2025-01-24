@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.SetTypesEnum;
@@ -15,17 +16,12 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
-import org.cedacri.pingpong.utils.ViewUtils;
+import org.cedacri.pingpong.utils.*;
 import org.cedacri.pingpong.views.util.GridUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TournamentAddDialog extends Dialog {
@@ -116,6 +112,12 @@ public class TournamentAddDialog extends Dialog {
                 tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
                 tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
                 tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+
+                MatchGenerator matchGenerator = new MatchGenerator(
+                        tournament.getSetsToWin(),
+                        tournament.getSemifinalsSetsToWin(),
+                        tournament.getFinalsSetsToWin(),
+                        tournament.getTournamentType());
 
                 tournamentService.saveTournament(tournament);
                 logger.info("Tournament saved successfully: {}", tournament.getId());

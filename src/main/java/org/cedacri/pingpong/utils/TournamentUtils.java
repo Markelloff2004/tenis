@@ -66,17 +66,17 @@ public class TournamentUtils {
         logger.debug("getRoundsCount called with players: {}", players);
 
         return switch (players) {
-            case 8 -> List.of("Quarterfinals", "Semifinals", "Final");
-            case 16 -> List.of("Stage 1", "Quarterfinals", "Semifinals", "Final");
-            case 32 -> List.of("Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
-            case 64 -> List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
-            default -> List.of("Semifinals", "Final");
+            case 8 -> List.of("Quarterfinal", "Semifinal", "Final");
+            case 16 -> List.of("Stage 1", "Quarterfinal", "Semifinal", "Final");
+            case 32 -> List.of("Stage 2", "Stage 1", "Quarterfinal", "Semifinal", "Final");
+            case 64 -> List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinal", "Semifinal", "Final");
+            default -> List.of("Semifinal", "Final");
         };
     }
 
     public static String getNextRound(String currentRound)
     {
-        List<String> allRounds = List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinals", "Semifinals", "Final");
+        List<String> allRounds = List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinal", "Semifinal", "Final");
 
         int currentRoundIndex = allRounds.indexOf(currentRound);
 

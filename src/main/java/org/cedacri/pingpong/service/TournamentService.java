@@ -3,14 +3,17 @@ package org.cedacri.pingpong.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.TournamentRepository;
+import org.cedacri.pingpong.utils.MatchGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -56,6 +59,18 @@ public class TournamentService {
         }
 
         tournamentRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void startTournament(Tournament tournament) {
+        MatchGenerator matchGenerator = new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
+                tournament.getFinalsSetsToWin(), tournament.getTournamentType());
+
+        List<Match> tournamentMatches = matchGenerator.generateMatches(tournament);
+
+        tournament.setMatches(new HashSet<>(tournamentMatches));
+
+        saveTournament(tournament);
     }
 
 
