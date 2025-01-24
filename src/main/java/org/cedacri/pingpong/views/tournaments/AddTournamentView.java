@@ -9,14 +9,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.MatchGenerator;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
@@ -24,9 +25,7 @@ import org.cedacri.pingpong.views.util.GridUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.cedacri.pingpong.utils.TournamentUtils.calculateMaxPlayers;
@@ -39,12 +38,11 @@ public class AddTournamentView extends VerticalLayout {
     private static final Logger logger = LoggerFactory.getLogger(AddTournamentView.class);
 
     private final TournamentService tournamentService;
-    private final MatchService matchService;
 
     private final TextField tournamentNameField = ViewUtils.createTextField("Tournament Name");
     private final ComboBox<String> tournamentStatusComboBox = ViewUtils.createComboBox("Tournament Status", Constraints.STATUS_OF_TOURNAMENTS);
-    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", Arrays.asList(TournamentTypeEnum.values()).stream()
-            .map(v -> v.toString())
+    private final ComboBox<String> tournamentTypeComboBox = ViewUtils.createComboBox("Tournament Type", Arrays.stream(TournamentTypeEnum.values())
+            .map(Enum::toString)
             .collect(Collectors.toList()));
     private final Grid<Player> availablePlayersGrid = new Grid<>(Player.class, false);
     private final Grid<Player> selectedPlayersGrid = new Grid<>(Player.class, false);
@@ -52,9 +50,8 @@ public class AddTournamentView extends VerticalLayout {
     private final Set<Player> availablePlayers;
     private final Set<Player> selectedPlayers = new HashSet<>();
 
-    public AddTournamentView(PlayerService playerService, TournamentService tournamentService, MatchService matchService) {
+    public AddTournamentView(PlayerService playerService, TournamentService tournamentService) {
         this.tournamentService = tournamentService;
-        this.matchService = matchService;
 
         this.availablePlayers = playerService.getAll().collect(Collectors.toSet());
 
@@ -120,8 +117,22 @@ public class AddTournamentView extends VerticalLayout {
         newTournament.setTournamentType(TournamentTypeEnum.valueOf(tournamentTypeComboBox.getValue().toUpperCase()));
         newTournament.setMaxPlayers(maxPlayers);
         newTournament.setPlayers(selectedPlayers);
+        MatchGenerator matchGenerator = new MatchGenerator(
+                newTournament.getSetsToWin(),
+                newTournament.getSemifinalsSetsToWin(),
+                newTournament.getFinalsSetsToWin(),
+                newTournament.getTournamentType());
+
+        List<Player> sortedPlayers = new ArrayList<>(selectedPlayers.stream().toList());
+
+        sortedPlayers.sort(Comparator.comparingInt(Player::getRating));
+
+        List<Match> tournamentMatches = matchGenerator.generateMatches(selectedPlayers.stream().toList(), newTournament);
+
+        newTournament.setMatches(new HashSet<>(tournamentMatches));
 
         try {
+
             newTournament = tournamentService.saveTournament(newTournament);
             logger.info("Tournament successfully saved with ID: {}:", newTournament.getId());
 
