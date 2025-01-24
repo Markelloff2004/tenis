@@ -17,8 +17,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.SetTypes;
-import org.cedacri.pingpong.enums.TournamentType;
+import org.cedacri.pingpong.enums.SetTypesEnum;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
@@ -185,7 +186,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             nameField.setValue(tournament.getTournamentName());
 
             ComboBox<String> typeComboBox = new ComboBox<>("Type");
-            typeComboBox.setItems(Arrays.asList(TournamentType.values())
+            typeComboBox.setItems(Arrays.asList(TournamentTypeEnum.values())
                     .stream()
                     .map(v -> v.toString())
                     .collect(Collectors.toSet()));
@@ -193,7 +194,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             typeComboBox.setWidthFull();
 
             ComboBox<String> setsCountComboBox = new ComboBox<>("Sets Count");
-            setsCountComboBox.setItems(Arrays.asList(SetTypes.values())
+            setsCountComboBox.setItems(Arrays.asList(SetTypesEnum.values())
                     .stream()
                     .map(st -> st.toString())
                     .collect(Collectors.toSet()));
@@ -201,7 +202,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             setsCountComboBox.setWidthFull();
 
         ComboBox<String> semifinalsSetsCountComboBox= new ComboBox<>("Semifinals Sets Count");
-        semifinalsSetsCountComboBox.setItems(Arrays.asList(SetTypes.values())
+        semifinalsSetsCountComboBox.setItems(Arrays.asList(SetTypesEnum.values())
                 .stream()
                 .map(st -> st.toString())
                 .collect(Collectors.toSet()));
@@ -209,7 +210,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         semifinalsSetsCountComboBox.setWidthFull();
 
         ComboBox<String> finalsSetsCountComboBox = new ComboBox<>("Finals Sets Count");
-        finalsSetsCountComboBox.setItems(Arrays.asList(SetTypes.values())
+        finalsSetsCountComboBox.setItems(Arrays.asList(SetTypesEnum.values())
                 .stream()
                 .map(st -> st.toString())
                 .collect(Collectors.toSet()));
@@ -218,7 +219,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
             ComboBox<String> statusComboBox = new ComboBox<>("Status");
             statusComboBox.setItems(Constraints.TOURNAMENT_STATUSES);
-            statusComboBox.setValue(tournament.getTournamentStatus());
+            statusComboBox.setValue(tournament.getTournamentStatus().toString());
 
             Set<Player> selectedPlayersSet = new HashSet<>(tournament.getPlayers());
 
@@ -261,12 +262,12 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
             Button saveButton = new Button("Save", event -> {
                 try{
                     tournament.setTournamentName(nameField.getValue());
-                    tournament.setTournamentType(TournamentType.valueOf(typeComboBox.getValue().toUpperCase()));
-                    tournament.setTournamentStatus(statusComboBox.getValue());
+                    tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
+                    tournament.setTournamentStatus(TournamentStatusEnum.valueOf(statusComboBox.getValue().toUpperCase()));
                     tournament.setPlayers(selectedPlayersSet);
-                    tournament.setSetsToWin(SetTypes.valueOf(setsCountComboBox.getValue().toUpperCase()));
-                    tournament.setSemifinalsSetsToWin(SetTypes.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-                    tournament.setFinalsSetsToWin(SetTypes.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+                    tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
+                    tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
+                    tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
 
                     tournamentService.saveTournament(tournament);
                     editDialog.close();

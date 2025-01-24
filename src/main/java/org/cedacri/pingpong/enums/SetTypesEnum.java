@@ -1,6 +1,6 @@
 package org.cedacri.pingpong.enums;
 
-public enum SetTypes {
+public enum SetTypesEnum {
     BEST_OF_ONE,
     BEST_OF_THREE,
     BEST_OF_FIVE,
