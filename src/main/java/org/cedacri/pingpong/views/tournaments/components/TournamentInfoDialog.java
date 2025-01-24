@@ -1,38 +1,33 @@
 package org.cedacri.pingpong.views.tournaments.components;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
-import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
-public class TournamentEditDialog extends TournamentDialog {
+public class TournamentInfoDialog extends TournamentDialog {
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentEditDialog.class);
+    private static final Logger logger = LoggerFactory.getLogger(TournamentInfoDialog.class);
 
-    private final TournamentService tournamentService;
-    private final Runnable onSaveCallback;
     private final Tournament tournament;
 
     private final ComboBox<String> statusComboBox;
 
-    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, Tournament tournament, Runnable onSaveCallback) {
-        super("Edit Tournament");
+    public TournamentInfoDialog(PlayerService playerService, Tournament tournament) {
+        super("Tournament Details:");
 
-        this.tournamentService = tournamentService;
         this.tournament = tournament;
-        this.onSaveCallback = onSaveCallback;
 
 
         this.selectedPlayersSet = new HashSet<>();
@@ -43,14 +38,41 @@ public class TournamentEditDialog extends TournamentDialog {
         statusComboBox = createStatusComboBox();
         configureComboBoxes();
 
-        initializeGrids(true);
+        initializeGrids(false);
+
 
         add(createDialogLayoutWithStatus(), createPlayersLayout(), createDialogButtons());
 
         logger.debug("Initializing fields for editing...");
 
         prefillFields(tournament);
-        refreshGrids();
+        setReadOnlyForFields();
+//        refreshGrids();
+    }
+
+    private void setReadOnlyForFields() {
+        logger.debug("Set readOnly for fields");
+        tournamentNameField.setReadOnly(true);
+        typeComboBox.setReadOnly(true);
+        statusComboBox.setReadOnly(true);
+        setsCountComboBox.setReadOnly(true);
+        semifinalsSetsCountComboBox.setReadOnly(true);
+        finalsSetsCountComboBox.setReadOnly(true);
+    }
+
+    @Override
+    protected HorizontalLayout createPlayersLayout() {
+        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN,
+                ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER, new Span("Selected Players"), selectedPlayersGrid)
+        );
+    }
+
+    @Override
+    protected HorizontalLayout createDialogButtons() {
+        Button saveButton = ViewUtils.createButton("Matches", "colored-button", this::onSave);
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+
+        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
     }
 
     private VerticalLayout createDialogLayoutWithStatus() {
@@ -70,6 +92,7 @@ public class TournamentEditDialog extends TournamentDialog {
         comboBox.setValue(String.valueOf(tournament.getTournamentStatus()));
         comboBox.setWidth("20%");
         comboBox.setRequired(true);
+        comboBox.setReadOnly(true);
         return comboBox;
     }
 
@@ -84,29 +107,8 @@ public class TournamentEditDialog extends TournamentDialog {
 
     @Override
     protected void onSave() {
-            logger.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
-
-            try{
-                tournament.setTournamentName(tournamentNameField.getValue());
-                tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-                tournament.setTournamentStatus(TournamentStatusEnum.valueOf(statusComboBox.getValue()));
-                tournament.setPlayers(selectedPlayersSet);
-                tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
-                tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-                tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
-
-                tournamentService.saveTournament(tournament);
-                logger.info("Tournament updated successfully: {}", tournament.getId());
-
-                onSaveCallback.run();
-
-                close();
-
-                NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
-            }
-            catch (Exception e){
-                logger.error("Error updating tournament: {} {}", tournament.getId(), e.getMessage(), e);
-                NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + "\n" + e.getMessage());
-            }
+        getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()));
+        logger.info("Navigating to tournament details page, id: {}", tournament.getId());
+        close();
     }
 }
