@@ -11,10 +11,8 @@ import java.util.Set;
 
 public class GridUtils {
 
-    public static void configurePlayerGrid(Grid<Player> grid, Set<Player> source, Set<Player> target, String buttonLabel, Runnable refreshAction) {
-        grid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
-        grid.addColumn(Player::getName).setHeader("Name").setSortable(true);
-        grid.setItems(source);
+    public static void configurePlayerGridWithActionButtons(Grid<Player> grid, Set<Player> source, Set<Player> target, String buttonLabel, Runnable refreshAction) {
+        configurePlayerGrid(grid, source);
         grid.addColumn(createPlayerActionColumn(source, target, buttonLabel, refreshAction))
                 .setHeader("Action")
                 .setFlexGrow(0)
@@ -35,5 +33,12 @@ public class GridUtils {
      public static void configureGrid(Grid grid) {
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.setWidth("45%");
+    }
+
+    public static void configurePlayerGrid(Grid<Player> grid, Set<Player> source) {
+        grid.addColumn(Player::getRating).setHeader("Rating").setSortable(true);
+        grid.addColumn(Player::getName).setHeader("Name").setSortable(true);
+        grid.addColumn(Player::getSurname).setHeader("Surname").setSortable(true);
+        grid.setItems(source);
     }
 }

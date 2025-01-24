@@ -12,6 +12,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
@@ -22,6 +23,7 @@ import org.cedacri.pingpong.views.interfaces.TournamentManagement;
 import org.cedacri.pingpong.views.tournaments.components.TournamentAddDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentDeleteDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentEditDialog;
+import org.cedacri.pingpong.views.tournaments.components.TournamentInfoDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +106,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
         Button editButton = ViewUtils.createButton("Edit", "compact-button", () ->
         {
-            if(tournament.getTournamentStatus().equals(Constraints.STATUS_PENDING)) {
+            if(tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
                 showEditTournament(tournament);
             }
             else{
@@ -133,8 +135,13 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     @Override
     public void showInfoTournament(Tournament tournamentDetails) {
-        getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournamentDetails.getId()));
-        logger.info("Navigating to tournament details page, id: {}", tournamentDetails.getId());
+        logger.info("Showing tournament details for tournamnet: {} with Id: {}", tournamentDetails.getTournamentName(), tournamentDetails.getId());
+
+        TournamentInfoDialog tournamentEditDialog = new TournamentInfoDialog(playerService, tournamentDetails);
+        tournamentEditDialog.open();
+
+//        getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournamentDetails.getId()));
+//        logger.info("Navigating to tournament details page, id: {}", tournamentDetails.getId());
     }
 
     @Override

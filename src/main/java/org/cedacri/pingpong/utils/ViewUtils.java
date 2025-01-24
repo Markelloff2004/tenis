@@ -1,10 +1,12 @@
 package org.cedacri.pingpong.utils;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,15 @@ public class ViewUtils
         return comboBox;
     }
 
+    public static Checkbox createCheckBox(String label) {
+        logger.debug("Creating Checkbox with label: '{}' ",label);
+
+        Checkbox checkbox = new Checkbox(label);
+        checkbox.setWidth("150px");
+        logger.debug("Checkbox created: {}", checkbox);
+        return checkbox;
+    }
+
     /*public static ComboBox<TournamentType> createComboBox(String label, TournamentType type) {
         logger.debug("Creating ComboBox with label: '{}' and type: '{}'", label, type);
 
@@ -76,6 +87,17 @@ public class ViewUtils
         layout.setWidthFull();
         layout.setJustifyContentMode(justifyContentMode);
         layout.setAlignItems(FlexComponent.Alignment.BASELINE);
+        logger.debug("HorizontalLayout created: {}", layout);
+        return layout;
+    }
+
+    public static VerticalLayout createVerticalLayout(FlexComponent.JustifyContentMode justifyContentMode , com.vaadin.flow.component.Component... components) {
+        logger.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
+        VerticalLayout layout = new VerticalLayout(components);
+        layout.setSpacing(true);
+        layout.setWidthFull();
+        layout.setJustifyContentMode(justifyContentMode);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
         logger.debug("HorizontalLayout created: {}", layout);
         return layout;
     }
