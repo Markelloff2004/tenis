@@ -10,8 +10,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.SetTypes;
-import org.cedacri.pingpong.enums.TournamentType;
+import org.cedacri.pingpong.enums.SetTypesEnum;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
@@ -45,7 +46,7 @@ public class TournamentAddDialog extends Dialog {
         tournamentNameField.setRequired(true);
 
         ComboBox<String> typeComboBox = new ComboBox<>("Type");
-        typeComboBox.setItems(Arrays.stream(TournamentType.values())
+        typeComboBox.setItems(Arrays.stream(TournamentTypeEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
         typeComboBox.setWidth("35%");
@@ -53,21 +54,21 @@ public class TournamentAddDialog extends Dialog {
 
 
         ComboBox<String> setsCountComboBox = new ComboBox<>("Sets Count");
-        setsCountComboBox.setItems(Arrays.stream(SetTypes.values())
+        setsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
         setsCountComboBox.setWidth("30%");
         setsCountComboBox.setRequired(true);
 
         ComboBox<String> semifinalsSetsCountComboBox= new ComboBox<>("Semifinals Sets Count");
-        semifinalsSetsCountComboBox.setItems(Arrays.stream(SetTypes.values())
+        semifinalsSetsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
         semifinalsSetsCountComboBox.setWidth("30%");
         semifinalsSetsCountComboBox.setRequired(true);
 
         ComboBox<String> finalsSetsCountComboBox = new ComboBox<>("Finals Sets Count");
-        finalsSetsCountComboBox.setItems(Arrays.stream(SetTypes.values())
+        finalsSetsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
         finalsSetsCountComboBox.setWidth("30%");
@@ -108,13 +109,13 @@ public class TournamentAddDialog extends Dialog {
                 Tournament tournament = new Tournament();
 
                 tournament.setTournamentName(tournamentNameField.getValue());
-                tournament.setTournamentType(TournamentType.valueOf(typeComboBox.getValue().toUpperCase()));
-                tournament.setTournamentStatus(Constraints.STATUS_PENDING);
+                tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
+                tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
                 tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(selectedPlayersSet.size()));
                 tournament.setPlayers(selectedPlayersSet);
-                tournament.setSetsToWin(SetTypes.valueOf(setsCountComboBox.getValue().toUpperCase()));
-                tournament.setSemifinalsSetsToWin(SetTypes.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-                tournament.setFinalsSetsToWin(SetTypes.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+                tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
+                tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
+                tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
 
                 tournamentService.saveTournament(tournament);
                 logger.info("Tournament saved successfully: {}", tournament.getId());

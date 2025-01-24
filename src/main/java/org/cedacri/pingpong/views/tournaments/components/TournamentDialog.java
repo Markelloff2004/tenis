@@ -9,17 +9,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.enums.SetTypes;
-import org.cedacri.pingpong.enums.TournamentType;
-import org.cedacri.pingpong.service.PlayerService;
-import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.enums.SetTypesEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.util.GridUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,7 +34,7 @@ public abstract class TournamentDialog extends Dialog {
     protected Grid<Player> selectedPlayersGrid;
     protected Grid<Player> availablePlayersGrid;
 
-    protected TournamentDialog(String headerTitle, TournamentService tournamentService, PlayerService playerService) {
+    protected TournamentDialog(String headerTitle) {
         logger.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
@@ -45,7 +42,7 @@ public abstract class TournamentDialog extends Dialog {
 
         initializeFields();
         configureComboBoxes();
-        initializeGrids(playerService);
+        initializeGrids();
 
         VerticalLayout dialogLayout = createDialogLayout();
         HorizontalLayout playersLayout = createPlayersLayout();
@@ -78,40 +75,37 @@ public abstract class TournamentDialog extends Dialog {
     }
 
     private void configureComboBoxes() {
-        typeComboBox.setItems(Arrays.stream(TournamentType.values())
+        typeComboBox.setItems(Arrays.stream(TournamentTypeEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
 
-        setsCountComboBox.setItems(Arrays.stream(SetTypes.values())
+        setsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
 
-        semifinalsSetsCountComboBox.setItems(Arrays.stream(SetTypes.values())
+        semifinalsSetsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
 
-        finalsSetsCountComboBox.setItems(Arrays.stream(SetTypes.values())
+        finalsSetsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
                 .map(Enum::toString)
                 .collect(Collectors.toSet()));
     }
 
-    private void initializeGrids(PlayerService playerService) {
+    private void initializeGrids() {
         selectedPlayersGrid = new Grid<>(Player.class, false);
         availablePlayersGrid = new Grid<>(Player.class, false);
-
-        selectedPlayersSet = new HashSet<>();
-        availablePlayersSet = playerService.getAll().collect(Collectors.toSet());
 
         availablePlayersGrid.setItems(availablePlayersSet);
         selectedPlayersGrid.setItems(selectedPlayersSet);
 
-        Runnable refreshGrids = () -> {
+        GridUtils.configurePlayerGrid(selectedPlayersGrid, selectedPlayersSet, availablePlayersSet, "Remove", this::refreshGrids);
+        GridUtils.configurePlayerGrid(availablePlayersGrid, availablePlayersSet, selectedPlayersSet, "Add", this::refreshGrids);
+    }
+
+    protected void refreshGrids() {
             selectedPlayersGrid.setItems(selectedPlayersSet);
             availablePlayersGrid.setItems(availablePlayersSet);
-        };
-
-        GridUtils.configurePlayerGrid(selectedPlayersGrid, selectedPlayersSet, availablePlayersSet, "Remove", refreshGrids);
-        GridUtils.configurePlayerGrid(availablePlayersGrid, availablePlayersSet, selectedPlayersSet, "Add", refreshGrids);
     }
 
     private VerticalLayout createDialogLayout() {
