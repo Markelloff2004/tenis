@@ -42,18 +42,13 @@ public class MatchService {
     }
 
     @Transactional
-    public void saveOrUpdateMatch(Match nextRoundMatch)
-    {
-        if (nextRoundMatch == null) {
-            logger.error("Attempted to save or update a null Match");
-            throw new IllegalArgumentException("Match cannot be null.");
-        }
+    public void saveOrUpdateMatch(Match match) {
 
-        logger.debug("Attempting to save or update match: {}", nextRoundMatch);
+        logger.debug("Attempting to save or update match: {}", match);
 
         // Saving new entity
-        matchRepository.save(nextRoundMatch);
-        logger.debug("Match saved: {}", nextRoundMatch);
+        matchRepository.save(match);
+        logger.debug("Match saved: {}", match);
     }
 
     @Transactional
