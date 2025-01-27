@@ -15,9 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
-public class TournamentEditDialog extends TournamentDialog {
+public class TournamentEditDialog extends AbstractTournamentDialog {
 
     private static final Logger logger = LoggerFactory.getLogger(TournamentEditDialog.class);
 

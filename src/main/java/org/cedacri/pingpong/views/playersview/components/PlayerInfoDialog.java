@@ -1,50 +1,56 @@
 package org.cedacri.pingpong.views.playersview.components;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextField;
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PlayerInfoDialog extends Dialog {
+public class PlayerInfoDialog extends PlayerEditDialog {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlayerInfoDialog.class);
 
-    public PlayerInfoDialog(Player player) {
-        logger.info("Showing details player: {} {}:{}", player.getName(), player.getSurname(), player.getId());
+    public PlayerInfoDialog(Player player, PlayerService playerService, Runnable onSaveCallback) {
+        super(player, playerService, onSaveCallback);
 
-        setWidth("400px");
-        setHeight("auto");
-        setHeaderTitle("Player Details");
-
-        FormLayout formLayout = new FormLayout();
-        formLayout.getStyle().set("gap", "5px");
-
-        formLayout.addFormItem(new Span(player.getName()), "Name");
-        formLayout.addFormItem(new Span(player.getSurname()), "Surname");
-        formLayout.addFormItem(new Span(player.getEmail()), "Email");
-        formLayout.addFormItem(new Span(player.getBirthDate() != null ? player.getBirthDate().toString() : "N/A"), "Age");
-        formLayout.addFormItem(new Span(player.getAddress()), "Address");
-        formLayout.addFormItem(new Span(player.getHand()), "Playing Hand");
-        formLayout.addFormItem(new Span(player.getRating() != null ? player.getRating().toString() : "N/A"), "Rating");
-        formLayout.addFormItem(new Span(player.getWonMatches() != null ? player.getWonMatches().toString() : "N/A"), "Won Matches");
-        formLayout.addFormItem(new Span(player.getLostMatches() != null ? player.getLostMatches().toString() : "N/A"), "Lost Matches");
-        formLayout.addFormItem(new Span(player.getGoalsScored() != null ? player.getGoalsScored().toString() : "N/A"), "Goals Scored");
-        formLayout.addFormItem(new Span(player.getGoalsLost() != null ? player.getGoalsLost().toString() : "N/A"), "Goals Lost");
-        formLayout.addFormItem(new Span(player.getCreatedAt() != null ? player.getCreatedAt().toString() : "N/A"), "Created At");
-
-        Button closeButton = ViewUtils.createButton("Cancel", "button", () -> {
-            logger.info("Close button clicked. Closing PlayerInfoDialog.");
-            close();
-        } );
-
-        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, closeButton);
-
-        add(formLayout, buttonLayout);
+        setReadOnlyForFields();
     }
+
+    protected void setReadOnlyForFields() {
+        nameField.setReadOnly(true);
+        surnameField.setReadOnly(true);
+        emailField.setReadOnly(true);
+        addressField.setReadOnly(true);
+        birthDatePicker.setReadOnly(true);
+        handComboBox.setReadOnly(true);
+        ratingField.setReadOnly(true);
+        wonMatchesField.setReadOnly(true);
+        lostMatchesField.setReadOnly(true);
+        goalsLostField.setReadOnly(true);
+        goalsScoredField.setReadOnly(true);
+    }
+
+    @Override
+    protected HorizontalLayout createButtonsLayout() {
+        Button cancelButton = ViewUtils.createButton(
+                "Cancel",
+                "button",
+                this::close
+        );
+
+        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, cancelButton);
+    }
+
+
+
 }

@@ -3,10 +3,12 @@ package org.cedacri.pingpong.utils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +57,27 @@ public class ViewUtils
         logger.debug("Creating Checkbox with label: '{}' ",label);
 
         Checkbox checkbox = new Checkbox(label);
-        checkbox.setWidth("150px");
+        checkbox.setWidth("250px");
         logger.debug("Checkbox created: {}", checkbox);
         return checkbox;
+    }
+
+    public static DatePicker createDatePicker(String label) {
+        logger.debug("Creating DatePicker with label: '{}'", label);
+
+        DatePicker datePicker = new DatePicker(label);
+        datePicker.setWidth("250px");
+        logger.debug("DatePicker created: {}", datePicker);
+        return datePicker;
+    }
+
+    public static IntegerField createIntegerField(String label) {
+        logger.debug("Creating IntegerField with label: '{}'", label);
+
+        IntegerField integerField = new IntegerField(label);
+        integerField.setWidth("250px");
+        logger.debug("IntegerField created: {}", integerField);
+        return integerField;
     }
 
     /*public static ComboBox<TournamentType> createComboBox(String label, TournamentType type) {

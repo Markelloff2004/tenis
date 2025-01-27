@@ -9,14 +9,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
-import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 
-public class TournamentInfoDialog extends TournamentDialog {
+public class TournamentInfoDialog extends AbstractTournamentDialog {
 
     private static final Logger logger = LoggerFactory.getLogger(TournamentInfoDialog.class);
 

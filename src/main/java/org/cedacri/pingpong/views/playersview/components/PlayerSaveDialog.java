@@ -5,6 +5,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -18,97 +19,44 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 
-public class PlayerSaveDialog extends Dialog {
+public class PlayerSaveDialog extends AbstractPlayerDialog {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlayerSaveDialog.class);
+    private PlayerService playerService;
+    private Runnable onSaveCallback;
+    private Player player;
 
     public PlayerSaveDialog(PlayerService playerService, Runnable onSaveCallback) {
-        logger.info("Initializing PlayerSaveDialog for new player ");
+        super("Save Player");
+        this.playerService = playerService;
+        this.onSaveCallback = onSaveCallback;
+        this.player = new Player();
 
-        setWidth("400px");
-        setHeight("auto");
-        setHeaderTitle("Save Player");
+        initializeFields();
+        add(createFieldsLayout(), createButtonsLayout());
 
-        logger.debug("Initializing fields for player...");
+        logger.debug("Initializing fields for editing...");
 
-        TextField nameField = new TextField();
-        nameField.setRequired(true);
-        nameField.setWidth("300px");
+        populateFields(player);
+    }
 
-        TextField surnameField = new TextField();
-        surnameField.setRequired(true);
-        surnameField.setWidth("300px");
+    @Override
+    protected void onSave() {
+        logger.info("Saving player: {} {}", player.getName(), player.getSurname());
+        player.setName(nameField.getValue());
+        player.setSurname(surnameField.getValue());
+        player.setEmail(emailField.getValue());
+        player.setAddress(addressField.getValue());
+        player.setBirthDate(birthDatePicker.getValue());
+        player.setHand(handComboBox.getValue());
 
-        DatePicker birthDateTimePicker = new DatePicker();
-        birthDateTimePicker.setWidth("300px");
-
-        TextField emailField = new TextField();
-        emailField.setWidth("300px");
-
-        TextField addressField = new TextField();
-        addressField.setWidth("300px");
-
-        ComboBox<String> handComboBox = new ComboBox<>();
-        handComboBox.setItems(Constraints.PLAYING_HAND);
-        handComboBox.setWidth("300px");
-
-        FormLayout formLayout = new FormLayout();
-        formLayout.addFormItem(nameField, "Name").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(surnameField, "Surname").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(birthDateTimePicker, "Birth Date").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(addressField, "Address").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(emailField, "Email").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-        formLayout.addFormItem(handComboBox, "Playing Hand").getStyle().set("flex-direction", "column").set("margin-bottom", "5px");
-
-
-        Button saveButton = ViewUtils.createButton("Save", "colored-button", () ->
-        {
-            logger.info("Save button clicked. Attempting to save player ");
-
-            String name = nameField.getValue();
-            String surname = surnameField.getValue();
-            String email = emailField.getValue();
-            LocalDate birthDate = birthDateTimePicker.getValue();
-            String address = addressField.getValue();
-            String hand = handComboBox.getValue();
-
-//            if (name.isBlank() || name.isEmpty() || surname.isEmpty() || birthDate.toString().isEmpty() || email.isEmpty() || hand.isEmpty()) {
-//                NotificationManager.showInfoNotification("Please fill in all required fields.");
-//                logger.warn("Player creation failed: Empty fields are present");
-//                return;
-//            }
-
-            Player newPlayer = new Player(name, surname, birthDate, email, "", LocalDate.now(),  0, hand, 0, 0, 0, 0);
-
-            try
-            {
-                playerService.save(newPlayer);
-                logger.info("Player saved successfully: {} {}", name, surname);
-
-                onSaveCallback.run();
-
-                close();
-
-                NotificationManager.showInfoNotification("Player added successfully: " + newPlayer.getName() + " " + newPlayer.getSurname());
-            }
-            catch (Exception e)
-            {
-                logger.error("Error creating player {} {} : {}", name, surname, e.getMessage(), e);
-                NotificationManager.showInfoNotification("Player cannot be added : " + e.getMessage());
-            }
-        });
-        saveButton.setWidth("100px");
-
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
-            logger.info("Cancel button clicked. Closing PlayerSaveDialog.");
-            this.close();
-        } );
-
-        cancelButton.setWidth("100px");
-
-        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
-        buttonLayout.getStyle().set("margin-top", "10px");
-
-        add(formLayout, buttonLayout);
+        try {
+            playerService.save(player);
+            onSaveCallback.run();
+            close();
+            NotificationManager.showInfoNotification("Player updated successfully!");
+        } catch (Exception e) {
+            logger.error("Error saving player: {}", e.getMessage());
+            Notification.show("Error updating player: " + e.getMessage());
+        }
     }
 }

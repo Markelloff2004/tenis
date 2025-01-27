@@ -116,7 +116,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     public void showDetailsPlayer(Player player)
     {
         logger.info("Loading player details for {} {}", player.getName(), player.getSurname());
-        PlayerInfoDialog playerInfoDialog = new PlayerInfoDialog(player);
+        PlayerInfoDialog playerInfoDialog = new PlayerInfoDialog(player, playerService, this::showAllPlayers);
         playerInfoDialog.open();
     }
 

@@ -19,14 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class TournamentDialog extends Dialog {
+public abstract class AbstractTournamentDialog extends Dialog {
 
-    protected static final Logger logger = LoggerFactory.getLogger(TournamentDialog.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractTournamentDialog.class);
 
     protected TextField tournamentNameField;
     protected ComboBox<String> typeComboBox;
@@ -38,7 +36,7 @@ public abstract class TournamentDialog extends Dialog {
     protected Grid<Player> selectedPlayersGrid;
     protected Grid<Player> availablePlayersGrid;
 
-    protected TournamentDialog(String headerTitle) {
+    protected AbstractTournamentDialog(String headerTitle) {
         logger.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
