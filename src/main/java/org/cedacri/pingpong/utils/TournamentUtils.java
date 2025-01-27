@@ -4,11 +4,9 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
-import org.cedacri.pingpong.service.PlayerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TournamentUtils {
@@ -54,9 +52,9 @@ public class TournamentUtils {
         };
     }
 
-    // This method is intended to return the number of rounds (sets played) in a match.
+    /*// This method is intended to return the number of rounds (sets played) in a match.
     // Rounds are individual sets within a match, such as 11-3; 4-11; 11-8 (example for BESTOFTHREE).
-    public static List<String> getRoundsCount(Integer players) {
+    public static List<int> getRoundsCount(Integer players) {
         if (players == null || players < 4)
         {
             logger.error("Invalid number of players: {}", players);
@@ -72,9 +70,9 @@ public class TournamentUtils {
             case 64 -> List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinal", "Semifinal", "Final");
             default -> List.of("Semifinal", "Final");
         };
-    }
+    }*/
 
-    public static String getNextRound(String currentRound)
+    public static String getNextRound(int currentRound)
     {
         List<String> allRounds = List.of("Stage 3", "Stage 2", "Stage 1", "Quarterfinal", "Semifinal", "Final");
 
@@ -85,7 +83,7 @@ public class TournamentUtils {
         return allRounds.get(currentRoundIndex + 1);
     }
 
-    public static void generateTournamentMatches(MatchService matchService, Tournament tournament)
+   /* public static void generateTournamentMatches(MatchService matchService, Tournament tournament)
     {
         logger.info("Generating tournament matches for tournament: {}", tournament);
 
@@ -97,7 +95,7 @@ public class TournamentUtils {
             players.add(null);
         }
 
-        String initialRound = getRoundsCount(tournament.getMaxPlayers()).get(0);
+        int initialRound = getRoundsCount(tournament.getMaxPlayers()).get(0);
         int matchCount = tournament.getMaxPlayers() / 2;
 
         logger.debug("Generating {} matches for round: {}", matchCount, initialRound);
@@ -130,9 +128,9 @@ public class TournamentUtils {
 
             determinateWinner(matchService, match, tournament.getMaxPlayers());
         }
-    }
+    }*/
 
-    public static void determinateWinner(MatchService matchService, Match match, Integer maxPlayers)
+   /* public static void determinateWinner(MatchService matchService, Match match, Integer maxPlayers)
     {
         logger.debug("Determining winner for match: {} in round {}", match.getId(), match.getRound());
         if ( getRoundsCount(maxPlayers).indexOf(match.getRound()) == 0 )
@@ -163,11 +161,11 @@ public class TournamentUtils {
             logger.error("Match {} ended in a tie, no winner determined", match.getId());
         }
 
-    }
+    }*/
 
     private static void moveWinnerToNextRound(MatchService matchService, Match match)
     {
-        String nextRound = getNextRound(match.getRound());
+        int nextRound = match.getRound() + 1;
         int nextPosition = match.getPosition()/2 + match.getPosition()%2;
 
         logger.debug("Moving winner of match {} to next round: {}", match.getId(), nextRound);
@@ -246,7 +244,7 @@ public class TournamentUtils {
         return null;
     }
 
-    private static Match createMatch(Tournament tournament, String round, int position, List<Player> players)
+    private static Match createMatch(Tournament tournament, int  round, int position, List<Player> players)
     {
         logger.debug("Creating match for tournament {} in round {} at position {}", tournament, round, position);
         Match match = new Match();

@@ -8,6 +8,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.TournamentRepository;
 import org.cedacri.pingpong.utils.MatchGenerator;
+import org.cedacri.pingpong.utils.PlayerDistributer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,7 @@ public class TournamentService {
     @Transactional
     public void startTournament(Tournament tournament) {
         MatchGenerator matchGenerator = new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
-                tournament.getFinalsSetsToWin(), tournament.getTournamentType());
+                tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer());
 
         List<Match> tournamentMatches = matchGenerator.generateMatches(tournament);
 

@@ -34,6 +34,8 @@ public class TournamentAddDialog extends TournamentDialog {
     private final TournamentService tournamentService;
     private final Runnable onSaveCallback;
 
+    private Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
+
     public TournamentAddDialog(TournamentService tournamentService, PlayerService playerService, Runnable onSaveCallback) {
         super("Edit Tournament");
 
@@ -62,7 +64,7 @@ public class TournamentAddDialog extends TournamentDialog {
         Button saveButton = ViewUtils.createButton("Save", "colored-button", this::onSave);
         Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
 
-        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, ViewUtils.createCheckBox("Start Now"), saveButton, cancelButton);
+        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, startNowCheckbox, saveButton, cancelButton);
     }
 
 
@@ -70,38 +72,50 @@ public class TournamentAddDialog extends TournamentDialog {
     protected void onSave() {
         logger.info("Save button clicked. Attempting to add new tournament");
 
-        try{
-            Tournament tournament = new Tournament();
-
-            tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(selectedPlayersSet.size()));
-            tournament.setPlayers(selectedPlayersSet);
-            tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
-            tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-            tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
-
-            tournamentService.saveTournament(tournament);
-            logger.info("Tournament saved successfully: {}", tournament.getId());
-                MatchGenerator matchGenerator = new MatchGenerator(
-                        tournament.getSetsToWin(),
-                        tournament.getSemifinalsSetsToWin(),
-                        tournament.getFinalsSetsToWin(),
-                        tournament.getTournamentType());
-
-                tournamentService.saveTournament(tournament);
-                logger.info("Tournament saved successfully: {}", tournament.getId());
-
-            onSaveCallback.run();
-
-            close();
-
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
+        if(selectedPlayersSet.size() < 8) {
+            NotificationManager.showInfoNotification("Please enter more than 8 players!");
         }
-        catch (Exception e){
-            logger.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + "\n" + e.getMessage());
+        else{
+            try{
+                Tournament tournament = new Tournament();
+
+                tournament.setTournamentName(tournamentNameField.getValue());
+                tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
+                tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+                tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(selectedPlayersSet.size()));
+                tournament.setPlayers(selectedPlayersSet);
+                tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
+                tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
+                tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+
+                if(startNowCheckbox.getValue()) {
+                    tournamentService.startTournament(tournament);
+                }
+                else{
+                    tournamentService.saveTournament(tournament);
+                    logger.info("Tournament saved successfully: {}", tournament.getId());
+                    MatchGenerator matchGenerator = new MatchGenerator(
+                            tournament.getSetsToWin(),
+                            tournament.getSemifinalsSetsToWin(),
+                            tournament.getFinalsSetsToWin(),
+                            tournament.getTournamentType(),
+                            new PlayerDistributer());
+
+                    tournamentService.saveTournament(tournament);
+                    logger.info("Tournament saved successfully: {}", tournament.getId());
+                }
+
+                onSaveCallback.run();
+                close();
+
+
+                NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
+            }
+            catch (Exception e){
+                logger.error("Error saving tournament: {}", e.getMessage(), e);
+                NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + "\n" + e.getMessage());
+            }
         }
+
     }
 }

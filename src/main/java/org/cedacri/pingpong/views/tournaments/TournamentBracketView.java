@@ -90,21 +90,20 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         matchContainer.setSpacing(true);
         add(matchContainer);
 
-        refreshMatchesInRound(
-                // get FirstRound name
-                TournamentUtils.getRoundsCount(tournament.getMaxPlayers()).get(0)
-        );
+        refreshMatchesInRound(1);
     }
 
     private HorizontalLayout createRoundButtonsLayout() {
         logger.info("Creating layout for Round buttons.");
         HorizontalLayout roundButtons = new HorizontalLayout();
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
+        Integer roundsCount = (int) Math.sqrt(tournament.getMaxPlayers());
 
-        for (String round : TournamentUtils.getRoundsCount(tournament.getMaxPlayers())) {
-            logger.debug("Adding button for round {}", round);
+        for (int i = 1; i <= roundsCount; i++) {
+            int round = i;
+            logger.debug("Adding button for round {}", i);
             roundButtons.add(
-                    ViewUtils.createButton(round, "colored-button",
+                    ViewUtils.createButton("Stage " + round, "colored-button",
                             () -> refreshMatchesInRound(round)
                     )
             );
@@ -130,13 +129,13 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
 
-    private void refreshMatchesInRound(String round) {
+    private void refreshMatchesInRound(int round) {
         logger.info("Refreshing matches for round {}", round);
         matchContainer.removeAll();
 
         displayMatches(tournament.getMatches()
                 .stream()
-                .filter(m -> m.getRound().equals(round))
+                .filter(m -> m.getRound() == round)
                 .toList());
     }
 
@@ -309,7 +308,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 match.setScore(finalScore);
                 matchService.saveOrUpdateMatch(match);
                 NotificationManager.showInfoNotification("Score saved: " + finalScore);
-                TournamentUtils.determinateWinner(matchService, match, tournament.getMaxPlayers());
+//                TournamentUtils.determinateWinner(matchService, match, tournament.getMaxPlayers());
             } else {
                 NotificationManager.showInfoNotification("Please fix invalid scores!");
             }

@@ -21,14 +21,14 @@ public class MatchService {
         this.matchRepository = matchRepository;
     }
 
-    public List<Match> getMatchesByTournamentAndRound(Tournament tournament, String round) {
+    public List<Match> getMatchesByTournamentAndRound(Tournament tournament, int round) {
         logger.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
         List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round);
         logger.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournament, round);
         return matches;
     }
 
-    public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, String round, Integer position) {
+    public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, int round, int position) {
         logger.debug("Fetching match for tournament: {}, round: {} and position: {}", tournament, round, position);
         Optional<Match> match = matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
         if(match.isPresent()) {

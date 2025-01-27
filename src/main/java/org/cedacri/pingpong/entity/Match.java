@@ -22,7 +22,7 @@ public class Match {
 
     @NotNull
     @Column(name = "round", nullable = false)
-    private String round;
+    private Integer round;
 
     @Column(name = "position")
     private Integer position;

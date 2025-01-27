@@ -33,10 +33,10 @@ VALUES
 
 INSERT INTO matches(position, tournament_id, bottom_player_id, top_player_id, winner_id, score, round)
 VALUES
-    (1, 2, 6, 7, 6, '11:2', 'Quarterfinals'),
-    (1, 2, 8, null, 8, null, 'Quarterfinals'),
-    (2, 2, 9, null, 9, null, 'Quarterfinals'),
-    (2, 2, 10, null, 10, null, 'Quarterfinals'),
-    (3, 2, 6, 8, 6, '11:1', 'Semifinals'),
-    (3, 2, 9, 10, null, null, 'Semifinals'),
-    (4, 2, 6, null, null, null, 'Finals');
+    (1, 2, 6, 7, 6, '11:2', 1),
+    (1, 2, 8, null, 8, null, 1),
+    (2, 2, 9, null, 9, null, 1),
+    (2, 2, 10, null, 10, null, 1),
+    (3, 2, 6, 8, 6, '11:1', 2),
+    (3, 2, 9, 10, null, null, 2),
+    (4, 2, 6, null, null, null, 3);

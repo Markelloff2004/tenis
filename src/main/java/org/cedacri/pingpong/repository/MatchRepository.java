@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface MatchRepository extends JpaRepository<Match, Integer> {
 
     List<Match> findByTournament(Tournament tournament);
-    List<Match> findByTournamentAndRound(Tournament tournament, String round);
-    Optional<Match> findByTournamentAndRoundAndPosition(Tournament tournament, String round, Integer position);
+    List<Match> findByTournamentAndRound(Tournament tournament, int round);
+    Optional<Match> findByTournamentAndRoundAndPosition(Tournament tournament, int round, int position);
     List<Match> findByTopPlayer(Player topPlayer);
     List<Match> findByBottomPlayer(Player bottomPlayer);
 
