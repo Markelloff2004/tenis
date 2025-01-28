@@ -16,6 +16,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Match;
+import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
@@ -206,18 +207,15 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         scoreDetails.setSpacing(false);
         scoreDetails.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        String defaultScore = match.getScore();
+        List<Score> defaultScore = match.getScore();
 
-        String[] setScores = defaultScore != null
-                ? defaultScore.split(";")
-                : "-:-;-:-;-:-".split(";");
-
-        for (int i = 0; i < TournamentUtils.getSetsCount(tournament.getTournamentType().toString()); i++)
+        for (int i = 0; i < 3; i++)
         {
-            String[] setScore = (i < setScores.length)
-                    ? setScores[i].split(":")
+            Score setScore = (i < defaultScore.size())
+                    ? defaultScore.get(i)
                     // handle if setScore is empty
-                    : new String[]{"-", "-"};
+//                    : new Score(0, 0);
+                    : null;
 
             scoreDetails.add(createScoreColumn(setScore));
         }
@@ -231,12 +229,19 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         return scoreDetails;
     }
 
-    private VerticalLayout createScoreColumn(String[] scores) {
+    private VerticalLayout createScoreColumn(Score scores) {
         VerticalLayout column = new VerticalLayout();
         column.setSpacing(true);
         column.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        column.add(createStyledDiv(scores[0]), createStyledDiv(scores[1]));
+        column.add(
+                createStyledDiv(
+                        (scores != null) ? String.valueOf(scores.getTopPlayerScore()) : "-"
+                        ),
+                createStyledDiv(
+                        (scores != null) ? String.valueOf(scores.getBottomPlayerScore()) : "-"
+                        )
+        );
         return column;
     }
 
@@ -279,9 +284,9 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         // insert default score
         if (match.getScore() != null && !match.getScore().isEmpty()) {
-            String[] setScores = match.getScore().split(";");
-            for (int i = 0; i < setScores.length && i < scoreFields.length; i++) {
-                scoreFields[i].setValue(setScores[i]);
+            List<Score> setScores = match.getScore();
+            for (int i = 0; i < setScores.size() && i < scoreFields.length; i++) {
+                scoreFields[i].setValue(setScores.get(i).toString());
             }
         }
 
@@ -305,7 +310,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
             if (isValid) {
                 String finalScore = scoreBuilder.toString();
-                match.setScore(finalScore);
+//                match.setScore(finalScore);
                 matchService.saveOrUpdateMatch(match);
                 NotificationManager.showInfoNotification("Score saved: " + finalScore);
 //                TournamentUtils.determinateWinner(matchService, match, tournament.getMaxPlayers());

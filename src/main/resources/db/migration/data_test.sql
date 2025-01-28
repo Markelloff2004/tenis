@@ -31,12 +31,27 @@ VALUES
     (1, 5), (2, 5), (3, 5), (4, 5), (5, 5);
 
 
-INSERT INTO matches(position, tournament_id, bottom_player_id, top_player_id, winner_id, score, round)
+INSERT INTO matches (position, tournament_id, bottom_player_id, top_player_id, winner_id, round)
 VALUES
-    (1, 2, 6, 7, 6, '11:2', 1),
-    (1, 2, 8, null, 8, null, 1),
-    (2, 2, 9, null, 9, null, 1),
-    (2, 2, 10, null, 10, null, 1),
-    (3, 2, 6, 8, 6, '11:1', 2),
-    (3, 2, 9, 10, null, null, 2),
-    (4, 2, 6, null, null, null, 3);
+    (1, 2, 6, 7, 6, 1),
+    (1, 2, 8, NULL, 8, 1),
+    (2, 2, 9, NULL, 9, 1),
+    (2, 2, 10, NULL, 10, 1),
+    (3, 2, 6, 8, 6, 2),
+    (3, 2, 9, 10, NULL, 2),
+    (4, 2, 6, NULL, NULL, 3);
+
+-- Inserare în tabelul `match_scores` pentru Meciul 1 (3 seturi)
+INSERT INTO match_scores (match_id, top_player_score, bottom_player_score)
+VALUES
+    (1, 11, 2),  -- Set 1: top player score 11, bottom player score 2
+    (1, 8, 6),   -- Set 2: top player score 8, bottom player score 6
+    (1, 6, 4);   -- Set 3: top player score 6, bottom player score 4
+
+-- Inserare în tabelul `match_scores` pentru Meciul 5 (3 seturi)
+INSERT INTO match_scores (match_id, top_player_score, bottom_player_score)
+VALUES
+    (5, 11, 1),  -- Set 1: top player score 11, bottom player score 1
+    (5, 7, 5),   -- Set 2: top player score 7, bottom player score 5
+    (5, 6, 4);   -- Set 3: top player score 6, bottom player score 4
+

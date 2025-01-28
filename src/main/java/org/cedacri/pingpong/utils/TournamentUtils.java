@@ -2,6 +2,7 @@ package org.cedacri.pingpong.utils;
 
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
 import org.slf4j.Logger;
@@ -210,39 +211,38 @@ public class TournamentUtils {
         logger.info("Next round match saved or updated successfully: {}", nextRoundMatch);
     }
 
-    private static Player calculateWinnerFromScore(Match match)
-    {
-        String score = match.getScore();
-        if (score != null && !score.isEmpty())
-        {
-            String[] sets = score.split(";");
-            int topPlayerWins = 0;
-            int bottomPlayerWins = 0;
-
-            for (String set : sets) {
-                if (!set.equals("-:-")) {
-                    String[] points = set.split(":");
-                    int topPoints = Integer.parseInt(points[0].trim());
-                    int bottomPoints = Integer.parseInt(points[1].trim());
-
-                    if (topPoints > bottomPoints) topPlayerWins++;
-                    else if (bottomPoints > topPoints) bottomPlayerWins++;
-                }
-            }
-
-            if (topPlayerWins > bottomPlayerWins) {
-                return match.getTopPlayer();
-            } else if (bottomPlayerWins > topPlayerWins) {
-                return match.getBottomPlayer();
-            } else {
-                logger.error("ERROR: Tie detected, no winner decided for match {}", match);
-                return null;
-            }
-        }
-        // Cannot find the winner
-        logger.error("ERROR: Score not available for match {}", match);
-        return null;
-    }
+//    private static Player calculateWinnerFromScore(Match match)
+//    {
+//        List<Score> score = match.getScore();
+//        if (score != null && !score.isEmpty())
+//        {
+//            int topPlayerWins = 0;
+//            int bottomPlayerWins = 0;
+//
+//            for (Score set : score) {
+//                if (set != null) {
+//                    String[] points = set.split(":");
+//                    int topPoints = Integer.parseInt(points[0].trim());
+//                    int bottomPoints = Integer.parseInt(points[1].trim());
+//
+//                    if (topPoints > bottomPoints) topPlayerWins++;
+//                    else if (bottomPoints > topPoints) bottomPlayerWins++;
+//                }
+//            }
+//
+//            if (topPlayerWins > bottomPlayerWins) {
+//                return match.getTopPlayer();
+//            } else if (bottomPlayerWins > topPlayerWins) {
+//                return match.getBottomPlayer();
+//            } else {
+//                logger.error("ERROR: Tie detected, no winner decided for match {}", match);
+//                return null;
+//            }
+//        }
+//        // Cannot find the winner
+//        logger.error("ERROR: Score not available for match {}", match);
+//        return null;
+//    }
 
     private static Match createMatch(Tournament tournament, int  round, int position, List<Player> players)
     {

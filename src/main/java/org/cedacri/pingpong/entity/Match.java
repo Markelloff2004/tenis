@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 
 @ToString
 @Getter
@@ -30,9 +32,10 @@ public class Match {
     /*
     score is in formate topPlayer:bottomPlayer;
      */
-    @Size(max = 50)
-    @Column(name = "score", length = 50)
-    private String score;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "match_scores", joinColumns = @JoinColumn(name = "match_id"))
+    @Column(name = "score")
+    private List<Score> score;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
@@ -51,3 +54,4 @@ public class Match {
     @JoinColumn(name = "winner_id")
     private Player winner;
 }
+
