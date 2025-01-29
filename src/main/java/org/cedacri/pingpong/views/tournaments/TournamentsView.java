@@ -15,8 +15,6 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.TournamentManagement;
@@ -104,19 +102,19 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     {
         Button viewButton = ViewUtils.createButton("View", "compact-button", () -> showInfoTournament(tournament));
 
-        Button editButton = ViewUtils.createButton("Edit", "compact-button", () ->
-        {
-            if(tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
-                showEditTournament(tournament);
-            }
-            else{
-                NotificationManager.showInfoNotification("This tournament isn't in Pending status!");
-            }
-        });
-
         Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeleteTournament(tournament));
 
-        return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, editButton, deleteButton);
+        HorizontalLayout layout;
+
+        if(tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
+            Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditTournament(tournament));
+            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, editButton, deleteButton);
+        }
+        else {
+            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, deleteButton);
+        }
+
+        return layout;
     }
 
     private void refreshGridData() {
