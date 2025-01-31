@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -142,5 +143,33 @@ public class ViewUtils
         logger.error("Validation error: {}", message);
         Notification.show(message, 3000, Notification.Position.MIDDLE);
         return false;
+    }
+
+    public static TextField createScoreField(Integer value) {
+        TextField score = new TextField();
+
+        score.setMaxLength(2);
+        score.setPattern("[-0-9]+");
+
+        score.setWidth("50px");
+
+        if (value != null)
+            score.setValue(value.toString());
+        else score.setValue("-");
+
+        return score;
+    }
+
+
+    public static Span createPlayerLabel(String content)
+    {
+        Span span = new Span(content);
+
+        span.getStyle().setFontSize("18px");
+        span.getStyle().setTop("15px");
+        span.setMaxWidth("200px");
+        span.setWidth("150px");
+
+        return span;
     }
 }

@@ -12,12 +12,14 @@ import lombok.*;
 @Setter
 public class Score {
 
-    @NotNull
-    @Column(name = "top_player_score", nullable = false)
+    @Column(name = "top_player_score")
     private int topPlayerScore;
 
-    @NotNull
-    @Column(name = "bottom_player_score", nullable = false)
+    @Column(name = "bottom_player_score")
     private int bottomPlayerScore;
 
+    @Override
+    public String toString() {
+        return "{" + topPlayerScore + "-" + bottomPlayerScore + '}';
+    }
 }

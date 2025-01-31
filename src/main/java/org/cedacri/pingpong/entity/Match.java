@@ -53,5 +53,10 @@ public class Match {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "winner_id")
     private Player winner;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "next_match_id")
+    private Match nextMatch;
+
 }
 
