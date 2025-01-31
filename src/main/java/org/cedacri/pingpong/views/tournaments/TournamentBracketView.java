@@ -27,6 +27,7 @@ import org.cedacri.pingpong.views.MainLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,35 +101,29 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
         Integer roundsCount = (int) Math.sqrt(tournament.getMaxPlayers());
 
+        List<Button> buttons = new ArrayList<>();
         for (int i = 1; i <= roundsCount; i++) {
             int round = i;
             logger.debug("Adding button for round {}", i);
-            roundButtons.add(
-                    ViewUtils.createButton("Stage " + round, "colored-button",
-                            () -> refreshMatchesInRound(round)
-                    )
-            );
+            Button roundButton = new Button("Stage " + round, event -> {
+                refreshMatchesInRound(round);
+                ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
+            });
+
+            roundButton.addClassName("button");
+
+            buttons.add(roundButton);
+            roundButtons.add(roundButton);
         }
 
-        Button prevoiusPageButton = ViewUtils.createButton(
-                "Previous Page",
-                "colored-button",
-                () -> getUI().
-                        ifPresent(ui ->
-                                {
-                                    logger.info("Navigating to general details page for Tournament with ID: {}", tournament.getId());
-                                    ui.navigate("tournament/general-details/" + tournament.getId());
-                                }
-                        )
-        );
+        // Initially highlight the first button
+        ViewUtils.highlightSelectedComponentFromComponentsList(buttons, 0, "selected");
 
         return ViewUtils.createHorizontalLayout(
                 JustifyContentMode.BETWEEN,
-                roundButtons,
-                prevoiusPageButton
+                roundButtons
         );
     }
-
 
     private void refreshMatchesInRound(int round) {
         logger.info("Refreshing matches for round {}", round);

@@ -1,5 +1,6 @@
 package org.cedacri.pingpong.utils;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -33,6 +34,21 @@ public class ViewUtils
         logger.debug("Button created: {}", button);
         return button;
     }
+
+    public static <T extends Component> void highlightSelectedComponentFromComponentsList(List<T> components, int selectedIndex, String selectedClass) {
+        if (selectedIndex < 0 || selectedIndex >= components.size()) {
+            return;
+        }
+
+        for (int i = 0; i < components.size(); i++) {
+            if (i == selectedIndex) {
+                components.get(i).addClassName(selectedClass);
+            } else {
+                components.get(i).removeClassName(selectedClass);
+            }
+        }
+    }
+
 
     public static TextField createTextField(String label) {
         logger.debug("Creating TextField with label: '{}' and width: '{}'", label);

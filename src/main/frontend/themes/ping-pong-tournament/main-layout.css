@@ -28,9 +28,9 @@ vaadin-side-nav-item vaadin-icon {
 .menu-items-sidebar {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Align buttons to the left */
-  padding-left: 20px; /* Add consistent padding from the left edge */
-  gap: 10px; /* Add spacing between buttons */
+  align-items: flex-start;
+  padding-left: 20px;
+  gap: 10px;
 }
 
 .transparent-button {
@@ -38,8 +38,8 @@ vaadin-side-nav-item vaadin-icon {
   color: black;
   gap: 8px;
   padding: 10px 20px;
-  width: 200px; /* Set a uniform button width */
-  text-align: left; /* Align text to the left */
+  width: 200px;
+  text-align: left;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -56,8 +56,20 @@ vaadin-side-nav-item vaadin-icon {
   border: 2px solid var(--highlight-color);
   gap: 8px;
   padding: 10px 20px;
-  width: 200px; /* Set a uniform button width */
-  text-align: left; /* Align text to the left */
+  width: 200px;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button.selected {
+  background-color: var(--highlight-color);
+  color: white;
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px;
+  text-align: left;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -68,27 +80,23 @@ vaadin-side-nav-item vaadin-icon {
   color: white;
   gap: 8px;
   padding: 10px 20px;
-  width: 200px; /* Set a uniform button width */
-  text-align: left; /* Align text to the left */
+  width: 200px;
+  text-align: left;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-/*.colored-button.clicked */
 .colored-button:hover {
   background-color: var(--light-bg);
   color: var(--highlight-color);
-  /*border: 10px;*/
-  /*border-color: var(--highlight-color);*/
   gap: 8px;
   padding: 10px 20px;
-  width: 200px; /* Set a uniform button width */
-  text-align: left; /* Align text to the left */
+  width: 200px;
+  text-align: left;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  /*background-color: var(--highlight-color);*/
 }
 
 .compact-button {
@@ -96,14 +104,14 @@ vaadin-side-nav-item vaadin-icon {
   border: 2px solid var(--highlight-color);
   color: var(--highlight-color);
   cursor: pointer;
-  padding: 0.25em 0.5em; /* Smaller padding for compactness */
-  font-size: var(--lumo-font-size-s); /* Smaller font size */
-  line-height: 1.2; /* Reduce vertical spacing */
-  border-radius: 4px; /* Optional: keeps rounded corners */
+  padding: 0.25em 0.5em;
+  font-size: var(--lumo-font-size-s);
+  line-height: 1.2;
+  border-radius: 4px;
 }
 
 .compact-button:hover {
-  background-color: var(--background-color); /* Subtle hover effect */
+  background-color: var(--background-color);
 }
 
 .main-layout {
