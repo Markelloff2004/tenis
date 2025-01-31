@@ -2,8 +2,9 @@ package org.cedacri.pingpong.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.List;
 
 
 @NoArgsConstructor
@@ -31,9 +32,10 @@ public class Match {
     /*
     score is in formate topPlayer:bottomPlayer;
      */
-    @Size(max = 50)
-    @Column(name = "score", length = 50)
-    private String score;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "match_scores", joinColumns = @JoinColumn(name = "match_id"))
+    @Column(name = "score")
+    private List<Score> score;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "tournament_id", nullable = false)
@@ -55,3 +57,4 @@ public class Match {
     @JoinColumn(name = "next_match_id")
     private Match nextMatch;
 }
+

@@ -24,16 +24,14 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
 
     private final TournamentService tournamentService;
-    private final PlayerService playerService;
     private final Runnable onSaveCallback;
 
-    private Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
+    private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
     public TournamentAddDialog(TournamentService tournamentService, PlayerService playerService, Runnable onSaveCallback) {
         super("Edit Tournament");
 
         this.tournamentService = tournamentService;
-        this.playerService = playerService;
         this.onSaveCallback = onSaveCallback;
 
 
@@ -83,9 +81,8 @@ protected void onSave() {
             tournament = tournamentService.saveTournament(tournament);
 
             for (Player player : selectedPlayersSet) {
-                Player p = playerService.findById(player.getId());
-                p.getTournaments().add(tournament);
-                tournament.getPlayers().add(p);
+                player.getTournaments().add(tournament);
+                tournament.getPlayers().add(player);
             }
 
             tournament = tournamentService.saveTournament(tournament);

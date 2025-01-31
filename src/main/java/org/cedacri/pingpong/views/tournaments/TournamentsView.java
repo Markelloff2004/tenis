@@ -13,11 +13,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
-import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.TournamentManagement;
@@ -42,9 +39,8 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);
     private final TournamentService tournamentService;
     private final PlayerService playerService;
-    private final MatchService matchService;
 
-    public TournamentsView(TournamentService tournamentService, PlayerService playerService, MatchService matchService) {
+    public TournamentsView(TournamentService tournamentService, PlayerService playerService) {
         this.tournamentService = tournamentService;
 
         configureView();
@@ -54,7 +50,6 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         this.playerService = playerService;
 
         logger.info("TournamentsView initialized");
-        this.matchService = matchService;
     }
 
     private void configureView()
@@ -107,19 +102,19 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     {
         Button viewButton = ViewUtils.createButton("View", "compact-button", () -> showInfoTournament(tournament));
 
-        Button editButton = ViewUtils.createButton("Edit", "compact-button", () ->
-        {
-            if(tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
-                showEditTournament(tournament);
-            }
-            else{
-                NotificationManager.showInfoNotification("This tournament isn't in Pending status!");
-            }
-        });
-
         Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeleteTournament(tournament));
 
-        return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, editButton, deleteButton);
+        HorizontalLayout layout;
+
+        if(tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
+            Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditTournament(tournament));
+            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, editButton, deleteButton);
+        }
+        else {
+            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, deleteButton);
+        }
+
+        return layout;
     }
 
     private void refreshGridData() {
@@ -138,13 +133,11 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     @Override
     public void showInfoTournament(Tournament tournamentDetails) {
-        logger.info("Showing tournament details for tournamnet: {} with Id: {}", tournamentDetails.getTournamentName(), tournamentDetails.getId());
+        logger.info("Showing tournament details for tournament: {} with Id: {}", tournamentDetails.getTournamentName(), tournamentDetails.getId());
 
         TournamentInfoDialog tournamentEditDialog = new TournamentInfoDialog(playerService, tournamentDetails);
         tournamentEditDialog.open();
 
-//        getUI().ifPresent(ui -> ui.navigate("tournament/general-details/" + tournamentDetails.getId()));
-//        logger.info("Navigating to tournament details page, id: {}", tournamentDetails.getId());
     }
 
     @Override
