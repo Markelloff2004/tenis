@@ -42,13 +42,10 @@ public class MatchService {
     }
 
     @Transactional
-    public void saveOrUpdateMatch(Match match) {
-
+    public Match saveMatch(Match match) {
         logger.debug("Attempting to save or update match: {}", match);
-
         // Saving new entity
-        matchRepository.save(match);
-        logger.debug("Match saved: {}", match);
+        return matchRepository.save(match);
     }
 
     @Transactional

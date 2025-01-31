@@ -13,6 +13,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
@@ -41,8 +42,9 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);
     private final TournamentService tournamentService;
     private final PlayerService playerService;
+    private final MatchService matchService;
 
-    public TournamentsView(TournamentService tournamentService, PlayerService playerService) {
+    public TournamentsView(TournamentService tournamentService, PlayerService playerService, MatchService matchService) {
         this.tournamentService = tournamentService;
 
         configureView();
@@ -52,6 +54,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         this.playerService = playerService;
 
         logger.info("TournamentsView initialized");
+        this.matchService = matchService;
     }
 
     private void configureView()

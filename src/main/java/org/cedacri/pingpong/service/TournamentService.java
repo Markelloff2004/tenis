@@ -1,9 +1,7 @@
 package org.cedacri.pingpong.service;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.TournamentRepository;
@@ -14,20 +12,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
-    private final EntityManager em;
 
     private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
+    private final MatchService matchService;
 
-    public TournamentService(TournamentRepository tournamentRepository, EntityManager em) {
+    public TournamentService(TournamentRepository tournamentRepository, MatchService matchService) {
         this.tournamentRepository = tournamentRepository;
-        this.em = em;
+        this.matchService = matchService;
     }
 
     @Transactional
@@ -37,16 +34,13 @@ public class TournamentService {
         return tournaments.stream();
     }
 
-    public Optional<Tournament> find(Integer id) {
-        return tournamentRepository.findById(id);
+    public Tournament find(Integer id) {
+        return tournamentRepository.findById(id).orElseThrow();
     }
 
     @Transactional
-    public Tournament saveTournament(Tournament tournament) {
-        Tournament merged = em.merge(tournament);
-        em.flush();
-
-        return merged;
+    public Tournament saveTournament(Tournament tournament)  {
+        return tournamentRepository.save(tournament);
     }
 
     @Transactional
@@ -65,15 +59,8 @@ public class TournamentService {
     @Transactional
     public void startTournament(Tournament tournament) {
         MatchGenerator matchGenerator = new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
-                tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer());
+                tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this, matchService);
 
-        List<Match> tournamentMatches = matchGenerator.generateMatches(tournament);
-
-        tournament.setMatches(new HashSet<>(tournamentMatches));
-
-        saveTournament(tournament);
+        matchGenerator.generateMatches(tournament);
     }
-
-
-
 }

@@ -1,29 +1,29 @@
 package org.cedacri.pingpong.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.IntStream;
 
+@Slf4j
 public class PlayerDistributer {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlayerDistributer.class);
 
     /***
      * Distributes players into pairs based on seeding logic.
      *
-     * @param players - represents list of players sorted by rating in descending order
+     * @param tournament - represents tournament
      * @param maxPlayers - maximum number of players (nearest power of 2)
      * @return list of player pairs for matches
      */
-    public List<Player[]> distributePlayers(List<Player> players, int maxPlayers) {
+    public List<Player[]> distributePlayers(Tournament tournament, int maxPlayers) {
         List<Player[]> pairs = new ArrayList<>();
-        List<Player> paddedPlayers = new ArrayList<>(players);
+        List<Player> paddedPlayers =
+                new ArrayList<>(tournament.getPlayers().stream().sorted(Comparator.comparingInt(Player::getRating)).toList());
 
         while (paddedPlayers.size() < maxPlayers) {
             paddedPlayers.add(null);
@@ -34,12 +34,12 @@ public class PlayerDistributer {
             Player bottomPlayer = paddedPlayers.get(maxPlayers - i - 1);
 
             if (topPlayer == null && bottomPlayer == null) {
-                logger.warn("Skipping empty match pair: Index {}", i);
+                log.warn("Skipping empty match pair: Index {}", i);
                 continue;
             }
 
             pairs.add(new Player[]{topPlayer, bottomPlayer});
-            logger.info("Generated new pair: TopPlayer={}, BottomPlayer={}",
+            log.info("Generated new pair: TopPlayer={}, BottomPlayer={}",
                     topPlayer != null ? topPlayer.getName() : "null",
                     bottomPlayer != null ? bottomPlayer.getName() : "null");
         }
@@ -50,32 +50,34 @@ public class PlayerDistributer {
     /**
      * Creates the first round of matches based on player pairs.
      *
-     * @param players - list of sorted players
      * @param maxPlayers - maximum number of players (nearest power of 2)
-     * @param tournament - current tournament
-     * @return list of first-round matches
+     * @param tournament - tournament
      */
-    public List<Match> createFirstRoundMatches(List<Player> players, int maxPlayers, Tournament tournament) {
-        List<Player[]> pairs = distributePlayers(players, maxPlayers);
+    public void distributePlayersInFirstRound(int maxPlayers, Tournament tournament) {
+        List<Player[]> pairs = distributePlayers(tournament, maxPlayers);
 
-        return IntStream.range(0, pairs.size())
-                .mapToObj(i -> {
-                    Match match = new Match();
-                    match.setTournament(tournament);
-                    match.setRound(1);
-                    match.setPosition(i + 1);
-                    match.setTopPlayer(pairs.get(i)[0]);
-                    match.setBottomPlayer(pairs.get(i)[1]);
-
-                    // Automatically set winner if only one player is present
-                    if (pairs.get(i)[0] != null && pairs.get(i)[1] == null) {
-                        match.setWinner(pairs.get(i)[0]);
-                    } else if (pairs.get(i)[0] == null && pairs.get(i)[1] != null) {
-                        match.setWinner(pairs.get(i)[1]);
-                    }
-
-                    return match;
-                })
+        List<Match> firstRoundMatches = tournament.getMatches().stream()
+                .filter(m -> m.getRound() == 1)
+                .sorted(Comparator.comparingInt(Match::getPosition))
                 .toList();
+
+        if (firstRoundMatches.size() != pairs.size()) {
+            log.error("Error while trying distributing pairs of players through first round matches");
+            throw new IllegalStateException("Amount of first round matches does not match with number of pairs!");
+        }
+
+        for (int i = 0; i < firstRoundMatches.size(); i++) {
+            Match match = firstRoundMatches.get(i);
+            Player[] pair = pairs.get(i);
+
+            match.setTopPlayer(pair[0]);
+            match.setBottomPlayer(pair[1]);
+
+            if (pair[0] != null && pair[1] == null) {
+                match.setWinner(pair[0]);
+            } else if (pair[0] == null && pair[1] != null) {
+                match.setWinner(pair[1]);
+            }
+        }
     }
 }

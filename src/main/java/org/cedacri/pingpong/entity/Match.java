@@ -3,11 +3,12 @@ package org.cedacri.pingpong.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @ToString
 @Getter
 @Setter
@@ -34,8 +35,7 @@ public class Match {
     @Column(name = "score", length = 50)
     private String score;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
@@ -51,7 +51,7 @@ public class Match {
     @JoinColumn(name = "winner_id")
     private Player winner;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "next_match_id")
     private Match nextMatch;
 }

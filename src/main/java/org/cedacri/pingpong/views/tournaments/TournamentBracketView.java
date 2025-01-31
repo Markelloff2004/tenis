@@ -51,11 +51,11 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     @Override
     public void setParameter(BeforeEvent beforeEvent, Integer tournamentId) {
         logger.info("Received request to load tournament with ID {}", tournamentId);
-        Optional<Tournament> searchedTournament = tournamentService.find(tournamentId);
+        Tournament searchedTournament = tournamentService.find(tournamentId);
 
-        if (searchedTournament.isPresent())
+        if (searchedTournament != null)
         {
-            tournament = searchedTournament.get();
+            tournament = searchedTournament;
             logger.info("Tournament found : {}", tournament);
             initView();
         } else
@@ -161,7 +161,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
             HorizontalLayout winnerDetails = ViewUtils.createHorizontalLayout(
                     JustifyContentMode.CENTER,
-                    (match.getWinner() != null)
+                    (match.getWinner() != null && match.getRound() == 1)
                             ? new Div("#" + match.getWinner().getRating() + " " + match.getWinner().getName() + " " + match.getWinner().getSurname() + match.getPosition())
                             : new Div("Unknown ->" + match.getPosition())
                     );
@@ -306,7 +306,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             if (isValid) {
                 String finalScore = scoreBuilder.toString();
                 match.setScore(finalScore);
-                matchService.saveOrUpdateMatch(match);
+                matchService.saveMatch(match);
                 NotificationManager.showInfoNotification("Score saved: " + finalScore);
 //                TournamentUtils.determinateWinner(matchService, match, tournament.getMaxPlayers());
             } else {

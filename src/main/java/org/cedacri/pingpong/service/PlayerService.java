@@ -2,8 +2,12 @@ package org.cedacri.pingpong.service;
 
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.repository.PlayerRepository;
+import org.cedacri.pingpong.utils.Constraints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +24,22 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
-    public Player findById(long id) {
-        return playerRepository.findById(id).orElse(null);
+    public Player findById(Long id) {
+        return playerRepository.findById(id).orElseThrow();
     }
     public Stream<Player> list(long page) {
         logger.info("Fetching list of players for page {}", page);
-        return playerRepository.paged(page);
+
+        Pageable pageable = PageRequest.of((int) page, Constraints.PAGE_SIZE);
+
+        Page<Player> playerPage = playerRepository.findAll(pageable);
+
+        return playerPage.stream();
     }
 
     public Stream<Player> getAll() {
         logger.info("Fetching list of players");
-        return playerRepository.getAll();
+        return playerRepository.findAll().stream();
     }
 
     @Transactional
@@ -52,7 +61,7 @@ public class PlayerService {
         if (id != null){
             logger.debug("Attempting to delete player with id {}", id);
 
-            playerRepository.delete(id);
+            playerRepository.deleteById(id);
             logger.debug("Successfully deleted player with id {}", id);
         }
         else

@@ -68,12 +68,7 @@ public class Player {
     @Column(name = "goals_lost", nullable = false, columnDefinition = "int default 0")
     private Integer goalsLost = 0;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(
-            name = "tournament_players",
-            joinColumns = @JoinColumn(name = "player_id"),
-            inverseJoinColumns = @JoinColumn(name = "tournament_id")
-    )
+    @ManyToMany(mappedBy = "players", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Tournament> tournaments = new HashSet<>();
 
     public Player(String name, String surname, LocalDate birthDate, String email, String address, LocalDate createdAt, Integer rating, String hand,
