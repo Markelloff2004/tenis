@@ -1,5 +1,6 @@
 package org.cedacri.pingpong.views.tournaments.components;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -37,6 +38,7 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
         this.selectedPlayersSet = new HashSet<>();
         this.availablePlayersSet = new HashSet<>();
+
         initializePlayerSets(playerService, new HashSet<>());
         initializeFields();
 
@@ -89,6 +91,7 @@ protected void onSave() {
 
             if (startNowCheckbox.getValue()) {
                 tournamentService.startTournament(tournament);
+                UI.getCurrent().getPage().setLocation("tournament/matches/" + tournament.getId());
             }
 
             logger.info("Tournament saved successfully: {}", tournament.getId());
