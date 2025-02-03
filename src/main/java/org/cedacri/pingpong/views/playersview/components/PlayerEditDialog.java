@@ -22,7 +22,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     protected IntegerField lostMatchesField;
     protected IntegerField goalsScoredField;
     protected IntegerField goalsLostField;
-    protected TextField createdAtField;
+//    protected TextField createdAtField;
 
 
 
@@ -66,8 +66,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
         lostMatchesField = new IntegerField("Lost Matches");
         goalsScoredField = new IntegerField("Goals Scored");
         goalsLostField = new IntegerField("Goals Lost");
-        createdAtField = ViewUtils.createTextField("Created At");
-        createdAtField.setReadOnly(true);
+//        createdAtField = ViewUtils.createTextField("Created At");
+//        createdAtField.setReadOnly(true);
 
         logger.debug("Initialized fields for editing.");
 
@@ -98,8 +98,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
                 wonMatchesField,
                 lostMatchesField,
                 goalsScoredField,
-                goalsLostField,
-                createdAtField
+                goalsLostField
+//                ,createdAtField
 
         );
 

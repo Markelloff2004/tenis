@@ -119,8 +119,6 @@ public class TournamentUtils {
     {
         tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
         updateRating(tournament);
-
-
     }
 
     private static void updateRating(Tournament tournament) {
