@@ -4,6 +4,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,11 +117,15 @@ public class TournamentUtils {
 
     private static void fineTournament(Tournament tournament)
     {
-        Set<Player> playerList = tournament.getPlayers();
+        tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
+        updateRating(tournament);
 
-        for (Player player : playerList)
+
+    }
+
+    private static void updateRating(Tournament tournament) {
+        for (Player player : tournament.getPlayers())
         {
-//            List<Match> playedMatches = matchService.getMatchesByTournamentAndByPlayer();
 
             List<Match> playedMatches = tournament.getMatches().stream()
                     .filter(match ->
@@ -168,7 +173,5 @@ public class TournamentUtils {
             player.setWonMatches(player.getWonMatches() + newWonMatches);
             player.setLostMatches(player.getLostMatches() + newLostMatches);
         }
-
-
     }
 }

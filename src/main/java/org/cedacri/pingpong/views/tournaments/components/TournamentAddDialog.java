@@ -72,7 +72,7 @@ protected void onSave() {
 
             tournament.setTournamentName(tournamentNameField.getValue());
             tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournament.setTournamentStatus( startNowCheckbox.getValue() ? TournamentStatusEnum.ONGOING : TournamentStatusEnum.PENDING);
             tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(selectedPlayersSet.size()));
             tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
             tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));

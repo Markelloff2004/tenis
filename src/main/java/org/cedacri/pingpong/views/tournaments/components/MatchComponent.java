@@ -96,6 +96,12 @@ public class MatchComponent extends HorizontalLayout {
                     ? ViewUtils.createScoreField(matchScore.get(i).getBottomPlayerScore())
                     : ViewUtils.createScoreField(null);
 
+            if(match.getRound() == 1 && (match.getTopPlayer() == null || match.getBottomPlayer() == null) )
+            {
+                topScoreField.setReadOnly(true);
+                bottomScoreField.setReadOnly(true);
+            }
+
             scoreFields.add(List.of(topScoreField, bottomScoreField));
 
             scoreDetails.add(
@@ -107,14 +113,18 @@ public class MatchComponent extends HorizontalLayout {
             );
         }
 
-        Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
-            updateMatchScore(match);
-            NotificationManager.showInfoNotification("Score for this match is updated.");
-        });
-        editScoreButton.setIcon(VaadinIcon.PENCIL.create());
-        editScoreButton.setMaxWidth("20px");
+        if(match.getTopPlayer() != null && match.getBottomPlayer() != null )
+        {
+            Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
+                updateMatchScore(match);
+                NotificationManager.showInfoNotification("Score for this match is updated.");
+            });
+            editScoreButton.setIcon(VaadinIcon.PENCIL.create());
+            editScoreButton.setMaxWidth("20px");
 
-        scoreDetails.add(editScoreButton);
+            scoreDetails.add(editScoreButton);
+        }
+
 
         return scoreDetails;
     }
@@ -149,7 +159,6 @@ public class MatchComponent extends HorizontalLayout {
 
         match.setScore(newMatchScores);
         matchService.saveMatch(match);
-        NotificationManager.showInfoNotification("Score for this match is updated.");
         logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
         TournamentUtils.determinateWinner(match);
         matchService.saveMatch(match);
