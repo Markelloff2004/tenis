@@ -1,11 +1,16 @@
 package org.cedacri.pingpong.utils;
 
 import org.cedacri.pingpong.entity.Match;
+import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.service.MatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 
 public class TournamentUtils {
@@ -66,6 +71,104 @@ public class TournamentUtils {
         } catch (Exception e){
             logger.error("Error updating winners after round: {}", round, e);
         }
+
+    }
+
+    public static void determinateWinner(Match match) {
+
+        int topPlayerWined = 0;
+        int bottomPlayerWined = 0;
+
+        for(Score score : match.getScore())
+        {
+            if(score.getTopPlayerScore() > score.getBottomPlayerScore())
+            {
+                topPlayerWined++;
+            }
+            else if (score.getTopPlayerScore() < score.getBottomPlayerScore()){
+                bottomPlayerWined++;
+            }
+            else {
+                logger.warn("Score cannot be equal {}", score);
+            }
+        }
+
+        if(topPlayerWined>bottomPlayerWined)
+        {
+            match.setWinner(match.getTopPlayer());
+        } else {
+            match.setWinner(match.getBottomPlayer());
+        }
+
+        if(match.getRound() < TournamentUtils.calculateNumberOfRounds(match.getTournament().getMaxPlayers()))
+        {
+            if(match.getPosition()%2==0){
+                match.getNextMatch().setBottomPlayer(match.getWinner());
+            } else
+            {
+                match.getNextMatch().setTopPlayer(match.getWinner());
+            }
+        } else {
+            //fine tournament
+            fineTournament(match.getTournament());
+        }
+    }
+
+    private static void fineTournament(Tournament tournament)
+    {
+        Set<Player> playerList = tournament.getPlayers();
+
+        for (Player player : playerList)
+        {
+//            List<Match> playedMatches = matchService.getMatchesByTournamentAndByPlayer();
+
+            List<Match> playedMatches = tournament.getMatches().stream()
+                    .filter(match ->
+                            (Objects.nonNull(match.getBottomPlayer())
+                                                && match.getBottomPlayer().equals(player))
+                            || (Objects.nonNull(match.getTopPlayer())
+                                    && match.getTopPlayer().equals(player))
+                    ).toList();
+
+            int oldRating = player.getRating();
+            int newGoalsScored = 0;
+            int newGoalsLost = 0;
+            int newWonMatches = 0;
+            int newLostMatches = 0;
+
+            for (Match match : playedMatches)
+            {
+                boolean isTopPlayer = match.getTopPlayer().equals(player);
+
+                for (Score score : match.getScore())
+                {
+                    newGoalsScored += isTopPlayer
+                            ? score.getTopPlayerScore()
+                            : score.getBottomPlayerScore() ;
+
+                    newGoalsLost += isTopPlayer
+                            ? score.getBottomPlayerScore()
+                            : score.getTopPlayerScore() ;
+                }
+
+                if (match.getWinner().equals(player))
+                {
+                    newWonMatches++;
+                } else
+                {
+                    newLostMatches++;
+                }
+            }
+
+            int newRating = oldRating + (5 * newWonMatches - 3 * newLostMatches) + (2 * newGoalsScored - newGoalsLost) ;
+
+            player.setRating(newRating);
+            player.setGoalsScored(player.getGoalsScored() + newGoalsScored);
+            player.setGoalsLost(player.getGoalsLost() + newGoalsLost);
+            player.setWonMatches(player.getWonMatches() + newWonMatches);
+            player.setLostMatches(player.getLostMatches() + newLostMatches);
+        }
+
 
     }
 }

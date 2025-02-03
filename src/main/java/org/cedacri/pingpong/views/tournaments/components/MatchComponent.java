@@ -12,6 +12,7 @@ import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +151,10 @@ public class MatchComponent extends HorizontalLayout {
         matchService.saveMatch(match);
         NotificationManager.showInfoNotification("Score for this match is updated.");
         logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+        TournamentUtils.determinateWinner(match);
+        matchService.saveMatch(match);
+        logger.info("Updated winner for this match and moved in next round.");
+
     }
 
     private Span getPlayerLabel(Player player, Match match, boolean isTop) {
