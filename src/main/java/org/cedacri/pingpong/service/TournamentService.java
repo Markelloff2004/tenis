@@ -4,8 +4,12 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
+import org.cedacri.pingpong.utils.Constraints;
 import org.cedacri.pingpong.utils.MatchGenerator;
+import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.PlayerDistributer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +61,12 @@ public class TournamentService {
     }
 
     @Transactional
-    public void startTournament(Tournament tournament) {
+    public void startTournament(Tournament tournament) throws NotEnoughPlayersException {
+        int playersCount = tournament.getPlayers().size();
+        if(playersCount < 8) {
+            NotificationManager.showErrorNotification(Constraints.NOT_ENOUGH_PLAYERS_MESSAGE);
+            throw new NotEnoughPlayersException(playersCount);
+        }
         MatchGenerator matchGenerator = new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
                 tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this, matchService);
 

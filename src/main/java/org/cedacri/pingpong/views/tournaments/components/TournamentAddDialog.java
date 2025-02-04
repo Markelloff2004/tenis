@@ -65,16 +65,12 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
    @Override
 protected void onSave() {
     logger.info("Save button clicked. Attempting to add new tournament");
-
-    if (selectedPlayersSet.size() < 8) {
-        NotificationManager.showInfoNotification("Please enter more than 8 players!");
-    } else {
         try {
             Tournament tournament = new Tournament();
 
             tournament.setTournamentName(tournamentNameField.getValue());
             tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-            tournament.setTournamentStatus( startNowCheckbox.getValue() ? TournamentStatusEnum.ONGOING : TournamentStatusEnum.PENDING);
+            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
             tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(selectedPlayersSet.size()));
             tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
             tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
@@ -90,6 +86,7 @@ protected void onSave() {
             tournament = tournamentService.saveTournament(tournament);
 
             if (startNowCheckbox.getValue()) {
+                tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
                 tournamentService.startTournament(tournament);
                 UI.getCurrent().getPage().setLocation("tournament/matches/" + tournament.getId());
             }
@@ -104,6 +101,5 @@ protected void onSave() {
             logger.error("Error saving tournament: {}", e.getMessage(), e);
             NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + "\n" + e.getMessage());
         }
-    }
-}
+   }
 }

@@ -12,6 +12,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
@@ -90,7 +91,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         logger.info("Creating layout for Round buttons.");
         HorizontalLayout roundButtons = new HorizontalLayout();
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
-        int roundsCount = (int) Math.sqrt(tournament.getMaxPlayers());
+        int roundsCount = TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers());
 
         List<Button> buttons = new ArrayList<>();
         for (int i = 1; i <= roundsCount; i++) {

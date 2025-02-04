@@ -21,7 +21,12 @@ public class Constraints {
     //INFO
     public static final int INFO_NOTIFICATION_DURATION = 5000;
     public static final Notification.Position INFO_NOTIFICATION_POSITION = Notification.Position.BOTTOM_CENTER;
+    //ERROR
+    public static final int ERROR_NOTIFICATION_DURATION = 8000;
+    public static final Notification.Position ERROR_NOTIFICATION_POSITION = Notification.Position.TOP_CENTER;
 
     public static final int PAGE_SIZE = 10;
 
+    //Exceptions
+    public static final String NOT_ENOUGH_PLAYERS_MESSAGE = "Not enough players!";
 }
