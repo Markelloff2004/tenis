@@ -122,13 +122,13 @@ public class ViewUtils
         TextField score = new TextField();
 
         score.setMaxLength(2);
-        score.setPattern("[-0-9]+");
+        score.setAllowedCharPattern("^[0-9]+$");
 
         score.setWidth("50px");
 
         if (value != null)
             score.setValue(value.toString());
-        else score.setValue("-");
+        else score.setPlaceholder("-");
 
         return score;
     }

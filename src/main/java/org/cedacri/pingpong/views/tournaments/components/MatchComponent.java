@@ -28,7 +28,7 @@ public class MatchComponent extends HorizontalLayout {
     private final Tournament tournament;
     private final List<List<TextField>> scoreFields = new ArrayList<>();
 
-    public MatchComponent(Match match, MatchService matchService, Tournament tournament) {
+    public MatchComponent(Match match, MatchService matchService, Tournament tournament, Runnable refreshMatches) {
         this.matchService = matchService;
         this.tournament = tournament;
         logger.info("Initializing MatchComponent for match with id {}", match.getId());
@@ -37,10 +37,13 @@ public class MatchComponent extends HorizontalLayout {
         add(
                 createMatchIdDetails(match),
                 createPlayersDetails(match),
-                createScoreDetails(match),
+                createScoreDetails(match, refreshMatches),
                 createWinnerDetails(match)
         );
     }
+
+//    public MatchComponent(Match match, MatchService matchService, Tournament tournament, void aVoid) {
+//    }
 
     private void configureLayout() {
         setWidthFull();
@@ -76,7 +79,7 @@ public class MatchComponent extends HorizontalLayout {
         return playerDetails;
     }
 
-    private HorizontalLayout createScoreDetails(Match match) {
+    private HorizontalLayout createScoreDetails(Match match, Runnable onEditScoreCallback) {
         logger.debug("Creating score details for match '{}'", match.getId());
 
         HorizontalLayout scoreDetails = new HorizontalLayout();
@@ -118,6 +121,7 @@ public class MatchComponent extends HorizontalLayout {
             Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
                 updateMatchScore(match);
                 NotificationManager.showInfoNotification("Score for this match is updated.");
+                onEditScoreCallback.run();
             });
             editScoreButton.setIcon(VaadinIcon.PENCIL.create());
             editScoreButton.setMaxWidth("20px");
@@ -158,7 +162,7 @@ public class MatchComponent extends HorizontalLayout {
         }
 
         match.setScore(newMatchScores);
-        matchService.saveMatch(match);
+//        matchService.saveMatch(match);
         logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
         TournamentUtils.determinateWinner(match);
         matchService.saveMatch(match);

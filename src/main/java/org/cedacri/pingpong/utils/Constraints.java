@@ -29,4 +29,6 @@ public class Constraints {
 
     //Exceptions
     public static final String NOT_ENOUGH_PLAYERS_MESSAGE = "Not enough players!";
+    public static final int MINIMAL_POINTS_IN_SET = 11;
+    public static final int MINIMAL_DIFFERENCE_OF_POINTS_IN_SET = 2;
 }

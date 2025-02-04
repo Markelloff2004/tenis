@@ -136,7 +136,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         for (Match match : matches ) {
             logger.debug("Processed match {}", match);
 
-            MatchComponent matchLayout = new MatchComponent(match, matchService, tournament);
+            MatchComponent matchLayout = new MatchComponent(match, matchService, tournament, () -> refreshMatchesInRound(match.getRound()));
 
             matchContainer.add(matchLayout);
         } // ends foreach(matches)

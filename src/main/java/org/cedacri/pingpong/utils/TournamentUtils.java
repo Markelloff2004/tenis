@@ -79,27 +79,47 @@ public class TournamentUtils {
 
         int topPlayerWined = 0;
         int bottomPlayerWined = 0;
+        int minScoresCounts = getMinimalNumsOfScores(match);
 
         for(Score score : match.getScore())
         {
-            if(score.getTopPlayerScore() > score.getBottomPlayerScore())
+            if(score.getTopPlayerScore() > score.getBottomPlayerScore()
+                    && score.getTopPlayerScore() >= Constraints.MINIMAL_POINTS_IN_SET
+                    && score.getTopPlayerScore() - score.getBottomPlayerScore() >= Constraints.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET
+            )
             {
                 topPlayerWined++;
             }
-            else if (score.getTopPlayerScore() < score.getBottomPlayerScore()){
+            else if (score.getBottomPlayerScore() > score.getTopPlayerScore()
+                    && score.getBottomPlayerScore() >= Constraints.MINIMAL_POINTS_IN_SET
+                    && score.getBottomPlayerScore() - score.getTopPlayerScore() >= Constraints.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET
+            )
+            {
                 bottomPlayerWined++;
             }
             else {
-                logger.warn("Score cannot be equal {}", score);
+                logger.warn("This Score cannot be used for determinate a winner {}", score);
             }
         }
 
-        if(topPlayerWined>bottomPlayerWined)
+        Player winner = null;
+
+        if(topPlayerWined > bottomPlayerWined
+                && topPlayerWined >= minScoresCounts)
         {
-            match.setWinner(match.getTopPlayer());
+            winner = match.getTopPlayer();
+        } else if (bottomPlayerWined > topPlayerWined
+                && bottomPlayerWined >= minScoresCounts) {
+            winner = match.getBottomPlayer();
         } else {
-            match.setWinner(match.getBottomPlayer());
+            NotificationManager.showInfoNotification("Cannot be determinate a winner for Match:" + match.getId());
         }
+
+        match.setWinner(winner);
+        moveWinner(match);
+    }
+
+    private static void moveWinner(Match match) {
 
         if(match.getRound() < TournamentUtils.calculateNumberOfRounds(match.getTournament().getMaxPlayers()))
         {
@@ -112,6 +132,23 @@ public class TournamentUtils {
         } else {
             //fine tournament
             fineTournament(match.getTournament());
+        }
+    }
+
+    private static int getMinimalNumsOfScores(Match match) {
+
+        int setsToWin = match.getTournament().getSetsToWin().getValue();
+        int semifinalSetsToWin = match.getTournament().getSemifinalsSetsToWin().getValue();
+        int finalSetsToWin = match.getTournament().getFinalsSetsToWin().getValue();
+        int numOfRound = calculateNumberOfRounds(match.getTournament().getMaxPlayers());
+        int currRound = match.getRound();
+
+        if (currRound == numOfRound){
+            return finalSetsToWin/2+1;
+        } else if (currRound == numOfRound-1){
+            return semifinalSetsToWin/2+1;
+        } else {
+            return setsToWin/2+1;
         }
     }
 
