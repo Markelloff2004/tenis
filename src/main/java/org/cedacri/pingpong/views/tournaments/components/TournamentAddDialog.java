@@ -77,7 +77,8 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
             tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
 
             tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
+            tournament.setMaxPlayers(
+                    (selectedPlayersSet.size() < 8) ? 8 : TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
 
             tournament = tournamentService.saveTournament(tournament);
 
