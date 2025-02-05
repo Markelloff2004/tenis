@@ -27,6 +27,8 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
     private final TournamentService tournamentService;
     private final Runnable onSaveCallback;
 
+    private Tournament tournament = new Tournament();
+
     private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
     public TournamentAddDialog(TournamentService tournamentService, PlayerService playerService, Runnable onSaveCallback) {
@@ -66,8 +68,6 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
     {
         try
         {
-            Tournament tournament = new Tournament();
-
             //extract data
             tournament.setTournamentName(tournamentNameField.getValue());
             tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
