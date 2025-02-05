@@ -43,22 +43,49 @@ public class MatchGenerator {
 
     public void generateMatches(Tournament tournamentRef) {
         Tournament tournament = tournamentService.find(tournamentRef.getId());
-        if (tournamentType == TournamentTypeEnum.OLYMPIC) {
-            List<Player> sortedPlayers = new ArrayList<>(tournament.getPlayers());
-            sortedPlayers.sort(Comparator.comparingInt(Player::getRating).reversed());
 
-            tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
-            tournamentService.saveTournament(tournament);
+        switch(tournamentType){
+            case OLYMPIC -> {
+                List<Player> sortedPlayers = new ArrayList<>(tournament.getPlayers());
+                sortedPlayers.sort(Comparator.comparingInt(Player::getRating).reversed());
 
-            generateOlympicTournament(tournament);
+                generateOlympicTournament(tournament);
+            }
+            case ROBIN_ROUND -> {
+                generateRobinRoundTournament(tournament);
+            }
+            default -> {
+                NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
+                log.error("Tournament type {} not supported", tournamentType);
+            }
         }
-        else {
-            NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
-            log.error("Tournament type {} not supported", tournamentType);
+
+    }
+
+    private void generateRobinRoundTournament(Tournament tournament) {
+        List<Player> players = new ArrayList<>(tournament.getPlayers());
+        int numPlayers = players.size();
+
+        // Создаём список матчей для каждого игрока против каждого
+        List<Match> matches = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            for (int j = i + 1; j < numPlayers; j++) {
+                Match match = createMatch(1, matches.size() + 1, null, tournament);
+                matches.add(match);
+            }
         }
+
+        tournament.getMatches().addAll(matches);
+
+        // Распределение игроков в отдельном методе PlayerDistributer
+        playerDistributer.distributePlayersInRobinRound(matches, players);
     }
 
     private void generateOlympicTournament(Tournament tournament) {
+
+        tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
+        tournamentService.saveTournament(tournament);
+
         int numPlayers = tournament.getPlayers().size();
         int maxPlayers = calculateMaxPlayers(numPlayers);
         int totalRounds = TournamentUtils.calculateNumberOfRounds(maxPlayers);

@@ -80,4 +80,20 @@ public class PlayerDistributer {
             }
         }
     }
+
+    public void distributePlayersInRobinRound(List<Match> matches, List<Player> players) {
+        int matchIndex = 0;
+        int numPlayers = players.size();
+
+        for (int i = 0; i < numPlayers; i++) {
+            for (int j = i + 1; j < numPlayers; j++) {
+                if (matchIndex < matches.size()) {
+                    Match match = matches.get(matchIndex);
+                    match.setTopPlayer(players.get(i));
+                    match.setBottomPlayer(players.get(j));
+                    matchIndex++;
+                }
+            }
+        }
+    }
 }

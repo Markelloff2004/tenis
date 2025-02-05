@@ -77,9 +77,6 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
         playersGrid.addColumn(Player::getName).setHeader("Name").setSortable(true).setKey("playerName");
         playersGrid.addColumn(Player::getSurname).setHeader("Surname").setSortable(true).setKey("playerSurname");
         playersGrid.addColumn(player ->ChronoUnit.YEARS.between(player.getBirthDate(), LocalDate.now())).setHeader("Age").setSortable(true).setKey("age");
-//        playersGrid.addColumn(Player::getHand).setHeader("Playing Style").setSortable(true).setKey("hand");
-//        playersGrid.addColumn(Player::getWonMatches).setHeader("Won Matches").setSortable(true).setKey("wonMatches");
-//        playersGrid.addColumn(Player::getLostMatches).setHeader("Losed Matches").setSortable(true).setKey("lostMatches");
 
         playersGrid.addColumn(
                 new ComponentRenderer<>(player ->
