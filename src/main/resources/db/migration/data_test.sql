@@ -40,3 +40,98 @@ VALUES
 #     (3, 2, 6, 8, 6, '11:1', 2),
 #     (3, 2, 9, 10, null, null, 2),
 #     (4, 2, 6, null, null, null, 3);
+
+
+
+use tournament_db;
+
+INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type) VALUES ('2025-02-05', 1, 16, 'cedacri', 'BEST_OF_THREE', 'BEST_OF_THREE', 'BEST_OF_THREE', 'FINISHED', 'OLYMPIC');
+INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type) VALUES ('2025-02-05', 2, 16, 'Test1', 'BEST_OF_ONE', 'BEST_OF_ONE', 'BEST_OF_ONE', 'FINISHED', 'OLYMPIC');
+INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type) VALUES ('2025-02-05', 3, 16, 'Test2', 'BEST_OF_ONE', 'BEST_OF_ONE', 'BEST_OF_ONE', 'PENDING', 'OLYMPIC');
+
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 1);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 1);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 1);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 2);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 2);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 2);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 3);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 3);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 3);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 4);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 4);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 4);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 5);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 5);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 5);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 6);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 6);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 6);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 7);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 7);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 7);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 8);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 8);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 8);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 9);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 9);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (3, 9);
+INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 10);
+
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (1, null, 1, 4, 1, 2, 6, 6);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (2, 1, 1, 3, 1, 3, 6, 6);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (3, 2, 2, 2, 1, 1, 3, 3);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (4, 3, 3, 1, 1, null, 3, 3);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (5, 1, 2, 3, 1, 7, 2, 2);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (6, 5, 4, 2, 1, 4, 7, 7);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (7, 6, 7, 1, 1, null, 7, 7);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (8, 6, 8, 1, 1, 9, 4, 4);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (9, 2, 1, 2, 1, 8, 6, 6);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (10, 9, 2, 1, 1, null, 6, 6);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (11, 5, 3, 2, 1, 5, 2, 2);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (12, 11, 6, 1, 1, null, 2, 2);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (13, 3, 4, 1, 1, null, 1, 1);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (14, 11, 5, 1, 1, null, 5, 5);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (15, 9, 1, 1, 1, null, 8, 8);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (16, null, 1, 4, 2, 2, 3, 3);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (17, 16, 1, 3, 2, 1, 3, 3);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (18, 17, 2, 2, 2, 6, 1, 1);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (19, 16, 2, 3, 2, 7, 2, 2);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (20, 19, 4, 2, 2, 4, 7, 7);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (21, 19, 3, 2, 2, 5, 2, 2);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (22, 21, 6, 1, 2, null, 2, 2);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (23, 18, 3, 1, 2, null, 1, 1);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (24, 21, 5, 1, 2, null, 5, 5);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (25, 20, 8, 1, 2, 9, 4, 4);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (26, 18, 4, 1, 2, null, 6, 6);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (27, 17, 1, 2, 2, 8, 3, 3);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (28, 27, 2, 1, 2, null, 3, 3);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (29, 20, 7, 1, 2, 10, 7, 7);
+INSERT INTO tournament_db.matches (id, next_match_id, position, round, tournament_id, bottom_player_id, top_player_id, winner_id) VALUES (30, 27, 1, 1, 2, null, 8, 8);
+
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (1, 1, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (6, 1, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (1, 2, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (2, 2, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (1, 3, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (1, 3, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (1, 5, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (5, 5, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (4, 6, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (5, 6, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (1, 8, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (10, 8, 12);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (0, 9, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (3, 9, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (2, 11, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (3, 11, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (6, 16, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (5, 17, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (4, 18, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (5, 19, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (5, 20, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (2, 21, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (3, 25, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (3, 27, 11);
+INSERT INTO tournament_db.match_scores (bottom_player_score, match_id, top_player_score) VALUES (3, 29, 11);
+
