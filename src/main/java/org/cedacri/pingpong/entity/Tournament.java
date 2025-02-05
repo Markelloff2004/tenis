@@ -1,11 +1,16 @@
 package org.cedacri.pingpong.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cedacri.pingpong.entity.Match;
+import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
@@ -22,38 +27,41 @@ import java.util.Set;
 @Table(name = "tournaments")
 public class Tournament implements ITournament {
 
-   @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     @Size(max = 100)
-    @NotNull
+    @NotBlank(message = "Tournament name cannot be null or blank")
     @Column(name = "tournament_name", nullable = false, length = 100)
     private String tournamentName;
 
-    @NotNull
+    @NotNull(message = "Add at least one player")
     @Column(name = "max_players", nullable = false)
     private Integer maxPlayers;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Tournament status cannot be null")
     @Column(name = "tournament_status", length = 15)
     private TournamentStatusEnum tournamentStatus;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Tournament type cannot be null")
     @Column(name = "tournament_type", nullable = false)
     private TournamentTypeEnum tournamentType;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Tournament sets cannot be null")
     @Column(name = "sets_to_win", nullable = false)
     private SetTypesEnum setsToWin;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "semifinals_sets_to_win", nullable = false)
+    @NotNull(message = "Tournament semifinals sets cannot be null")
     private SetTypesEnum semifinalsSetsToWin;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "finals_sets_to_win", nullable = false)
+    @NotNull(message = "Tournament final sets cannot be null")
     private SetTypesEnum finalsSetsToWin;
 
     @Column(name = "created_at", updatable = false)

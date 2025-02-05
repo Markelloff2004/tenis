@@ -1,8 +1,13 @@
 package org.cedacri.pingpong.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.entity.Score;
+import org.cedacri.pingpong.entity.Tournament;
 
 import java.util.List;
 
@@ -22,7 +27,8 @@ public class Match {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @NotNull
+    @NotNull(message = "Round cannot be null or empty")
+    @Min(value = 1, message = "Round cannot be less than 1")
     @Column(name = "round", nullable = false)
     private Integer round;
 

@@ -9,7 +9,13 @@ public class Constraints {
     public static final List<String> PLAYING_HAND = List.of("LEFT", "RIGHT");
 
     public static final String TOURNAMENT_UPDATE_SUCCESS = "Tournament updated successfully";
-    public static final String TOURNAMENT_UPDATE_ERROR = "Encountered an error while updating tournament, please check the data!";
+    public static final String TOURNAMENT_UPDATE_ERROR = "Error updating tournament: ";
+
+    public static final String PLAYER_UPDATE_SUCCESS = "Player updated successfully";
+    public static final String PLAYER_UPDATE_ERROR = "Error updating player: ";
+
+    public static final String MATCH_UPDATE_SUCCESS = "Match updated successfully";
+    public static final String MATCH_UPDATE_ERROR = "Error updating match: ";
 
     //Notification params
     //INFO
