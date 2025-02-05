@@ -3,9 +3,9 @@ package org.cedacri.pingpong.views.tournaments.components;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class TournamentDeleteDialog extends Dialog {
                         onDeleteCallback.run();
                         close();
                     } catch (Exception e) {
-                        NotificationManager.showInfoNotification("Error deleting tournament: " + e.getMessage());
+                        NotificationManager.showErrorNotification("Error deleting tournament: " + ExceptionUtils.getExceptionMessage(e));
                         logger.error("Error deleting tournament: {}, {}", id, e.getMessage());
                     }
                 }

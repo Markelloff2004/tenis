@@ -11,7 +11,6 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.springframework.security.core.parameters.P;
 
 import java.util.*;
 
@@ -54,7 +53,7 @@ public class MatchGenerator {
             generateOlympicTournament(tournament);
         }
         else {
-            NotificationManager.showInfoNotification("Tournament type " + tournamentType + " not supported!");
+            NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
             log.error("Tournament type {} not supported", tournamentType);
         }
     }

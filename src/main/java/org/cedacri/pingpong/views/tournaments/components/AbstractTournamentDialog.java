@@ -27,10 +27,10 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractTournamentDialog.class);
 
     protected TextField tournamentNameField;
-    protected ComboBox<String> typeComboBox;
-    protected ComboBox<String> setsCountComboBox;
-    protected ComboBox<String> semifinalsSetsCountComboBox;
-    protected ComboBox<String> finalsSetsCountComboBox;
+    protected ComboBox<TournamentTypeEnum> typeComboBox;
+    protected ComboBox<SetTypesEnum> setsCountComboBox;
+    protected ComboBox<SetTypesEnum> semifinalsSetsCountComboBox;
+    protected ComboBox<SetTypesEnum> finalsSetsCountComboBox;
     protected Set<Player> selectedPlayersSet;
     protected Set<Player> availablePlayersSet;
     protected Grid<Player> selectedPlayersGrid;
@@ -68,21 +68,13 @@ public abstract class AbstractTournamentDialog extends Dialog {
     }
 
     protected void configureComboBoxes() {
-        typeComboBox.setItems(Arrays.stream(TournamentTypeEnum.values())
-                .map(Enum::toString)
-                .collect(Collectors.toSet()));
 
-        setsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
-                .map(Enum::toString)
-                .collect(Collectors.toSet()));
+        typeComboBox.setItems(TournamentTypeEnum.values());
 
-        semifinalsSetsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
-                .map(Enum::toString)
-                .collect(Collectors.toSet()));
+        setsCountComboBox.setItems(SetTypesEnum.values());
+        semifinalsSetsCountComboBox.setItems(SetTypesEnum.values());
+        finalsSetsCountComboBox.setItems(SetTypesEnum.values());
 
-        finalsSetsCountComboBox.setItems(Arrays.stream(SetTypesEnum.values())
-                .map(Enum::toString)
-                .collect(Collectors.toSet()));
     }
 
     protected void initializePlayerSets(PlayerService playerService, Set<Player> players) {

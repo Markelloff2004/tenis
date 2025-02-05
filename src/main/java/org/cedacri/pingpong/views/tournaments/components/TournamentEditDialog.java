@@ -15,6 +15,7 @@ import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -84,10 +85,10 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
     private void prefillFields(Tournament tournament) {
         logger.debug("Pre-fill fields with existing tournament data");
         tournamentNameField.setValue(tournament.getTournamentName());
-        typeComboBox.setValue(tournament.getTournamentType().toString());
-        setsCountComboBox.setValue(tournament.getSetsToWin().toString());
-        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin().toString());
-        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin().toString());
+        typeComboBox.setValue(tournament.getTournamentType());
+        setsCountComboBox.setValue(tournament.getSetsToWin());
+        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin());
+        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin());
     }
 
     @Override
@@ -106,10 +107,10 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         {
             //extract data
             tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-            tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
-            tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-            tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+            tournament.setTournamentType(typeComboBox.getValue());
+            tournament.setSetsToWin(setsCountComboBox.getValue());
+            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
 
             tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
             tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
@@ -139,7 +140,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         } catch (Exception e)
         {
             logger.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + e.getMessage());
+            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }
