@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Route(value = "tournament/matches", layout = MainLayout.class)
@@ -124,6 +125,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         displayMatches(tournament.getMatches()
                 .stream()
                 .filter(m -> m.getRound() == round)
+                .sorted(Comparator.comparingInt(Match::getPosition))
                 .toList());
     }
 
