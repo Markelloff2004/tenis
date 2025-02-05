@@ -1,11 +1,13 @@
 package org.cedacri.pingpong.views.tournaments;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -13,8 +15,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
+import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.interfaces.TournamentManagement;
@@ -106,12 +112,14 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
         HorizontalLayout layout;
 
-        if(tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
+        if(tournament.getTournamentStatus() != null && tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
             Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditTournament(tournament));
-            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, editButton, deleteButton);
+
+            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, editButton, viewButton, deleteButton);
+
         }
         else {
-            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, viewButton, deleteButton);
+            layout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, viewButton, deleteButton);
         }
 
         return layout;

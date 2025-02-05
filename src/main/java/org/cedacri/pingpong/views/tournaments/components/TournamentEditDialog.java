@@ -1,8 +1,13 @@
 package org.cedacri.pingpong.views.tournaments.components;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
@@ -11,6 +16,8 @@ import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
 import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.TournamentUtils;
+import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +29,11 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
 
     private final TournamentService tournamentService;
     private final Runnable onSaveCallback;
-    private final Tournament tournament;
+    private Tournament tournament;
 
     private final ComboBox<String> statusComboBox;
+
+    private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
     public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, Tournament tournament, Runnable onSaveCallback) {
         super("Edit Tournament");
@@ -44,7 +53,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
 
         initializeGrids(true);
 
-        add(createDialogLayoutWithStatus(), createPlayersLayout(), createDialogButtons());
+        add(createDialogLayoutWithStaus(), createPlayersLayout(), createDialogButtons());
 
         logger.debug("Initializing fields for editing...");
 
@@ -52,7 +61,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         refreshGrids();
     }
 
-    private VerticalLayout createDialogLayoutWithStatus() {
+    protected VerticalLayout createDialogLayoutWithStaus() {
         VerticalLayout dialogLayout = createDialogLayout();
 
         HorizontalLayout firstRow = (HorizontalLayout) dialogLayout.getComponentAt(0);
@@ -82,30 +91,55 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
     }
 
     @Override
+    protected HorizontalLayout createDialogButtons() {
+        Button saveButton = ViewUtils.createButton("Save", "colored-button", this::onSave);
+        Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+
+        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, startNowCheckbox, saveButton, cancelButton);
+    }
+
+    @Override
     protected void onSave() {
             logger.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
 
-            try{
-                tournament.setTournamentName(tournamentNameField.getValue());
-                tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-                tournament.setTournamentStatus(TournamentStatusEnum.valueOf(statusComboBox.getValue()));
-                tournament.setPlayers(selectedPlayersSet);
-                tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
-                tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-                tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+        try
+        {
+            //extract data
+            tournament.setTournamentName(tournamentNameField.getValue());
+            tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
+            tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
+            tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
+            tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
 
-                tournamentService.saveTournament(tournament);
-                logger.info("Tournament updated successfully: {}", tournament.getId());
+            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
 
-                onSaveCallback.run();
+            tournament = tournamentService.saveTournament(tournament);
 
-                close();
-
-                NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
+            for (Player player : selectedPlayersSet) {
+                player.getTournaments().add(tournament);
+                tournament.getPlayers().add(player);
             }
-            catch (Exception e){
-                logger.error("Error updating tournament: {} {}", tournament.getId(), e.getMessage(), e);
-                NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + "\n" + e.getMessage());
+
+            tournament = tournamentService.saveTournament(tournament);
+
+
+            if (startNowCheckbox.getValue()) {
+
+                tournamentService.startTournament(tournament);
+
+                UI.getCurrent().getPage().setLocation("tournament/matches/" + tournament.getId());
             }
+
+            logger.info("Tournament saved successfully: {}", tournament.getId());
+            onSaveCallback.run();
+            close();
+            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
+
+        } catch (Exception e)
+        {
+            logger.error("Error saving tournament: {}", e.getMessage(), e);
+            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + e.getMessage());
+        }
     }
 }

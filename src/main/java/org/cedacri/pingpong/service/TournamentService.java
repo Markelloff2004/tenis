@@ -63,13 +63,16 @@ public class TournamentService {
     @Transactional
     public void startTournament(Tournament tournament) throws NotEnoughPlayersException {
         int playersCount = tournament.getPlayers().size();
+
         if(playersCount < 8) {
             NotificationManager.showErrorNotification(Constraints.NOT_ENOUGH_PLAYERS_MESSAGE);
             throw new NotEnoughPlayersException(playersCount);
         }
+
         MatchGenerator matchGenerator = new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
                 tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this, matchService);
 
         matchGenerator.generateMatches(tournament);
+
     }
 }

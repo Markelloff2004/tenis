@@ -61,20 +61,22 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, startNowCheckbox, saveButton, cancelButton);
     }
 
-
-   @Override
-protected void onSave() {
-    logger.info("Save button clicked. Attempting to add new tournament");
-        try {
+    @Override
+    protected void onSave()
+    {
+        try
+        {
             Tournament tournament = new Tournament();
 
+            //extract data
             tournament.setTournamentName(tournamentNameField.getValue());
             tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(selectedPlayersSet.size()));
             tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
             tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
             tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+
+            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
 
             tournament = tournamentService.saveTournament(tournament);
 
@@ -85,21 +87,23 @@ protected void onSave() {
 
             tournament = tournamentService.saveTournament(tournament);
 
+
             if (startNowCheckbox.getValue()) {
-                tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
+
                 tournamentService.startTournament(tournament);
+
                 UI.getCurrent().getPage().setLocation("tournament/matches/" + tournament.getId());
             }
 
             logger.info("Tournament saved successfully: {}", tournament.getId());
-
             onSaveCallback.run();
             close();
-
             NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
-        } catch (Exception e) {
+
+        } catch (Exception e)
+        {
             logger.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + "\n" + e.getMessage());
+            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + e.getMessage());
         }
-   }
+    }
 }

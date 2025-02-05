@@ -7,6 +7,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.SetTypesEnum;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
@@ -46,6 +47,9 @@ public class MatchGenerator {
         if (tournamentType == TournamentTypeEnum.OLYMPIC) {
             List<Player> sortedPlayers = new ArrayList<>(tournament.getPlayers());
             sortedPlayers.sort(Comparator.comparingInt(Player::getRating).reversed());
+
+            tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
+            tournamentService.saveTournament(tournament);
 
             generateOlympicTournament(tournament);
         }
