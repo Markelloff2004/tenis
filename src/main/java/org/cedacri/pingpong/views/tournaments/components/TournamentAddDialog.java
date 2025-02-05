@@ -14,6 +14,7 @@ import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -70,10 +71,10 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
         {
             //extract data
             tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(TournamentTypeEnum.valueOf(typeComboBox.getValue().toUpperCase()));
-            tournament.setSetsToWin(SetTypesEnum.valueOf(setsCountComboBox.getValue().toUpperCase()));
-            tournament.setSemifinalsSetsToWin(SetTypesEnum.valueOf(semifinalsSetsCountComboBox.getValue().toUpperCase()));
-            tournament.setFinalsSetsToWin(SetTypesEnum.valueOf(finalsSetsCountComboBox.getValue().toUpperCase()));
+            tournament.setTournamentType(typeComboBox.getValue());
+            tournament.setSetsToWin(setsCountComboBox.getValue());
+            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
 
             tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
             tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
@@ -103,7 +104,7 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
         } catch (Exception e)
         {
             logger.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_ERROR + e.getMessage());
+            NotificationManager.showErrorNotification(Constraints.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

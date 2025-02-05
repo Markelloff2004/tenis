@@ -98,10 +98,10 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     private void prefillFields(Tournament tournament) {
         logger.debug("Pre-fill fields with existing tournament data");
         tournamentNameField.setValue(tournament.getTournamentName());
-        typeComboBox.setValue(tournament.getTournamentType().toString());
-        setsCountComboBox.setValue(tournament.getSetsToWin().toString());
-        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin().toString());
-        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin().toString());
+        typeComboBox.setValue(tournament.getTournamentType());
+        setsCountComboBox.setValue(tournament.getSetsToWin());
+        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin());
+        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin());
     }
 
     @Override

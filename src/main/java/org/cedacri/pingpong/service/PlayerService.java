@@ -1,8 +1,13 @@
 package org.cedacri.pingpong.service;
 
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.ExceptionUtils;
+import org.cedacri.pingpong.utils.NotificationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -11,9 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.stream.Stream;
 
+@Validated
 @Service
 public class PlayerService {
 
@@ -25,8 +32,13 @@ public class PlayerService {
     }
 
     public Player findById(Long id) {
-        return playerRepository.findById(id).orElseThrow();
+        return playerRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("Player with id {} not found", id);
+                    return new IllegalArgumentException("Player not found");
+                });
     }
+
     public Stream<Player> list(long page) {
         logger.info("Fetching list of players for page {}", page);
 
@@ -43,12 +55,7 @@ public class PlayerService {
     }
 
     @Transactional
-    public void save(Player player) {
-        if (player == null) {
-            logger.error("Attempted to save a null Player");
-            throw new IllegalArgumentException("Player cannot be null");
-        }
-
+    public void save(@Valid Player player) {
         logger.debug("Attempting to save player {}", player);
 
         playerRepository.save(player);

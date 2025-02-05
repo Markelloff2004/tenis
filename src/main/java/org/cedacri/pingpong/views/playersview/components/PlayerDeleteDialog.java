@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
@@ -42,8 +43,8 @@ public class PlayerDeleteDialog extends Dialog {
             }
             catch (Exception e)
             {
-                logger.error("Error while deleting player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId(), e);
-                NotificationManager.showInfoNotification("Player cannot be deleted : " + e.getMessage());
+                logger.error("Error while deleting player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId(), e.getMessage());
+                NotificationManager.showErrorNotification("Player cannot be deleted : " + ExceptionUtils.getExceptionMessage(e));
             }
         });
 

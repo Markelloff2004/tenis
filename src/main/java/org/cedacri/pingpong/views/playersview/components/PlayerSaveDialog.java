@@ -1,23 +1,11 @@
 package org.cedacri.pingpong.views.playersview.components;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
+import jakarta.validation.ConstraintViolationException;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.ViewUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.time.LocalDate;
 
 public class PlayerSaveDialog extends AbstractPlayerDialog {
 
@@ -35,8 +23,6 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
         add(createFieldsLayout(), createButtonsLayout());
 
         logger.debug("Initializing fields for editing...");
-
-        populateFields(player);
     }
 
     @Override
@@ -53,10 +39,10 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
             playerService.save(player);
             onSaveCallback.run();
             close();
-            NotificationManager.showInfoNotification("Player updated successfully!");
-        } catch (Exception e) {
-            logger.error("Error saving player: {}", e.getMessage());
-            Notification.show("Error updating player: " + e.getMessage());
+            NotificationManager.showInfoNotification("Player saved successfully!");
+        } catch (ConstraintViolationException e) {
+            logger.error(Constraints.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
+            NotificationManager.showErrorNotification(Constraints.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

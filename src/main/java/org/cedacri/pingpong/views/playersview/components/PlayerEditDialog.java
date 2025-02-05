@@ -1,13 +1,12 @@
 package org.cedacri.pingpong.views.playersview.components;
 
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.TextField;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 
@@ -73,7 +72,6 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 
     }
 
-    @Override
     protected void populateFields(Player player) {
         super.populateFields(player);
 
@@ -133,8 +131,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 
             NotificationManager.showInfoNotification("Player updated successfully!");
         } catch (Exception e) {
-            logger.error("Error saving player: {}", e.getMessage());
-            Notification.show("Error updating player: " + e.getMessage());
+            logger.error(Constraints.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
+            NotificationManager.showErrorNotification(Constraints.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }
