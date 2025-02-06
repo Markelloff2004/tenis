@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -32,6 +33,33 @@ public class MatchService {
         return matches;
     }
 
+    public List<Match> getMatchesByPlayerNameSurname(Tournament tournament, String playerName, String playerSurname)
+    {
+        logger.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
+
+        List<Match> matchesFromTournament = matchRepository.findByTournament(tournament);
+
+        List<Match> matchesWhereIsTopPlayer = matchesFromTournament.stream()
+                .filter(m -> (Objects.nonNull(m.getTopPlayer())
+                                && (m.getTopPlayer().getName().equals(playerName)
+                                && m.getTopPlayer().getSurname().equals(playerSurname))
+                        )
+                ).toList();
+
+        List<Match> matchesWhereIsBottomPlayer = matchesFromTournament.stream()
+                .filter(m -> (Objects.nonNull(m.getTopPlayer())
+                                && (m.getBottomPlayer().getName().equals(playerName)
+                                && m.getBottomPlayer().getSurname().equals(playerSurname))
+                        )
+                ).toList();
+
+        List<Match> allMatches = new ArrayList<>();
+        allMatches.addAll(matchesWhereIsTopPlayer);
+        allMatches.addAll(matchesWhereIsBottomPlayer);
+
+        return allMatches;
+    }
+
     public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, int round, int position) {
         logger.debug("Fetching match for tournament: {}, round: {} and position: {}", tournament, round, position);
         Optional<Match> match = matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
@@ -42,7 +70,6 @@ public class MatchService {
             logger.warn("Match not found!");
         }
         return match;
-
     }
 
     @Transactional
@@ -114,6 +141,5 @@ public class MatchService {
 
         return null;
     }
-
 
 }

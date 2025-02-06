@@ -68,10 +68,21 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
 
     @Override
     protected HorizontalLayout createDialogButtons() {
-        Button saveButton = ViewUtils.createButton("Matches", "colored-button", this::onSave);
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
 
-        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
+        if(!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
+        {
+            Button saveButton = ViewUtils.createButton("Matches", "colored-button", this::onSave);
+            Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+
+            return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
+        }
+        else {
+            Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+
+            return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, cancelButton);
+
+        }
+
     }
 
     private VerticalLayout createDialogLayoutWithStatus() {

@@ -10,6 +10,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.utils.Constraints;
 import org.cedacri.pingpong.utils.NotificationManager;
@@ -119,14 +120,29 @@ public class MatchComponent extends HorizontalLayout {
             );
         }
 
-        Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
-            updateMatchScore(match);
-            onEditScoreCallback.run();
-        });
-        editScoreButton.setIcon(VaadinIcon.PENCIL.create());
-        editScoreButton.setMaxWidth("20px");
+        if(tournament.getTournamentStatus().equals(TournamentStatusEnum.ONGOING))
+        {
+            Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
+                updateMatchScore(match);
+                onEditScoreCallback.run();
+            });
+            editScoreButton.setIcon(VaadinIcon.PENCIL.create());
+            editScoreButton.setMaxWidth("20px");
 
-        scoreDetails.add(editScoreButton);
+            scoreDetails.add(editScoreButton);
+        }
+        else
+        {
+            Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
+                NotificationManager.showInfoNotification("Unable to edit the score for a match in a finished tournament");
+                onEditScoreCallback.run();
+            });
+            editScoreButton.setIcon(VaadinIcon.PENCIL.create());
+            editScoreButton.setMaxWidth("20px");
+
+            scoreDetails.add(editScoreButton);
+        }
+
 
 
         return scoreDetails;
@@ -157,11 +173,8 @@ public class MatchComponent extends HorizontalLayout {
                 int bottomScore = Integer.parseInt(scoreRow.get(1).getValue().trim());
                 newMatchScores.add(new Score(topScore, bottomScore));
 
-            } catch (NumberFormatException e)
+            } catch (NumberFormatException ignored)
             {
-                infoMessage.append("Invalid score input for: ")
-                        .append(scoreRow.get(0).getValue()).append("-")
-                        .append(scoreRow.get(1).getValue()).append("\n");
             }
         }
 
@@ -223,6 +236,6 @@ public class MatchComponent extends HorizontalLayout {
             }
         }
 
-        return new Span("Ne dorabotal, Marcu. Pozor.");
+        return new Span("");
     }
 }

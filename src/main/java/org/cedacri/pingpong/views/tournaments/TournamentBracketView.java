@@ -9,7 +9,9 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import org.cedacri.pingpong.entity.Match;
+import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.TournamentUtils;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 @Route(value = "tournament/matches", layout = MainLayout.class)
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
@@ -89,25 +92,52 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
     private HorizontalLayout createRoundButtonsLayout() {
+
         logger.info("Creating layout for Round buttons.");
         HorizontalLayout roundButtons = new HorizontalLayout();
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
-        int roundsCount = TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers());
-
         List<Button> buttons = new ArrayList<>();
-        for (int i = 1; i <= roundsCount; i++) {
-            int round = i;
-            logger.debug("Adding button for round {}", i);
-            Button roundButton = new Button("Stage " + round, event -> {
-                refreshMatchesInRound(round);
-                ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
-            });
 
-            roundButton.addClassName("button");
+        if(tournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
+        {
+            int roundsCount = TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers());
 
-            buttons.add(roundButton);
-            roundButtons.add(roundButton);
+            for (int i = 1; i <= roundsCount; i++) {
+                int round = i;
+                logger.debug("Adding button for round {}", i);
+                Button roundButton = new Button("Stage " + round, event -> {
+                    refreshMatchesInRound(round);
+                    ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
+                });
+
+                roundButton.addClassName("button");
+
+                buttons.add(roundButton);
+                roundButtons.add(roundButton);
+            }
         }
+        else
+        {
+            Set<Player> playerList = tournament.getPlayers();
+
+            for(Player roundOfPlayer : playerList )
+            {
+                String roundText = roundOfPlayer.getName() + " " + roundOfPlayer.getSurname();
+
+                logger.debug("Adding button for round {}", roundText );
+                Button roundButton = new Button(roundText, event -> {
+                    refreshMatchesInRound(roundText);
+//                    ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
+                });
+
+                roundButton.addClassName("button");
+
+                buttons.add(roundButton);
+                roundButtons.add(roundButton);
+
+            }
+        }
+
 
         // Initially highlight the first button
         ViewUtils.highlightSelectedComponentFromComponentsList(buttons, 0, "selected");
@@ -118,15 +148,29 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         );
     }
 
-    private void refreshMatchesInRound(int round) {
-        logger.info("Refreshing matches for round {}", round);
-        matchContainer.removeAll();
+    private void refreshMatchesInRound(Object round) {
 
-        displayMatches(tournament.getMatches()
-                .stream()
-                .filter(m -> m.getRound() == round)
-                .sorted(Comparator.comparingInt(Match::getPosition))
-                .toList());
+        if(round instanceof Integer)
+        {
+            logger.info("Refreshing matches for round {}", round);
+            matchContainer.removeAll();
+
+            displayMatches(tournament.getMatches()
+                    .stream()
+                    .filter(m -> m.getRound() == round)
+                    .sorted(Comparator.comparingInt(Match::getPosition))
+                    .toList());
+        } else if( round instanceof String)
+        {
+            logger.info("Refreshing matches for round {}", round);
+            matchContainer.removeAll();
+
+            String playerName = ((String) round).split(" ")[0];
+            String playerSurname = ((String) round).split(" ")[1];
+
+            displayMatches(matchService.getMatchesByPlayerNameSurname(tournament, playerName, playerSurname));
+        }
+
     }
 
     private void displayMatches(List<Match> matches)
