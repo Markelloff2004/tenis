@@ -2,28 +2,24 @@ package org.cedacri.pingpong.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.MatchGenerator;
-import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.PlayerDistributer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.cedacri.pingpong.utils.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
     private final MatchService matchService;
 
     public TournamentService(TournamentRepository tournamentRepository, MatchService matchService) {
@@ -73,6 +69,27 @@ public class TournamentService {
                 tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this, matchService);
 
         matchGenerator.generateMatches(tournament);
+    }
 
+    @Transactional
+    public Tournament saveTournamentWithPlayers(Tournament tournament, Set<Player> selectedPlayers, boolean startNow) throws NotEnoughPlayersException {
+
+        tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+        tournament.setMaxPlayers(TournamentUtils.determineMaxPlayers(selectedPlayers));
+
+        tournament = saveTournament(tournament);
+
+        for(Player player : selectedPlayers){
+            player.getTournaments().add(tournament);
+            tournament.getPlayers().add(player);
+        }
+
+        tournament = saveTournament(tournament);
+
+        if(startNow) {
+            startTournament(tournament);
+        }
+
+        return tournament;
     }
 }

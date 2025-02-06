@@ -208,4 +208,9 @@ public class TournamentUtils {
             player.setLostMatches(player.getLostMatches() + newLostMatches);
         }
     }
+
+    public static int determineMaxPlayers(Set<Player> players) {
+        int playerCount = players.size();
+        return (playerCount < 8) ? 8 : calculateMaxPlayers(playerCount);
+    }
 }

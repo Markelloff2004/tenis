@@ -8,9 +8,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
-import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
@@ -69,35 +67,22 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
     {
         try
         {
-            //extract data
             tournament.setTournamentName(tournamentNameField.getValue());
             tournament.setTournamentType(typeComboBox.getValue());
             tournament.setSetsToWin(setsCountComboBox.getValue());
             tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
             tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
 
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setMaxPlayers(
-                    (selectedPlayersSet.size() < 8) ? 8 : TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
+            boolean startNow = startNowCheckbox.getValue();
 
-            tournament = tournamentService.saveTournament(tournament);
+            tournament = tournamentService.saveTournamentWithPlayers(tournament, selectedPlayersSet, startNow);
 
-            for (Player player : selectedPlayersSet) {
-                player.getTournaments().add(tournament);
-                tournament.getPlayers().add(player);
+            if(startNow) {
+                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
             }
 
-            tournament = tournamentService.saveTournament(tournament);
+            log.info("Tournament saved successfully: {}", tournament.getId());
 
-
-            if (startNowCheckbox.getValue()) {
-
-                tournamentService.startTournament(tournament);
-
-                UI.getCurrent().getPage().setLocation("tournament/matches/" + tournament.getId());
-            }
-
-            logger.info("Tournament saved successfully: {}", tournament.getId());
             onSaveCallback.run();
             close();
             NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
