@@ -11,6 +11,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.MatchService;
+import org.cedacri.pingpong.utils.Constraints;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -90,7 +91,9 @@ public class MatchComponent extends HorizontalLayout {
 
         List<Score> matchScore = match.getScore();
 
-        for (int i = 0; i < tournament.getSetsToWin().getValue(); i++) {
+        int setsCount = TournamentUtils.getNumsOfSetsPerMatch(match);
+
+        for (int i = 0; i < setsCount; i++) {
             TextField topScoreField = (matchScore.size() > i)
                     ? ViewUtils.createScoreField(matchScore.get(i).getTopPlayerScore())
                     : ViewUtils.createScoreField(null);
@@ -99,7 +102,7 @@ public class MatchComponent extends HorizontalLayout {
                     ? ViewUtils.createScoreField(matchScore.get(i).getBottomPlayerScore())
                     : ViewUtils.createScoreField(null);
 
-            if(match.getRound() == 1 && (match.getTopPlayer() == null || match.getBottomPlayer() == null) )
+            if(match.getTopPlayer() == null || match.getBottomPlayer() == null )
             {
                 topScoreField.setReadOnly(true);
                 bottomScoreField.setReadOnly(true);
@@ -116,18 +119,14 @@ public class MatchComponent extends HorizontalLayout {
             );
         }
 
-        if(match.getTopPlayer() != null && match.getBottomPlayer() != null )
-        {
-            Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
-                updateMatchScore(match);
-                NotificationManager.showInfoNotification("Score for this match is updated.");
-                onEditScoreCallback.run();
-            });
-            editScoreButton.setIcon(VaadinIcon.PENCIL.create());
-            editScoreButton.setMaxWidth("20px");
+        Button editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
+            updateMatchScore(match);
+            onEditScoreCallback.run();
+        });
+        editScoreButton.setIcon(VaadinIcon.PENCIL.create());
+        editScoreButton.setMaxWidth("20px");
 
-            scoreDetails.add(editScoreButton);
-        }
+        scoreDetails.add(editScoreButton);
 
 
         return scoreDetails;
@@ -149,25 +148,39 @@ public class MatchComponent extends HorizontalLayout {
 
     public void updateMatchScore(Match match) {
         List<Score> newMatchScores = new ArrayList<>();
+        StringBuilder infoMessage = new StringBuilder();
 
-        for (List<TextField> scoreRow : scoreFields) {
+        for (List<TextField> scoreRow : scoreFields)
+        {
             try {
-                newMatchScores.add(new Score(
-                        Integer.parseInt(scoreRow.get(0).getValue().trim()),
-                        Integer.parseInt(scoreRow.get(1).getValue().trim())
-                ));
-            } catch (NumberFormatException e) {
-//                logger.error("Invalid score input: {}", e.getMessage());
+                int topScore = Integer.parseInt(scoreRow.get(0).getValue().trim());
+                int bottomScore = Integer.parseInt(scoreRow.get(1).getValue().trim());
+                newMatchScores.add(new Score(topScore, bottomScore));
+
+            } catch (NumberFormatException e)
+            {
+                infoMessage.append("Invalid score input for: ")
+                        .append(scoreRow.get(0).getValue()).append("-")
+                        .append(scoreRow.get(1).getValue()).append("\n");
             }
         }
 
-        match.setScore(newMatchScores);
-//        matchService.saveMatch(match);
-        logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
-        TournamentUtils.determinateWinner(match);
-        matchService.saveMatch(match);
-        logger.info("Updated winner for this match and moved in next round.");
+        String validationMessages = matchService.validateAndUpdateScores(match, newMatchScores);
+        if (!validationMessages.isEmpty())
+        {
+            infoMessage.append(validationMessages);
+        }
 
+        if (!infoMessage.isEmpty())
+        {
+            NotificationManager.showErrorNotification(infoMessage.toString());
+        }
+
+        if (!newMatchScores.isEmpty())
+        {
+            NotificationManager.showInfoNotification("The Score for this match has been updated.");
+            logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+        }
     }
 
     private Span getPlayerLabel(Player player, Match match, boolean isTop) {
