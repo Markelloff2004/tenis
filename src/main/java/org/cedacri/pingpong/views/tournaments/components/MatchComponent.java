@@ -148,54 +148,39 @@ public class MatchComponent extends HorizontalLayout {
 
     public void updateMatchScore(Match match) {
         List<Score> newMatchScores = new ArrayList<>();
+        StringBuilder infoMessage = new StringBuilder();
 
-        String infoMessage = "";
-
-        for (List<TextField> scoreRow : scoreFields) {
+        for (List<TextField> scoreRow : scoreFields)
+        {
             try {
                 int topScore = Integer.parseInt(scoreRow.get(0).getValue().trim());
                 int bottomScore = Integer.parseInt(scoreRow.get(1).getValue().trim());
+                newMatchScores.add(new Score(topScore, bottomScore));
 
-                if(Math.min(topScore, bottomScore) >= Constraints.MINIMAL_POINTS_IN_SET-1)
-                {
-                    if(Math.abs(topScore - bottomScore) != Constraints.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET)
-                    {
-                        infoMessage += ("The difference between the scores {"+topScore+"-"+bottomScore+"} should be 2 points. ");
-                    }
-                    else
-                    {
-                        newMatchScores.add(new Score(topScore, bottomScore));
-                    }
-                } else if (Math.max(topScore, bottomScore) == Constraints.MINIMAL_POINTS_IN_SET)
-                {
-                    newMatchScores.add(new Score(topScore, bottomScore));
-                }
-                else
-                {
-                    infoMessage += "Score {"+topScore+"-"+bottomScore+"} with points < 11 wil not be saved! ";
-                }
-
-            } catch (NumberFormatException e) {
-                logger.error("Invalid score input: {}", e.getMessage());
+            } catch (NumberFormatException e)
+            {
+                infoMessage.append("Invalid score input for: ")
+                        .append(scoreRow.get(0).getValue()).append("-")
+                        .append(scoreRow.get(1).getValue()).append("\n");
             }
         }
 
-        if(!infoMessage.isEmpty())
+        String validationMessages = matchService.validateAndUpdateScores(match, newMatchScores);
+        if (!validationMessages.isEmpty())
         {
-            NotificationManager.showErrorNotification(infoMessage);
+            infoMessage.append(validationMessages);
         }
 
-        match.setScore(newMatchScores);
-        matchService.saveMatch(match);
-        NotificationManager.showInfoNotification("The Score for this match has been updated.");
+        if (!infoMessage.isEmpty())
+        {
+            NotificationManager.showErrorNotification(infoMessage.toString());
+        }
 
-
-        logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
-
-        TournamentUtils.determinateWinner(match);
-        matchService.saveMatch(match);
-        logger.info("Saved winner for Match: {}", match.getId());
-
+        if (!newMatchScores.isEmpty())
+        {
+            NotificationManager.showInfoNotification("The Score for this match has been updated.");
+            logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+        }
     }
 
     private Span getPlayerLabel(Player player, Match match, boolean isTop) {
