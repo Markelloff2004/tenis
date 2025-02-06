@@ -5,6 +5,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.service.MatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,46 +77,44 @@ public class TournamentUtils {
 
     public static void determinateWinner(Match match) {
 
-        int topPlayerWined = 0;
-        int bottomPlayerWined = 0;
-        int minScoresCounts = getMinimalNumsOfScores(match);
+        int topPlayerWins = 0;
+        int bottomPlayerWins = 0;
+        int minWinsRequired = getMinimalWinsPerMatch(match);
 
         for(Score score : match.getScore())
         {
-            if(score.getTopPlayerScore() > score.getBottomPlayerScore()
-                    && score.getTopPlayerScore() >= Constraints.MINIMAL_POINTS_IN_SET
-                    && score.getTopPlayerScore() - score.getBottomPlayerScore() >= Constraints.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET
-            )
+
+            if(score.getTopPlayerScore() > score.getBottomPlayerScore() )
             {
-                topPlayerWined++;
+                topPlayerWins++;
             }
-            else if (score.getBottomPlayerScore() > score.getTopPlayerScore()
-                    && score.getBottomPlayerScore() >= Constraints.MINIMAL_POINTS_IN_SET
-                    && score.getBottomPlayerScore() - score.getTopPlayerScore() >= Constraints.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET
-            )
+            else if (score.getBottomPlayerScore() > score.getTopPlayerScore() )
             {
-                bottomPlayerWined++;
-            }
-            else {
-                logger.warn("This Score cannot be used for determinate a winner {}", score);
+                bottomPlayerWins++;
             }
         }
+
+        if(topPlayerWins < minWinsRequired && bottomPlayerWins < minWinsRequired)
+        {
+            NotificationManager.showErrorNotification("Cannot be determinate a winner for Match:" + match.getId() + ". Not enough sets were played" );
+            return;
+        }
+
 
         Player winner = null;
 
-        if(topPlayerWined > bottomPlayerWined
-                && topPlayerWined >= minScoresCounts)
+        if(topPlayerWins > bottomPlayerWins)
         {
             winner = match.getTopPlayer();
-        } else if (bottomPlayerWined > topPlayerWined
-                && bottomPlayerWined >= minScoresCounts) {
+        } else if (bottomPlayerWins > topPlayerWins)
+        {
             winner = match.getBottomPlayer();
-        } else {
-            NotificationManager.showInfoNotification("Cannot be determinate a winner for Match:" + match.getId());
         }
+
 
         match.setWinner(winner);
         moveWinner(match);
+
     }
 
     private static void moveWinner(Match match) {
@@ -134,7 +133,13 @@ public class TournamentUtils {
         }
     }
 
-    private static int getMinimalNumsOfScores(Match match) {
+    private static int getMinimalWinsPerMatch(Match match) {
+
+        return getNumsOfSetsPerMatch(match)/2+1;
+
+    }
+
+    public static  int getNumsOfSetsPerMatch(Match match) {
 
         int setsToWin = match.getTournament().getSetsToWin().getValue();
         int semifinalSetsToWin = match.getTournament().getSemifinalsSetsToWin().getValue();
@@ -143,11 +148,11 @@ public class TournamentUtils {
         int currRound = match.getRound();
 
         if (currRound == numOfRound){
-            return finalSetsToWin/2+1;
+            return finalSetsToWin;
         } else if (currRound == numOfRound-1){
-            return semifinalSetsToWin/2+1;
+            return semifinalSetsToWin;
         } else {
-            return setsToWin/2+1;
+            return setsToWin;
         }
     }
 
