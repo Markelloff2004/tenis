@@ -7,28 +7,21 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.cedacri.pingpong.entity.Match;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
-import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 @PageTitle("Home")
 @Route(value = "home", layout = MainLayout.class)
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
 @Uses(Icon.class)
 public class HomeView extends VerticalLayout {
-
-    private static final Logger log = LoggerFactory.getLogger(HomeView.class);
 
     private final TournamentService tournamentService;
 
@@ -41,8 +34,7 @@ public class HomeView extends VerticalLayout {
         initView();
     }
 
-    private void initView()
-    {
+    private void initView() {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -62,8 +54,7 @@ public class HomeView extends VerticalLayout {
         displayTournaments(tournamentService.findAll().toList());
     }
 
-    private void displayTournaments(List<Tournament> tournaments)
-    {
+    private void displayTournaments(List<Tournament> tournaments) {
         log.info("Displaying {} tournaments", tournaments.size());
 
         if (tournaments.isEmpty()) {
@@ -71,7 +62,7 @@ public class HomeView extends VerticalLayout {
             return;
         }
 
-        for (Tournament tournament : tournaments ) {
+        for (Tournament tournament : tournaments) {
             log.debug("Processed tournament {}", tournament);
 
             TournamentSummaryComponent tournamentLayout = new TournamentSummaryComponent(tournamentService, tournament);

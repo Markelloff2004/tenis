@@ -1,15 +1,14 @@
 package org.cedacri.pingpong.utils;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+@Slf4j
 public class ExceptionUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(ExceptionUtils.class);
 
     public ResponseEntity<String> handleNotEnoughPlayersException(NotEnoughPlayersException ex) {
         log.error("Not enough players: {}", ex.getMessage());
@@ -18,12 +17,11 @@ public class ExceptionUtils {
 
     public static String getExceptionMessage(Exception ex) {
         if (ex instanceof ConstraintViolationException) {
-            String errorMessage = ((ConstraintViolationException) ex).getConstraintViolations()
+            return ((ConstraintViolationException) ex).getConstraintViolations()
                     .stream()
-                    .map(error -> error.getMessage())
+                    .map(ConstraintViolation::getMessage)
                     .findFirst()
                     .orElse("Validation error occurred");
-            return errorMessage;
         }
 
         return ex.getMessage();

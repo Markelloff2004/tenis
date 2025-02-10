@@ -11,6 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
@@ -22,19 +23,15 @@ import org.cedacri.pingpong.views.tournaments.components.TournamentAddDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentDeleteDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentEditDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentInfoDialog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @PageTitle("TournamentsView")
 @Route(value = "tournaments", layout = MainLayout.class)
 @Uses(Icon.class)
-public class TournamentsView extends VerticalLayout implements TournamentManagement
-{
-
-    private static final Logger log = LoggerFactory.getLogger(TournamentsView.class);
+public class TournamentsView extends VerticalLayout implements TournamentManagement {
 
     private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);
     private final TournamentService tournamentService;
@@ -52,8 +49,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         log.info("TournamentsView initialized");
     }
 
-    private void configureView()
-    {
+    private void configureView() {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -74,8 +70,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     }
 
-    private void configureGrid()
-    {
+    private void configureGrid() {
         tournamentsGrid.addClassName("tournaments-grid");
         tournamentsGrid.setSizeFull();
 
@@ -98,21 +93,19 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         log.debug("TournamentsView grid configured with columns and actions");
     }
 
-    private HorizontalLayout createActionButtons(Tournament tournament)
-    {
+    private HorizontalLayout createActionButtons(Tournament tournament) {
         Button viewButton = ViewUtils.createButton("View", "compact-button", () -> showInfoTournament(tournament));
 
         Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeleteTournament(tournament));
 
         HorizontalLayout layout;
 
-        if(tournament.getTournamentStatus() != null && tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
+        if (tournament.getTournamentStatus() != null && tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
             Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditTournament(tournament));
 
             layout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, editButton, viewButton, deleteButton);
 
-        }
-        else {
+        } else {
             layout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, viewButton, deleteButton);
         }
 
@@ -125,8 +118,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     @Override
-    public void showCreateTournament()
-    {
+    public void showCreateTournament() {
         log.info("Saving a new tournament:");
 
         TournamentAddDialog tournamentAddDialog = new TournamentAddDialog(tournamentService, playerService, this::refreshGridData);
@@ -151,7 +143,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     @Override
-    public void showEditTournament(Tournament tournament){
+    public void showEditTournament(Tournament tournament) {
 
         log.info("Editing tournament: {} with Id: {}", tournament.getTournamentName(), tournament.getId());
 

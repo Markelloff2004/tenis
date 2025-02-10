@@ -1,22 +1,18 @@
 package org.cedacri.pingpong.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
-import org.cedacri.pingpong.service.MatchService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-
+@Slf4j
 public class TournamentUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(TournamentUtils.class);
 
     public static int calculateMaxPlayers(int num) {
 
@@ -40,12 +36,12 @@ public class TournamentUtils {
         int rounds = 0;
         int players = 1;
 
-        if(num < 8) {
+        if (num < 8) {
             log.error("Invalid number of rounds: {}", num);
             throw new IllegalArgumentException("Number of players must be at least 8.");
         }
 
-        while(players < num) {
+        while (players < num) {
             players *= 2;
             rounds++;
         }
@@ -60,16 +56,15 @@ public class TournamentUtils {
                 .filter(m -> m.getRound() == round)
                 .toList();
 
-        try{
-            for(Match match : thisRoundMatches) {
-                if(match.getWinner() != null && round < TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers())){
-                    if(match.getNextMatch().getTopPlayer() == null) {
+        try {
+            for (Match match : thisRoundMatches) {
+                if (match.getWinner() != null && round < TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers())) {
+                    if (match.getNextMatch().getTopPlayer() == null) {
                         match.getNextMatch().setTopPlayer(match.getWinner());
-                    }
-                    else match.getNextMatch().setBottomPlayer(match.getWinner());
+                    } else match.getNextMatch().setBottomPlayer(match.getWinner());
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error updating winners after round: {}", round, e);
         }
 
@@ -81,33 +76,26 @@ public class TournamentUtils {
         int bottomPlayerWins = 0;
         int minWinsRequired = getMinimalWinsPerMatch(match);
 
-        for(Score score : match.getScore())
-        {
+        for (Score score : match.getScore()) {
 
-            if(score.getTopPlayerScore() > score.getBottomPlayerScore() )
-            {
+            if (score.getTopPlayerScore() > score.getBottomPlayerScore()) {
                 topPlayerWins++;
-            }
-            else if (score.getBottomPlayerScore() > score.getTopPlayerScore() )
-            {
+            } else if (score.getBottomPlayerScore() > score.getTopPlayerScore()) {
                 bottomPlayerWins++;
             }
         }
 
-        if(topPlayerWins < minWinsRequired && bottomPlayerWins < minWinsRequired)
-        {
-            NotificationManager.showErrorNotification("Cannot be determinate a winner for Match:" + match.getId() + ". Not enough sets were played" );
+        if (topPlayerWins < minWinsRequired && bottomPlayerWins < minWinsRequired) {
+            NotificationManager.showErrorNotification("Cannot be determinate a winner for Match:" + match.getId() + ". Not enough sets were played");
             return;
         }
 
 
         Player winner = null;
 
-        if(topPlayerWins > bottomPlayerWins)
-        {
+        if (topPlayerWins > bottomPlayerWins) {
             winner = match.getTopPlayer();
-        } else if (bottomPlayerWins > topPlayerWins)
-        {
+        } else if (bottomPlayerWins > topPlayerWins) {
             winner = match.getBottomPlayer();
         }
 
@@ -119,12 +107,10 @@ public class TournamentUtils {
 
     private static void moveWinner(Match match) {
 
-        if(match.getRound() < TournamentUtils.calculateNumberOfRounds(match.getTournament().getMaxPlayers()))
-        {
-            if(match.getPosition()%2==0){
+        if (match.getRound() < TournamentUtils.calculateNumberOfRounds(match.getTournament().getMaxPlayers())) {
+            if (match.getPosition() % 2 == 0) {
                 match.getNextMatch().setBottomPlayer(match.getWinner());
-            } else
-            {
+            } else {
                 match.getNextMatch().setTopPlayer(match.getWinner());
             }
         } else {
@@ -135,11 +121,11 @@ public class TournamentUtils {
 
     private static int getMinimalWinsPerMatch(Match match) {
 
-        return getNumsOfSetsPerMatch(match)/2+1;
+        return getNumsOfSetsPerMatch(match) / 2 + 1;
 
     }
 
-    public static  int getNumsOfSetsPerMatch(Match match) {
+    public static int getNumsOfSetsPerMatch(Match match) {
 
         int setsToWin = match.getTournament().getSetsToWin().getValue();
         int semifinalSetsToWin = match.getTournament().getSemifinalsSetsToWin().getValue();
@@ -147,30 +133,28 @@ public class TournamentUtils {
         int numOfRound = calculateNumberOfRounds(match.getTournament().getMaxPlayers());
         int currRound = match.getRound();
 
-        if (currRound == numOfRound){
+        if (currRound == numOfRound) {
             return finalSetsToWin;
-        } else if (currRound == numOfRound-1){
+        } else if (currRound == numOfRound - 1) {
             return semifinalSetsToWin;
         } else {
             return setsToWin;
         }
     }
 
-    private static void fineTournament(Tournament tournament)
-    {
+    private static void fineTournament(Tournament tournament) {
         tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
         updateRating(tournament);
     }
 
     private static void updateRating(Tournament tournament) {
-        for (Player player : tournament.getPlayers())
-        {
+        for (Player player : tournament.getPlayers()) {
 
             List<Match> playedMatches = tournament.getMatches().stream()
                     .filter(match ->
                             (Objects.nonNull(match.getBottomPlayer())
-                                                && match.getBottomPlayer().equals(player))
-                            || (Objects.nonNull(match.getTopPlayer())
+                                    && match.getBottomPlayer().equals(player))
+                                    || (Objects.nonNull(match.getTopPlayer())
                                     && match.getTopPlayer().equals(player))
                     ).toList();
 
@@ -180,31 +164,27 @@ public class TournamentUtils {
             int newWonMatches = 0;
             int newLostMatches = 0;
 
-            for (Match match : playedMatches)
-            {
+            for (Match match : playedMatches) {
                 boolean isTopPlayer = match.getTopPlayer().equals(player);
 
-                for (Score score : match.getScore())
-                {
+                for (Score score : match.getScore()) {
                     newGoalsScored += isTopPlayer
                             ? score.getTopPlayerScore()
-                            : score.getBottomPlayerScore() ;
+                            : score.getBottomPlayerScore();
 
                     newGoalsLost += isTopPlayer
                             ? score.getBottomPlayerScore()
-                            : score.getTopPlayerScore() ;
+                            : score.getTopPlayerScore();
                 }
 
-                if (match.getWinner().equals(player))
-                {
+                if (match.getWinner().equals(player)) {
                     newWonMatches++;
-                } else
-                {
+                } else {
                     newLostMatches++;
                 }
             }
 
-            int newRating = oldRating + (5 * newWonMatches - 3 * newLostMatches) + (2 * newGoalsScored - newGoalsLost) ;
+            int newRating = oldRating + (5 * newWonMatches - 3 * newLostMatches) + (2 * newGoalsScored - newGoalsLost);
 
             player.setRating(newRating);
             player.setGoalsScored(player.getGoalsScored() + newGoalsScored);

@@ -54,10 +54,8 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
     }
 
     @Override
-    protected void onSave()
-    {
-        try
-        {
+    protected void onSave() {
+        try {
             boolean startNow = startNowCheckbox.getValue();
 
             tournament = tournamentService.createAndSaveTournament(
@@ -70,7 +68,7 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
                     startNow
             );
 
-            if(startNow) {
+            if (startNow) {
                 UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
             }
 
@@ -78,7 +76,7 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
             onSaveCallback.run();
             close();
-            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS);
+            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
         } catch (Exception e) {
             log.error("Error saving tournament: {}", e.getMessage(), e);
             NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));

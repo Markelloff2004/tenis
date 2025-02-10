@@ -6,18 +6,16 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 
+@Slf4j
 public class TournamentInfoDialog extends AbstractTournamentDialog {
-
-    private static final Logger log = LoggerFactory.getLogger(TournamentInfoDialog.class);
 
     private final Tournament tournament;
 
@@ -69,14 +67,12 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     @Override
     protected HorizontalLayout createDialogButtons() {
 
-        if(!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
-        {
+        if (!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
             Button saveButton = ViewUtils.createButton("Matches", "colored-button", this::onSave);
             Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
-        }
-        else {
+        } else {
             Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, cancelButton);

@@ -86,11 +86,9 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         matchContainer.setHorizontalComponentAlignment(Alignment.STRETCH);
         add(matchContainer);
 
-        if(tournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
-        {
+        if (tournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC)) {
             refreshMatchesInRound(1);
-        } else if (tournament.getTournamentType().equals(TournamentTypeEnum.ROBIN_ROUND))
-        {
+        } else if (tournament.getTournamentType().equals(TournamentTypeEnum.ROBIN_ROUND)) {
             refreshMatchesInRound("All");
         }
 
@@ -103,8 +101,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
         List<Button> buttons = new ArrayList<>();
 
-        if(tournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
-        {
+        if (tournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC)) {
             int roundsCount = TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers());
 
             for (int i = 1; i <= roundsCount; i++) {
@@ -128,9 +125,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                     JustifyContentMode.BETWEEN,
                     roundButtons
             );
-        }
-        else
-        {
+        } else {
             Set<Player> playerList = tournament.getPlayers();
             List<String> playerOptions = new ArrayList<>(List.of("All"));
 
@@ -152,8 +147,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private void refreshMatchesInRound(Object round) {
 
-        if(round instanceof Integer)
-        {
+        if (round instanceof Integer) {
             log.info("Refreshing matches for round {}", round);
             matchContainer.removeAll();
 
@@ -162,16 +156,13 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                     .filter(m -> m.getRound() == round)
                     .sorted(Comparator.comparingInt(Match::getPosition))
                     .toList());
-        } else if( round instanceof String)
-        {
+        } else if (round instanceof String) {
             log.info("Refreshing matches for round {}", round);
             matchContainer.removeAll();
 
-            if(((String) round).equals("All"))
-            {
+            if (((String) round).equals("All")) {
                 displayMatches(tournament.getMatches().stream().toList());
-            }
-            else {
+            } else {
                 String playerName = ((String) round).split(" ")[0];
                 String playerSurname = ((String) round).split(" ")[1];
 
@@ -190,11 +181,8 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             log.debug("Processed match {}", match);
 
             MatchComponent matchLayout = new MatchComponent(match, matchService, tournament, () -> refreshMatchesInRound(match.getRound()));
-
             matchContainer.add(matchLayout);
         }
-
     }
-
 }
 

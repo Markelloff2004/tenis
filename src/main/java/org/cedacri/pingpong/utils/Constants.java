@@ -8,7 +8,7 @@ public class Constants {
 
     public static final List<String> PLAYING_HAND = List.of("LEFT", "RIGHT");
 
-    public static final String TOURNAMENT_UPDATE_SUCCESS = "Tournament updated successfully";
+    public static final String TOURNAMENT_UPDATE_SUCCESS_MESSAGE = "Tournament updated successfully";
     public static final String TOURNAMENT_UPDATE_ERROR = "Error updating tournament: ";
 
     public static final String PLAYER_UPDATE_SUCCESS = "Player updated successfully";

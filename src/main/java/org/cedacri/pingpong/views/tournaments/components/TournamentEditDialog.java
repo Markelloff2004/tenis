@@ -8,7 +8,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
@@ -16,10 +15,7 @@ import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 
@@ -94,10 +90,9 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
 
     @Override
     protected void onSave() {
-            log.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
+        log.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
 
-        try
-        {
+        try {
             boolean startNow = startNowCheckbox.getValue();
 
             tournament = tournamentService.updateTournament(
@@ -113,10 +108,14 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
 
             log.info("Tournament saved successfully: {}", tournament.getId());
             onSaveCallback.run();
-            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS);
+            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
+
+            if (startNow) {
+                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
+            }
+
             close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error saving tournament: {}", e.getMessage(), e);
             NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }

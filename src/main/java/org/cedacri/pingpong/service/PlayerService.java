@@ -1,12 +1,11 @@
 package org.cedacri.pingpong.service;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.utils.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,12 +18,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Validated
 @Service
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
-    private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
     public PlayerService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
@@ -64,14 +63,12 @@ public class PlayerService {
     @Modifying
     @Transactional
     public void deleteById(Long id) {
-        if (id != null){
+        if (id != null) {
             log.debug("Attempting to delete player with id {}", id);
 
             playerRepository.deleteById(id);
             log.debug("Successfully deleted player with id {}", id);
-        }
-        else
-        {
+        } else {
             log.error("Attempting to delete player with null id");
             throw new IllegalArgumentException("Player Id cannot be null");
         }

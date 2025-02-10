@@ -11,15 +11,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-public class ViewUtils
-{
+@Slf4j
+public class ViewUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(ViewUtils.class);
 
     public static Button createButton(String text, String className, Runnable clickListener) {
 
@@ -70,7 +68,7 @@ public class ViewUtils
     }
 
     public static Checkbox createCheckBox(String label) {
-        log.debug("Creating Checkbox with label: '{}' ",label);
+        log.debug("Creating Checkbox with label: '{}' ", label);
 
         Checkbox checkbox = new Checkbox(label);
         checkbox.setWidth("250px");
@@ -96,7 +94,7 @@ public class ViewUtils
         return integerField;
     }
 
-    public static HorizontalLayout createHorizontalLayout(FlexComponent.JustifyContentMode justifyContentMode ,com.vaadin.flow.component.Component... components) {
+    public static HorizontalLayout createHorizontalLayout(FlexComponent.JustifyContentMode justifyContentMode, com.vaadin.flow.component.Component... components) {
         log.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
         HorizontalLayout layout = new HorizontalLayout(components);
         layout.setSpacing(true);
@@ -107,7 +105,7 @@ public class ViewUtils
         return layout;
     }
 
-    public static VerticalLayout createVerticalLayout(FlexComponent.JustifyContentMode justifyContentMode , com.vaadin.flow.component.Component... components) {
+    public static VerticalLayout createVerticalLayout(FlexComponent.JustifyContentMode justifyContentMode, com.vaadin.flow.component.Component... components) {
         log.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
         VerticalLayout layout = new VerticalLayout(components);
         layout.setSpacing(true);
@@ -134,8 +132,7 @@ public class ViewUtils
     }
 
 
-    public static Span createPlayerLabel(String content)
-    {
+    public static Span createPlayerLabel(String content) {
         Span span = new Span(content);
 
         span.getStyle().setFontSize("18px");

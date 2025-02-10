@@ -5,17 +5,15 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class PlayerDeleteDialog extends Dialog {
-
-    private static final Logger log = LoggerFactory.getLogger(PlayerDeleteDialog.class);
 
     public PlayerDeleteDialog(Player player, PlayerService playerService, Runnable onDeleteCallback) {
         log.info("Initializing PlayerDeleteDialog for player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
@@ -40,9 +38,7 @@ public class PlayerDeleteDialog extends Dialog {
                         ": " + player.getId() + " deleted!");
 
                 onDeleteCallback.run();
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 log.error("Error while deleting player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId(), e.getMessage());
                 NotificationManager.showErrorNotification("Player cannot be deleted : " + ExceptionUtils.getExceptionMessage(e));
             }
@@ -51,7 +47,7 @@ public class PlayerDeleteDialog extends Dialog {
         Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
             log.info("Cancel button clicked. Closing PlayerDeleteDialog.");
             close();
-        } );
+        });
 
         HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, deleteButton, cancelButton);
 
