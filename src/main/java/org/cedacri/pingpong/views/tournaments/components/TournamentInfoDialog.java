@@ -29,7 +29,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
 
         this.selectedPlayersSet = new HashSet<>();
         this.availablePlayersSet = new HashSet<>();
-        initializePlayerSets(playerService, tournament.getPlayers());
+        initializePlayerSets(playerService);
         initializeFields();
 
         statusComboBox = createStatusComboBox();

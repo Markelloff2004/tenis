@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.shared.Registration;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.enums.SetTypesEnum;
@@ -16,6 +17,7 @@ import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.util.GridUtils;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected Grid<Player> selectedPlayersGrid;
     protected Grid<Player> availablePlayersGrid;
 
+    private Registration setsCountListenerRegistration;
+
     protected AbstractTournamentDialog(String headerTitle) {
         log.info("Initializing {}", headerTitle);
 
@@ -49,6 +53,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
         typeComboBox = new ComboBox<>("Type");
         typeComboBox.setWidth("35%");
         typeComboBox.setRequired(true);
+        typeComboBox.addValueChangeListener((value) -> manageSetFields(value.getValue()));
 
         setsCountComboBox = new ComboBox<>("Sets Count");
         setsCountComboBox.setWidth("30%");
@@ -74,7 +79,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     }
 
-    protected void initializePlayerSets(PlayerService playerService, Set<Player> selectedPlayers) {
+    protected void initializePlayerSets(PlayerService playerService) {
         availablePlayersSet.addAll(
                 playerService.getAll()
                         .filter(p -> !selectedPlayersSet.contains(p))
@@ -92,17 +97,15 @@ public abstract class AbstractTournamentDialog extends Dialog {
         if (withButtonActions) {
             GridUtils.configurePlayerGridWithActionButtons(selectedPlayersGrid, selectedPlayersSet, availablePlayersSet, "Remove", this::refreshGrids);
             GridUtils.configurePlayerGridWithActionButtons(availablePlayersGrid, availablePlayersSet, selectedPlayersSet, "Add", this::refreshGrids);
-        }
-        else
-        {
+        } else {
             GridUtils.configurePlayerGrid(selectedPlayersGrid, selectedPlayersSet);
             GridUtils.configurePlayerGrid(availablePlayersGrid, availablePlayersSet);
         }
     }
 
     protected void refreshGrids() {
-            selectedPlayersGrid.setItems(selectedPlayersSet);
-            availablePlayersGrid.setItems(availablePlayersSet);
+        selectedPlayersGrid.setItems(selectedPlayersSet);
+        availablePlayersGrid.setItems(availablePlayersSet);
     }
 
     protected VerticalLayout createDialogLayout() {
@@ -115,8 +118,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected HorizontalLayout createPlayersLayout() {
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN,
                 ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER, new Span("Selected Players"), selectedPlayersGrid),
-                ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER,  new Span("Available Players"), availablePlayersGrid)
-                );
+                ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER, new Span("Available Players"), availablePlayersGrid)
+        );
     }
 
     protected HorizontalLayout createDialogButtons() {
@@ -131,5 +134,29 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected void onCancel() {
         log.info("Cancel button clicked. Closing dialog.");
         close();
+    }
+
+    private void manageSetFields(TournamentTypeEnum tournamentType) {
+        if (setsCountListenerRegistration != null) {
+            setsCountListenerRegistration.remove();
+            setsCountListenerRegistration = null;
+        }
+
+        if (tournamentType == TournamentTypeEnum.ROBIN_ROUND) {
+            semifinalsSetsCountComboBox.setReadOnly(true);
+            semifinalsSetsCountComboBox.setValue(setsCountComboBox.getValue());
+
+            finalsSetsCountComboBox.setReadOnly(true);
+            finalsSetsCountComboBox.setValue(setsCountComboBox.getValue());
+
+            setsCountListenerRegistration = setsCountComboBox.addValueChangeListener(event -> {
+                semifinalsSetsCountComboBox.setValue(event.getValue());
+                finalsSetsCountComboBox.setValue(event.getValue());
+            });
+
+        } else {
+            semifinalsSetsCountComboBox.setReadOnly(false);
+            finalsSetsCountComboBox.setReadOnly(false);
+        }
     }
 }

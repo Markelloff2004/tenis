@@ -41,7 +41,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         this.availablePlayersSet = new HashSet<>();
 
         statusComboBox = createStatusComboBox();
-        initializePlayerSets(playerService, selectedPlayersSet);
+        initializePlayerSets(playerService);
         initializeFields();
         configureComboBoxes();
         initializeGrids(true);

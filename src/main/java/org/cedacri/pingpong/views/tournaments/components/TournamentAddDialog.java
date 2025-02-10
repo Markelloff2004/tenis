@@ -35,7 +35,7 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
         this.selectedPlayersSet = new HashSet<>();
         this.availablePlayersSet = new HashSet<>();
 
-        initializePlayerSets(playerService, new HashSet<>());
+        initializePlayerSets(playerService);
         initializeFields();
         configureComboBoxes();
         initializeGrids(true);
