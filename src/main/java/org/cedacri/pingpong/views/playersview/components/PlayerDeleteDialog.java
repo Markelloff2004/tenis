@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 
 public class PlayerDeleteDialog extends Dialog {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlayerDeleteDialog.class);
+    private static final Logger log = LoggerFactory.getLogger(PlayerDeleteDialog.class);
 
     public PlayerDeleteDialog(Player player, PlayerService playerService, Runnable onDeleteCallback) {
-        logger.info("Initializing PlayerDeleteDialog for player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
+        log.info("Initializing PlayerDeleteDialog for player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
 
         setWidth("500px");
         setHeaderTitle("Confirm Delete");
@@ -29,10 +29,10 @@ public class PlayerDeleteDialog extends Dialog {
 
         Button deleteButton = ViewUtils.createButton("Delete", "colored-button", () ->
         {
-            logger.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
+            log.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
             try {
                 playerService.deleteById(player.getId());
-                logger.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
+                log.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
 
                 close();
 
@@ -43,13 +43,13 @@ public class PlayerDeleteDialog extends Dialog {
             }
             catch (Exception e)
             {
-                logger.error("Error while deleting player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId(), e.getMessage());
+                log.error("Error while deleting player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId(), e.getMessage());
                 NotificationManager.showErrorNotification("Player cannot be deleted : " + ExceptionUtils.getExceptionMessage(e));
             }
         });
 
         Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
-            logger.info("Cancel button clicked. Closing PlayerDeleteDialog.");
+            log.info("Cancel button clicked. Closing PlayerDeleteDialog.");
             close();
         } );
 
@@ -58,6 +58,6 @@ public class PlayerDeleteDialog extends Dialog {
 
 //        add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, confirmationText, buttonLayout, cancelButton));
         add(confirmationText, buttonLayout);
-        logger.debug("PlayerDeleteDialog initialize completed.");
+        log.debug("PlayerDeleteDialog initialize completed.");
     }
 }

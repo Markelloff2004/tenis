@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class TournamentsView extends VerticalLayout implements TournamentManagement
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentsView.class);
+    private static final Logger log = LoggerFactory.getLogger(TournamentsView.class);
 
     private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);
     private final TournamentService tournamentService;
@@ -49,7 +49,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         refreshGridData();
         this.playerService = playerService;
 
-        logger.info("TournamentsView initialized");
+        log.info("TournamentsView initialized");
     }
 
     private void configureView()
@@ -70,7 +70,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, addTournamentButton);
 
         add(title, buttonLayout, tournamentsGrid);
-        logger.debug("TournamentsView configured: title and button added");
+        log.debug("TournamentsView configured: title and button added");
 
     }
 
@@ -95,7 +95,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
         refreshGridData();
 
-        logger.debug("TournamentsView grid configured with columns and actions");
+        log.debug("TournamentsView grid configured with columns and actions");
     }
 
     private HorizontalLayout createActionButtons(Tournament tournament)
@@ -121,13 +121,13 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     private void refreshGridData() {
         tournamentsGrid.setItems(tournamentService.findAll().collect(Collectors.toSet()));
-        logger.info("Grid data refreshed, tournaments loaded.");
+        log.info("Grid data refreshed, tournaments loaded.");
     }
 
     @Override
     public void showCreateTournament()
     {
-        logger.info("Saving a new tournament:");
+        log.info("Saving a new tournament:");
 
         TournamentAddDialog tournamentAddDialog = new TournamentAddDialog(tournamentService, playerService, this::refreshGridData);
         tournamentAddDialog.open();
@@ -135,7 +135,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     @Override
     public void showInfoTournament(Tournament tournamentDetails) {
-        logger.info("Showing tournament details for tournament: {} with Id: {}", tournamentDetails.getTournamentName(), tournamentDetails.getId());
+        log.info("Showing tournament details for tournament: {} with Id: {}", tournamentDetails.getTournamentName(), tournamentDetails.getId());
 
         TournamentInfoDialog tournamentEditDialog = new TournamentInfoDialog(playerService, tournamentDetails);
         tournamentEditDialog.open();
@@ -144,7 +144,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     @Override
     public void showDeleteTournament(Tournament tournamentDelete) {
-        logger.info("Deleting tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
+        log.info("Deleting tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
 
         TournamentDeleteDialog confirmDeleteTournamentDialog = new TournamentDeleteDialog(tournamentService, tournamentDelete, this::refreshGridData);
         confirmDeleteTournamentDialog.open();
@@ -153,7 +153,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     @Override
     public void showEditTournament(Tournament tournament){
 
-        logger.info("Editing tournament: {} with Id: {}", tournament.getTournamentName(), tournament.getId());
+        log.info("Editing tournament: {} with Id: {}", tournament.getTournamentName(), tournament.getId());
 
         TournamentEditDialog tournamentEditDialog = new TournamentEditDialog(tournamentService, playerService, tournament, this::refreshGridData);
         tournamentEditDialog.open();

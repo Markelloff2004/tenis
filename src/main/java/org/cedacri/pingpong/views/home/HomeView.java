@@ -28,7 +28,7 @@ import java.util.List;
 @Uses(Icon.class)
 public class HomeView extends VerticalLayout {
 
-    private static final Logger logger = LoggerFactory.getLogger(HomeView.class);
+    private static final Logger log = LoggerFactory.getLogger(HomeView.class);
 
     private final TournamentService tournamentService;
 
@@ -36,7 +36,7 @@ public class HomeView extends VerticalLayout {
 
     public HomeView(TournamentService tournamentService) {
         this.tournamentService = tournamentService;
-        logger.info("HomeView initialized.");
+        log.info("HomeView initialized.");
 
         initView();
     }
@@ -64,7 +64,7 @@ public class HomeView extends VerticalLayout {
 
     private void displayTournaments(List<Tournament> tournaments)
     {
-        logger.info("Displaying {} tournaments", tournaments.size());
+        log.info("Displaying {} tournaments", tournaments.size());
 
         if (tournaments.isEmpty()) {
             showNoTournamentFound();
@@ -72,7 +72,7 @@ public class HomeView extends VerticalLayout {
         }
 
         for (Tournament tournament : tournaments ) {
-            logger.debug("Processed tournament {}", tournament);
+            log.debug("Processed tournament {}", tournament);
 
             TournamentSummaryComponent tournamentLayout = new TournamentSummaryComponent(tournamentService, tournament);
             tournamentContainer.add(tournamentLayout);

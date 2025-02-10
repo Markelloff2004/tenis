@@ -26,7 +26,7 @@ import java.util.List;
 @Route(value = "tournament/matches", layout = MainLayout.class)
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentBracketView.class);
+    private static final Logger log = LoggerFactory.getLogger(TournamentBracketView.class);
 
     private final TournamentService tournamentService;
     private final MatchService matchService;
@@ -39,29 +39,26 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     public TournamentBracketView(TournamentService tournamentService, MatchService matchService) {
         this.tournamentService = tournamentService;
         this.matchService = matchService;
-        logger.info("TournamentBracketView initialized.");
+        log.info("TournamentBracketView initialized.");
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, Integer tournamentId) {
-        logger.info("Received request to load tournament with ID {}", tournamentId);
+        log.info("Received request to load tournament with ID {}", tournamentId);
         Tournament searchedTournament = tournamentService.find(tournamentId);
 
-        if (searchedTournament != null)
-        {
+        if (searchedTournament != null) {
             tournament = searchedTournament;
-            logger.info("Tournament found : {}", tournament);
+            log.info("Tournament found : {}", tournament);
             initView();
-        } else
-        {
-            logger.warn("Tournament with ID {} not found", tournamentId);
+        } else {
+            log.warn("Tournament with ID {} not found", tournamentId);
             add(new H2("Tournament not found"));
         }
     }
 
-    private void initView()
-    {
-        logger.info("Initializing view for tournament {}", tournament.getTournamentName());
+    private void initView() {
+        log.info("Initializing view for tournament {}", tournament.getTournamentName());
 
         /*
         Title view
@@ -89,7 +86,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
     private HorizontalLayout createRoundButtonsLayout() {
-        logger.info("Creating layout for Round buttons.");
+        log.info("Creating layout for Round buttons.");
         HorizontalLayout roundButtons = new HorizontalLayout();
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
         int roundsCount = TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers());
@@ -97,7 +94,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         List<Button> buttons = new ArrayList<>();
         for (int i = 1; i <= roundsCount; i++) {
             int round = i;
-            logger.debug("Adding button for round {}", i);
+            log.debug("Adding button for round {}", i);
             Button roundButton = new Button("Stage " + round, event -> {
                 refreshMatchesInRound(round);
                 ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
@@ -119,7 +116,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
     private void refreshMatchesInRound(int round) {
-        logger.info("Refreshing matches for round {}", round);
+        log.info("Refreshing matches for round {}", round);
         matchContainer.removeAll();
 
         displayMatches(tournament.getMatches()
@@ -129,14 +126,14 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 .toList());
     }
 
-    private void displayMatches(List<Match> matches)
-    {
-        logger.info("Displaying {} matches", matches.size() );
+    private void displayMatches(List<Match> matches) {
+
+        log.info("Displaying {} matches", matches.size());
 
 //        matches.sort(Comparator.comparingInt(Match::getId));
 
-        for (Match match : matches ) {
-            logger.debug("Processed match {}", match);
+        for (Match match : matches) {
+            log.debug("Processed match {}", match);
 
             MatchComponent matchLayout = new MatchComponent(match, matchService, tournament, () -> refreshMatchesInRound(match.getRound()));
 
