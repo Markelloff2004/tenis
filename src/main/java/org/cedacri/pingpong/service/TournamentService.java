@@ -12,6 +12,7 @@ import org.cedacri.pingpong.utils.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class TournamentService {
     public Stream<Tournament> findAll() {
         List<Tournament> tournaments = tournamentRepository.findAll();
 
-        return tournaments.stream();
+        return tournaments.stream().sorted(Comparator.comparing(Tournament::getCreatedAt).reversed());
     }
 
     public Tournament find(Integer id) {
@@ -91,5 +92,25 @@ public class TournamentService {
         }
 
         return tournament;
+    }
+
+    @Transactional
+    public Stream<Tournament> findTournamentsByStatus(TournamentStatusEnum status) {
+        List<Tournament> tournaments = tournamentRepository.findAll()
+                .stream()
+                .filter(tournament -> tournament.getTournamentStatus()
+                        .equals(status))
+                .sorted(Comparator.comparing(Tournament::getCreatedAt).reversed())
+                .toList();
+
+        return tournaments.stream();
+    }
+
+    public Player getTournamentWinner(Tournament tournament) {
+        return tournament.getMatches().stream()
+                .filter(match -> match.getNextMatch() == null)
+                .map(match -> match.getWinner())
+                .findFirst()
+                .orElse(null);
     }
 }

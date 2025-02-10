@@ -45,6 +45,18 @@ vaadin-side-nav-item vaadin-icon {
   transition: background-color 0.3s ease;
 }
 
+.transparent-button.selected {
+  background-color: var(--highlight-color);
+  color: black;
+  gap: 8px;
+  padding: 10px 20px;
+  width: 200px; /* Set a uniform button width */
+  text-align: left; /* Align text to the left */
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
 .transparent-button:focus,
 .transparent-button:active {
   background-color: var(--highlight-color);
