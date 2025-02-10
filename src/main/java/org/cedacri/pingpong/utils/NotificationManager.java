@@ -11,11 +11,11 @@ public class NotificationManager {
     public static void showInfoNotification(String message) {
 
         logger.debug("Notification manager -> showInfoNotificationMethod");
-        Notification.show(message, Constraints.INFO_NOTIFICATION_DURATION, Constraints.INFO_NOTIFICATION_POSITION);
+        Notification.show(message, Constants.INFO_NOTIFICATION_DURATION, Constants.INFO_NOTIFICATION_POSITION);
     }
 
     public static void showErrorNotification(String message) {
         logger.debug("Notification manager -> showErrorNotificationMethod");
-        Notification.show(message, Constraints.ERROR_NOTIFICATION_DURATION, Constraints.ERROR_NOTIFICATION_POSITION);
+        Notification.show(message, Constants.ERROR_NOTIFICATION_DURATION, Constants.ERROR_NOTIFICATION_POSITION);
     }
 }

@@ -28,7 +28,7 @@ public class ViewUtils
         Button button = new Button(text);
         button.addClassName(className);
         button.addClickListener(e -> {
-            logger.info("Button with text: '{}' clicker", text);
+            logger.info("Button with text: '{}' clicked", text);
             clickListener.run();
         });
         logger.debug("Button created: {}", button);

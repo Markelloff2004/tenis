@@ -12,6 +12,7 @@ import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
 import org.cedacri.pingpong.utils.*;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,52 +21,48 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 public class TournamentService {
-
     private final TournamentRepository tournamentRepository;
-
     private final MatchService matchService;
+    private final PlayerService playerService;
 
-    public TournamentService(TournamentRepository tournamentRepository, MatchService matchService) {
+    public TournamentService(TournamentRepository tournamentRepository, MatchService matchService, PlayerService playerService) {
         this.tournamentRepository = tournamentRepository;
         this.matchService = matchService;
+        this.playerService = playerService;
     }
 
     @Transactional
     public Stream<Tournament> findAll() {
         List<Tournament> tournaments = tournamentRepository.findAll();
-
+        tournaments.forEach(tournament -> Hibernate.initialize(tournament.getPlayers()));
         return tournaments.stream().sorted(Comparator.comparing(Tournament::getCreatedAt).reversed());
     }
 
     public Tournament find(Integer id) {
-        return tournamentRepository.findById(id).orElseThrow();
+        Tournament tournament = tournamentRepository.findById(id).orElseThrow();
+        Hibernate.initialize(tournament.getPlayers());
+        return tournament;
     }
 
     @Transactional
-    public Tournament saveTournament(Tournament tournament)  {
-        return tournamentRepository.save(tournament);
+    public void saveTournament(Tournament tournament) {
+        tournamentRepository.save(tournament);
     }
 
     @Transactional
-    public void deleteById(Integer id)
-    {
+    public void deleteById(Integer id) {
         Tournament tournamentToDelete = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
 
-        for(Player player : tournamentToDelete.getPlayers()){
-            player.getTournaments().remove(tournamentToDelete);
-        }
-
+        tournamentToDelete.getPlayers().forEach(player -> player.getTournaments().remove(tournamentToDelete));
         tournamentRepository.deleteById(id);
     }
 
     @Transactional
     public void startTournament(Tournament tournament) throws NotEnoughPlayersException {
-        int playersCount = tournament.getPlayers().size();
-
-        if(playersCount < 8) {
-            NotificationManager.showErrorNotification(Constraints.NOT_ENOUGH_PLAYERS_MESSAGE);
-            throw new NotEnoughPlayersException(playersCount);
+        if (tournament.getPlayers().size() < 8) {
+            NotificationManager.showErrorNotification(Constants.NOT_ENOUGH_PLAYERS_MESSAGE);
+            throw new NotEnoughPlayersException(tournament.getPlayers().size());
         }
 
         MatchGenerator matchGenerator = new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
@@ -77,22 +74,27 @@ public class TournamentService {
     @Transactional
     public Tournament createAndSaveTournament(
             String name, TournamentTypeEnum type, SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin,
-            Set<Player> players, boolean startNow
-    ) throws NotEnoughPlayersException {
+            Set<Player> players, boolean startNow) throws NotEnoughPlayersException {
         Tournament tournament = new Tournament();
-        tournament.setTournamentName(name);
-        tournament.setTournamentType(type);
-        tournament.setSetsToWin(setsToWin);
-        tournament.setSemifinalsSetsToWin(semiSetsToWin);
-        tournament.setFinalsSetsToWin(finalSetsToWin);
-
-        return saveTournamentWithPlayers(tournament, players, startNow);
+        setTournamentParams(tournament, name, type, setsToWin, semiSetsToWin, finalSetsToWin, players);
+        return saveTournamentWithPlayers(tournament, new ArrayList<>(players), startNow);
     }
 
     @Transactional
-    public Tournament saveTournamentWithPlayers(Tournament tournament, Set<Player> players, boolean startNow) throws NotEnoughPlayersException {
-        tournament.setPlayers(players);
-        Tournament savedTournament = tournamentRepository.save(tournament);
+    public Tournament saveTournamentWithPlayers(Tournament tournament, List<Player> players, boolean startNow) throws NotEnoughPlayersException {
+        Tournament managedTournament = tournament.getId() != null ?
+                tournamentRepository.findById(tournament.getId()).orElseThrow(() -> new EntityNotFoundException("Tournament not found")) :
+                tournament;
+
+        Set<Player> managedPlayers = new HashSet<>();
+        for (Player player : players) {
+            Player managedPlayer = playerService.findById(player.getId());
+            managedPlayer.getTournaments().add(managedTournament);
+            managedPlayers.add(managedPlayer);
+        }
+        if(startNow) { managedTournament.setTournamentStatus(TournamentStatusEnum.ONGOING); }
+        managedTournament.setPlayers(managedPlayers);
+        Tournament savedTournament = tournamentRepository.save(managedTournament);
 
         if (startNow) {
             startTournament(savedTournament);
@@ -103,14 +105,10 @@ public class TournamentService {
 
     @Transactional
     public Stream<Tournament> findTournamentsByStatus(TournamentStatusEnum status) {
-        List<Tournament> tournaments = tournamentRepository.findAll()
-                .stream()
-                .filter(tournament -> tournament.getTournamentStatus()
-                        .equals(status))
-                .sorted(Comparator.comparing(Tournament::getCreatedAt).reversed())
-                .toList();
-
-        return tournaments.stream();
+        List<Tournament> tournaments = tournamentRepository.findAll();
+        return tournaments.stream()
+                .filter(tournament -> tournament.getTournamentStatus().equals(status))
+                .sorted(Comparator.comparing(Tournament::getCreatedAt).reversed());
     }
 
     public Player getTournamentWinner(Tournament tournament) {
@@ -119,5 +117,25 @@ public class TournamentService {
                 .map(Match::getWinner)
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Transactional
+    public Tournament updateTournament(Tournament tournament, String name, TournamentTypeEnum tournamentType,
+                                       SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin,
+                                       Set<Player> players, boolean startNow) throws NotEnoughPlayersException {
+        Tournament managedTournament = find(tournament.getId());
+        setTournamentParams(managedTournament, name, tournamentType, setsToWin, semiSetsToWin, finalSetsToWin, players);
+        return saveTournamentWithPlayers(managedTournament, new ArrayList<>(players), startNow);
+    }
+
+    private void setTournamentParams(Tournament tournament, String name, TournamentTypeEnum tournamentType, SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin, Set<Player> players) {
+        tournament.setTournamentName(name);
+        tournament.setTournamentType(tournamentType);
+        tournament.setSetsToWin(setsToWin);
+        tournament.setSemifinalsSetsToWin(semiSetsToWin);
+        tournament.setFinalsSetsToWin(finalSetsToWin);
+        tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+        tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(players.size()));
+        tournament.setPlayers(players);
     }
 }

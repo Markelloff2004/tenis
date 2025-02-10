@@ -4,7 +4,7 @@ import com.vaadin.flow.component.notification.Notification;
 
 import java.util.List;
 
-public class Constraints {
+public class Constants {
 
     public static final List<String> PLAYING_HAND = List.of("LEFT", "RIGHT");
 

@@ -5,7 +5,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -57,7 +57,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
         birthDatePicker = ViewUtils.createDatePicker("Birth Date");
         birthDatePicker.setRequired(true);
 
-        handComboBox = ViewUtils.createComboBox("Hand", Constraints.PLAYING_HAND);
+        handComboBox = ViewUtils.createComboBox("Hand", Constants.PLAYING_HAND);
         handComboBox.setRequired(true);
 
         ratingField = ViewUtils.createIntegerField("Rating");
@@ -131,8 +131,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 
             NotificationManager.showInfoNotification("Player updated successfully!");
         } catch (Exception e) {
-            logger.error(Constraints.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
-            NotificationManager.showErrorNotification(Constraints.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            logger.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
+            NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

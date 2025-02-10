@@ -16,9 +16,9 @@ import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.util.GridUtils;
-
 import java.util.Set;
 import java.util.stream.Collectors;
+
 @Slf4j
 public abstract class AbstractTournamentDialog extends Dialog {
 
@@ -74,8 +74,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     }
 
-    protected void initializePlayerSets(PlayerService playerService, Set<Player> players) {
-        selectedPlayersSet = players;
+    protected void initializePlayerSets(PlayerService playerService, Set<Player> selectedPlayers) {
         availablePlayersSet.addAll(
                 playerService.getAll()
                         .filter(p -> !selectedPlayersSet.contains(p))

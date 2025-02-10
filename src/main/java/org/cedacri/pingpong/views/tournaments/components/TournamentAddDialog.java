@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -78,12 +78,10 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
             onSaveCallback.run();
             close();
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
-
-        } catch (Exception e)
-        {
+            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS);
+        } catch (Exception e) {
             log.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showErrorNotification(Constraints.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

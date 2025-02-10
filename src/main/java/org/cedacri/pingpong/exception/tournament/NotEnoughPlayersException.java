@@ -1,14 +1,14 @@
 package org.cedacri.pingpong.exception.tournament;
 
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 
 public class NotEnoughPlayersException  extends  Exception{
 
     public NotEnoughPlayersException(){
-        super(Constraints.NOT_ENOUGH_PLAYERS_MESSAGE);
+        super(Constants.NOT_ENOUGH_PLAYERS_MESSAGE);
     }
 
     public NotEnoughPlayersException(int playersCount) {
-        super(Constraints.NOT_ENOUGH_PLAYERS_MESSAGE +  " " + playersCount + ", should be at least 8");
+        super(Constants.NOT_ENOUGH_PLAYERS_MESSAGE +  " " + playersCount + ", should be at least 8");
     }
 }
