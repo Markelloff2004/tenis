@@ -27,7 +27,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
         this.tournament = tournament;
 
 
-        this.selectedPlayersSet = new HashSet<>();
+        this.selectedPlayersSet = tournament.getPlayers();
         this.availablePlayersSet = new HashSet<>();
         initializePlayerSets(playerService);
         initializeFields();
