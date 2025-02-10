@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 
 public class ExceptionUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ExceptionUtils.class);
 
     public ResponseEntity<String> handleNotEnoughPlayersException(NotEnoughPlayersException ex) {
-        logger.error("Not enough players: {}", ex.getMessage());
+        log.error("Not enough players: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

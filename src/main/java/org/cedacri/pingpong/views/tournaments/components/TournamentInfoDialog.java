@@ -17,7 +17,7 @@ import java.util.HashSet;
 
 public class TournamentInfoDialog extends AbstractTournamentDialog {
 
-    private static final Logger logger = LoggerFactory.getLogger(TournamentInfoDialog.class);
+    private static final Logger log = LoggerFactory.getLogger(TournamentInfoDialog.class);
 
     private final Tournament tournament;
 
@@ -42,7 +42,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
 
         add(createDialogLayoutWithStatus(), createPlayersLayout(), createDialogButtons());
 
-        logger.debug("Initializing fields for editing...");
+        log.debug("Initializing fields for editing...");
 
         prefillFields(tournament);
         setReadOnlyForFields();
@@ -50,7 +50,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     }
 
     private void setReadOnlyForFields() {
-        logger.debug("Set readOnly for fields");
+        log.debug("Set readOnly for fields");
         tournamentNameField.setReadOnly(true);
         typeComboBox.setReadOnly(true);
         statusComboBox.setReadOnly(true);
@@ -107,7 +107,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     }
 
     private void prefillFields(Tournament tournament) {
-        logger.debug("Pre-fill fields with existing tournament data");
+        log.debug("Pre-fill fields with existing tournament data");
         tournamentNameField.setValue(tournament.getTournamentName());
         typeComboBox.setValue(tournament.getTournamentType());
         setsCountComboBox.setValue(tournament.getSetsToWin());
@@ -118,7 +118,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     @Override
     protected void onSave() {
         getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()));
-        logger.info("Navigating to tournament details page, id: {}", tournament.getId());
+        log.info("Navigating to tournament details page, id: {}", tournament.getId());
         close();
     }
 }

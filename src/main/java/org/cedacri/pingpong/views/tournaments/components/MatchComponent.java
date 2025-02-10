@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class MatchComponent extends HorizontalLayout {
-    private static final Logger logger = LoggerFactory.getLogger(MatchComponent.class);
+    private static final Logger log = LoggerFactory.getLogger(MatchComponent.class);
 
     private final MatchService matchService;
     private final Tournament tournament;
@@ -32,7 +32,7 @@ public class MatchComponent extends HorizontalLayout {
     public MatchComponent(Match match, MatchService matchService, Tournament tournament, Runnable refreshMatches) {
         this.matchService = matchService;
         this.tournament = tournament;
-        logger.info("Initializing MatchComponent for match with id {}", match.getId());
+        log.info("Initializing MatchComponent for match with id {}", match.getId());
 
         configureLayout();
         add(
@@ -67,7 +67,7 @@ public class MatchComponent extends HorizontalLayout {
     }
 
     private VerticalLayout createPlayersDetails(Match match) {
-        logger.debug("Initializing PlayersDetails for match with id {}", match.getId());
+        log.debug("Initializing PlayersDetails for match with id {}", match.getId());
 
         VerticalLayout playerDetails = new VerticalLayout();
         playerDetails.setMaxWidth("300px");
@@ -81,7 +81,7 @@ public class MatchComponent extends HorizontalLayout {
     }
 
     private HorizontalLayout createScoreDetails(Match match, Runnable onEditScoreCallback) {
-        logger.debug("Creating score details for match '{}'", match.getId());
+        log.debug("Creating score details for match '{}'", match.getId());
 
         HorizontalLayout scoreDetails = new HorizontalLayout();
         scoreDetails.setSpacing(false);
@@ -191,7 +191,7 @@ public class MatchComponent extends HorizontalLayout {
         if (!newMatchScores.isEmpty())
         {
             NotificationManager.showInfoNotification("The Score for this match has been updated.");
-            logger.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+            log.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
         }
     }
 

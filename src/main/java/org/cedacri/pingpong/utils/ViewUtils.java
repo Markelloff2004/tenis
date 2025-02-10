@@ -19,19 +19,19 @@ import java.util.List;
 public class ViewUtils
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(ViewUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ViewUtils.class);
 
     public static Button createButton(String text, String className, Runnable clickListener) {
 
-        logger.debug("Creating button with text: '{}' and className: '{}'", text, className);
+        log.debug("Creating button with text: '{}' and className: '{}'", text, className);
 
         Button button = new Button(text);
         button.addClassName(className);
         button.addClickListener(e -> {
-            logger.info("Button with text: '{}' clicked", text);
+            log.info("Button with text: '{}' clicked", text);
             clickListener.run();
         });
-        logger.debug("Button created: {}", button);
+        log.debug("Button created: {}", button);
         return button;
     }
 
@@ -51,70 +51,70 @@ public class ViewUtils
 
 
     public static TextField createTextField(String label) {
-        logger.debug("Creating TextField with label: '{}'", label);
+        log.debug("Creating TextField with label: '{}'", label);
 
         TextField textField = new TextField(label);
         textField.setWidth("250px");
-        logger.debug("TextField created: {}", textField);
+        log.debug("TextField created: {}", textField);
         return textField;
     }
 
     public static ComboBox<String> createComboBox(String label, List<String> items) {
-        logger.debug("Creating ComboBox with label: '{}' and items: '{}'", label, items);
+        log.debug("Creating ComboBox with label: '{}' and items: '{}'", label, items);
 
         ComboBox<String> comboBox = new ComboBox<>(label);
         comboBox.setItems(items);
         comboBox.setWidth("250px");
-        logger.debug("ComboBox created: {}", comboBox);
+        log.debug("ComboBox created: {}", comboBox);
         return comboBox;
     }
 
     public static Checkbox createCheckBox(String label) {
-        logger.debug("Creating Checkbox with label: '{}' ",label);
+        log.debug("Creating Checkbox with label: '{}' ",label);
 
         Checkbox checkbox = new Checkbox(label);
         checkbox.setWidth("250px");
-        logger.debug("Checkbox created: {}", checkbox);
+        log.debug("Checkbox created: {}", checkbox);
         return checkbox;
     }
 
     public static DatePicker createDatePicker(String label) {
-        logger.debug("Creating DatePicker with label: '{}'", label);
+        log.debug("Creating DatePicker with label: '{}'", label);
 
         DatePicker datePicker = new DatePicker(label);
         datePicker.setWidth("250px");
-        logger.debug("DatePicker created: {}", datePicker);
+        log.debug("DatePicker created: {}", datePicker);
         return datePicker;
     }
 
     public static IntegerField createIntegerField(String label) {
-        logger.debug("Creating IntegerField with label: '{}'", label);
+        log.debug("Creating IntegerField with label: '{}'", label);
 
         IntegerField integerField = new IntegerField(label);
         integerField.setWidth("250px");
-        logger.debug("IntegerField created: {}", integerField);
+        log.debug("IntegerField created: {}", integerField);
         return integerField;
     }
 
     public static HorizontalLayout createHorizontalLayout(FlexComponent.JustifyContentMode justifyContentMode ,com.vaadin.flow.component.Component... components) {
-        logger.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
+        log.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
         HorizontalLayout layout = new HorizontalLayout(components);
         layout.setSpacing(true);
         layout.setWidthFull();
         layout.setJustifyContentMode(justifyContentMode);
         layout.setAlignItems(FlexComponent.Alignment.BASELINE);
-        logger.debug("HorizontalLayout created: {}", layout);
+        log.debug("HorizontalLayout created: {}", layout);
         return layout;
     }
 
     public static VerticalLayout createVerticalLayout(FlexComponent.JustifyContentMode justifyContentMode , com.vaadin.flow.component.Component... components) {
-        logger.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
+        log.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
         VerticalLayout layout = new VerticalLayout(components);
         layout.setSpacing(true);
         layout.setWidthFull();
         layout.setJustifyContentMode(justifyContentMode);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        logger.debug("HorizontalLayout created: {}", layout);
+        log.debug("HorizontalLayout created: {}", layout);
         return layout;
     }
 

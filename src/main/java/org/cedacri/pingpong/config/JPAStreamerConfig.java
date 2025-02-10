@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class JPAStreamerConfig {
 
 
-    Logger logger = LoggerFactory.getLogger(JPAStreamerConfig.class);
+    Logger log = LoggerFactory.getLogger(JPAStreamerConfig.class);
 
     @Bean
     public JPAStreamer jpaStreamer(EntityManagerFactory entityManagerFactory) {
@@ -21,6 +21,6 @@ public class JPAStreamerConfig {
 
     @PostConstruct
     public void init(){
-        logger.info("JPA Streamer configuration initialized");
+        log.info("JPA Streamer configuration initialized");
     }
 }

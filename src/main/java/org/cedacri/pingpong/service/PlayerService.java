@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public class PlayerService {
 
     private final PlayerRepository playerRepository;
-    private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
+    private static final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
     public PlayerService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
@@ -33,13 +33,13 @@ public class PlayerService {
     public Player findById(Long id) {
         return playerRepository.findById(id)
                 .orElseThrow(() -> {
-                    logger.error("Player with id {} not found", id);
+                    log.error("Player with id {} not found", id);
                     return new IllegalArgumentException("Player not found");
                 });
     }
 
     public Stream<Player> list(long page) {
-        logger.info("Fetching list of players for page {}", page);
+        log.info("Fetching list of players for page {}", page);
 
         Pageable pageable = PageRequest.of((int) page, Constants.PAGE_SIZE);
 
@@ -49,30 +49,30 @@ public class PlayerService {
     }
 
     public Stream<Player> getAll() {
-        logger.info("Fetching list of players");
+        log.info("Fetching list of players");
         return playerRepository.findAll().stream();
     }
 
     @Transactional
     public void save(@Valid Player player) {
-        logger.debug("Attempting to save player {}", player);
+        log.debug("Attempting to save player {}", player);
 
         playerRepository.save(player);
-        logger.debug("Successfully saved player {}", player);
+        log.debug("Successfully saved player {}", player);
     }
 
     @Modifying
     @Transactional
     public void deleteById(Long id) {
         if (id != null){
-            logger.debug("Attempting to delete player with id {}", id);
+            log.debug("Attempting to delete player with id {}", id);
 
             playerRepository.deleteById(id);
-            logger.debug("Successfully deleted player with id {}", id);
+            log.debug("Successfully deleted player with id {}", id);
         }
         else
         {
-            logger.error("Attempting to delete player with null id");
+            log.error("Attempting to delete player with null id");
             throw new IllegalArgumentException("Player Id cannot be null");
         }
     }

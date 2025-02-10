@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class PlayersView extends VerticalLayout implements PlayerViewManagement
 {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlayersView.class);
+    private static final Logger log = LoggerFactory.getLogger(PlayersView.class);
 
     private final PlayerService playerService;
 
@@ -54,7 +54,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
 
         add(playersGrid);
 
-        logger.info("PlayersView initialized");
+        log.info("PlayersView initialized");
 
     }
 
@@ -100,14 +100,14 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showAllPlayers()
     {
-        logger.info("Loading all players");
+        log.info("Loading all players");
         playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
     }
 
     @Override
     public void showCreatePlayer()
     {
-        logger.info("Creating new player");
+        log.info("Creating new player");
         PlayerSaveDialog playerSaveDialog = new PlayerSaveDialog(playerService, this::showAllPlayers);
         playerSaveDialog.open();
     }
@@ -115,7 +115,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showDetailsPlayer(Player player)
     {
-        logger.info("Loading player details for {} {}", player.getName(), player.getSurname());
+        log.info("Loading player details for {} {}", player.getName(), player.getSurname());
         PlayerInfoDialog playerInfoDialog = new PlayerInfoDialog(player, playerService, this::showAllPlayers);
         playerInfoDialog.open();
     }
@@ -123,7 +123,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showEditPlayer(Player player)
     {
-        logger.info("Editing player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
+        log.info("Editing player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
         Dialog playerEditDialog = new PlayerEditDialog(player, playerService, this::showAllPlayers);
         playerEditDialog.open();
     }
@@ -131,7 +131,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     @Override
     public void showDeletePlayer(Player player)
     {
-        logger.info("Deleting player: {} with Id: {}", player.getName(), player.getId());
+        log.info("Deleting player: {} with Id: {}", player.getName(), player.getId());
         Dialog playerDeleteDialog = new PlayerDeleteDialog(player, playerService, this::showAllPlayers);
         playerDeleteDialog.open();
     }

@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 
 public class TournamentDeleteDialog extends Dialog {
 
-    public static final Logger logger = LoggerFactory.getLogger(TournamentEditDialog.class);
+    public static final Logger log = LoggerFactory.getLogger(TournamentEditDialog.class);
 
     public TournamentDeleteDialog(TournamentService tournamentService, Tournament tournamentDelete, Runnable onDeleteCallback) {
-        logger.info("Initializing TournamentDeleteDialog for tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
+        log.info("Initializing TournamentDeleteDialog for tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
 
         setHeaderTitle("Delete Tournament");
         add("Are you sure you want to delete the tournament \"" + tournamentDelete.getTournamentName() + "\"?");
@@ -25,25 +25,25 @@ public class TournamentDeleteDialog extends Dialog {
                 "Delete",
                 "colored-button",
                 () -> {
-                    logger.debug("Delete button clicked. Attempting to delete tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
+                    log.debug("Delete button clicked. Attempting to delete tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
 
                     int id = tournamentDelete.getId();
                     try {
                         tournamentService.deleteById(id);
-                        logger.info("Tournament deleted successfully! id: {}", id);
+                        log.info("Tournament deleted successfully! id: {}", id);
 
                         NotificationManager.showInfoNotification("Tournament deleted successfully! id: " + id);
                         onDeleteCallback.run();
                         close();
                     } catch (Exception e) {
                         NotificationManager.showErrorNotification("Error deleting tournament: " + ExceptionUtils.getExceptionMessage(e));
-                        logger.error("Error deleting tournament: {}, {}", id, e.getMessage());
+                        log.error("Error deleting tournament: {}, {}", id, e.getMessage());
                     }
                 }
         );
 
         Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
-            logger.info("Cancel button clicked. Closing TournamentDeleteDialog.");
+            log.info("Cancel button clicked. Closing TournamentDeleteDialog.");
             close();
         } );
 

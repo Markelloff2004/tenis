@@ -18,7 +18,7 @@ import java.time.LocalDate;
 
 public abstract class AbstractPlayerDialog extends Dialog {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractPlayerDialog.class);
+    protected static final Logger log = LoggerFactory.getLogger(AbstractPlayerDialog.class);
 
     protected TextField nameField;
     protected TextField surnameField;
@@ -28,7 +28,7 @@ public abstract class AbstractPlayerDialog extends Dialog {
     protected ComboBox<String> handComboBox;
 
     public AbstractPlayerDialog(String headerTitle) {
-        logger.info("Initializing {}", headerTitle);
+        log.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
         setWidth("500px");
@@ -56,7 +56,7 @@ public abstract class AbstractPlayerDialog extends Dialog {
     }
 
     protected void populateFields(Player player) {
-        logger.info("Populating fields with player data: {} {}", player.getName(), player.getSurname());
+        log.info("Populating fields with player data: {} {}", player.getName(), player.getSurname());
         nameField.setValue(player.getName() != null ? player.getName() : "");
         surnameField.setValue(player.getSurname() != null ? player.getSurname() : "");
         emailField.setValue(player.getEmail() != null ? player.getEmail() : "");
@@ -91,7 +91,7 @@ public abstract class AbstractPlayerDialog extends Dialog {
     protected abstract void onSave();
 
     private void onCancel() {
-        logger.info("Cancel button clicked. Closing dialog.");
+        log.info("Cancel button clicked. Closing dialog.");
         close();
     }
 }

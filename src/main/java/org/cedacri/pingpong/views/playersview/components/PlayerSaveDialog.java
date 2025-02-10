@@ -22,12 +22,12 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
         initializeFields();
         add(createFieldsLayout(), createButtonsLayout());
 
-        logger.debug("Initializing fields for editing...");
+        log.debug("Initializing fields for editing...");
     }
 
     @Override
     protected void onSave() {
-        logger.info("Saving player: {} {}", player.getName(), player.getSurname());
+        log.info("Saving player: {} {}", player.getName(), player.getSurname());
         player.setName(nameField.getValue());
         player.setSurname(surnameField.getValue());
         player.setEmail(emailField.getValue());
@@ -41,7 +41,7 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
             close();
             NotificationManager.showInfoNotification("Player saved successfully!");
         } catch (ConstraintViolationException e) {
-            logger.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
+            log.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
             NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }

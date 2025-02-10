@@ -35,7 +35,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
         initializeFields();
         add(createFieldsLayout(), createButtonsLayout());
 
-        logger.debug("Initializing fields for editing...");
+        log.debug("Initializing fields for editing...");
 
         populateFields(player);
     }
@@ -68,7 +68,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 //        createdAtField = ViewUtils.createTextField("Created At");
 //        createdAtField.setReadOnly(true);
 
-        logger.debug("Initialized fields for editing.");
+        log.debug("Initialized fields for editing.");
 
     }
 
@@ -109,7 +109,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     }
     @Override
     protected void onSave() {
-        logger.info("Saving player: {} {}", player.getName(), player.getSurname());
+        log.info("Saving player: {} {}", player.getName(), player.getSurname());
         player.setName(nameField.getValue());
         player.setSurname(surnameField.getValue());
         player.setEmail(emailField.getValue());
@@ -131,7 +131,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 
             NotificationManager.showInfoNotification("Player updated successfully!");
         } catch (Exception e) {
-            logger.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
+            log.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
             NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
