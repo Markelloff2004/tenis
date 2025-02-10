@@ -1,13 +1,9 @@
 package org.cedacri.pingpong.service;
 
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.ExceptionUtils;
-import org.cedacri.pingpong.utils.NotificationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -77,6 +73,4 @@ public class PlayerService {
             throw new IllegalArgumentException("Player Id cannot be null");
         }
     }
-
-    
 }

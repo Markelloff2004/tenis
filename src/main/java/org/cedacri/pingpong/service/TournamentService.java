@@ -3,16 +3,18 @@ package org.cedacri.pingpong.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
 import org.cedacri.pingpong.utils.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -73,25 +75,30 @@ public class TournamentService {
     }
 
     @Transactional
-    public Tournament saveTournamentWithPlayers(Tournament tournament, Set<Player> selectedPlayers, boolean startNow) throws NotEnoughPlayersException {
+    public Tournament createAndSaveTournament(
+            String name, TournamentTypeEnum type, SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin,
+            Set<Player> players, boolean startNow
+    ) throws NotEnoughPlayersException {
+        Tournament tournament = new Tournament();
+        tournament.setTournamentName(name);
+        tournament.setTournamentType(type);
+        tournament.setSetsToWin(setsToWin);
+        tournament.setSemifinalsSetsToWin(semiSetsToWin);
+        tournament.setFinalsSetsToWin(finalSetsToWin);
 
-        tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-        tournament.setMaxPlayers(TournamentUtils.determineMaxPlayers(selectedPlayers));
+        return saveTournamentWithPlayers(tournament, players, startNow);
+    }
 
-        tournament = saveTournament(tournament);
+    @Transactional
+    public Tournament saveTournamentWithPlayers(Tournament tournament, Set<Player> players, boolean startNow) throws NotEnoughPlayersException {
+        tournament.setPlayers(players);
+        Tournament savedTournament = tournamentRepository.save(tournament);
 
-        for(Player player : selectedPlayers){
-            player.getTournaments().add(tournament);
-            tournament.getPlayers().add(player);
+        if (startNow) {
+            startTournament(savedTournament);
         }
 
-        tournament = saveTournament(tournament);
-
-        if(startNow) {
-            startTournament(tournament);
-        }
-
-        return tournament;
+        return savedTournament;
     }
 
     @Transactional
@@ -109,7 +116,7 @@ public class TournamentService {
     public Player getTournamentWinner(Tournament tournament) {
         return tournament.getMatches().stream()
                 .filter(match -> match.getNextMatch() == null)
-                .map(match -> match.getWinner())
+                .map(Match::getWinner)
                 .findFirst()
                 .orElse(null);
     }

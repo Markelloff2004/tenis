@@ -6,15 +6,12 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constraints;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.HashSet;
@@ -35,22 +32,16 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
         this.tournamentService = tournamentService;
         this.onSaveCallback = onSaveCallback;
-
-
         this.selectedPlayersSet = new HashSet<>();
         this.availablePlayersSet = new HashSet<>();
 
         initializePlayerSets(playerService, new HashSet<>());
         initializeFields();
-
         configureComboBoxes();
-
         initializeGrids(true);
-
         add(createDialogLayout(), createPlayersLayout(), createDialogButtons());
 
-        logger.debug("Initializing fields for editing...");
-
+        log.debug("Initializing fields for editing...");
         refreshGrids();
     }
 
@@ -67,15 +58,17 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
     {
         try
         {
-            tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(typeComboBox.getValue());
-            tournament.setSetsToWin(setsCountComboBox.getValue());
-            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
-            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
-
             boolean startNow = startNowCheckbox.getValue();
 
-            tournament = tournamentService.saveTournamentWithPlayers(tournament, selectedPlayersSet, startNow);
+            tournament = tournamentService.createAndSaveTournament(
+                    tournamentNameField.getValue(),
+                    typeComboBox.getValue(),
+                    setsCountComboBox.getValue(),
+                    semifinalsSetsCountComboBox.getValue(),
+                    finalsSetsCountComboBox.getValue(),
+                    selectedPlayersSet,
+                    startNow
+            );
 
             if(startNow) {
                 UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
@@ -89,7 +82,7 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
         } catch (Exception e)
         {
-            logger.error("Error saving tournament: {}", e.getMessage(), e);
+            log.error("Error saving tournament: {}", e.getMessage(), e);
             NotificationManager.showErrorNotification(Constraints.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
