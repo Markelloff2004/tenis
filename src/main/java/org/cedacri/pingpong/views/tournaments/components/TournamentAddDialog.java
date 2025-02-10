@@ -6,17 +6,12 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.SetTypesEnum;
-import org.cedacri.pingpong.enums.TournamentStatusEnum;
-import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.HashSet;
@@ -37,22 +32,16 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
         this.tournamentService = tournamentService;
         this.onSaveCallback = onSaveCallback;
-
-
         this.selectedPlayersSet = new HashSet<>();
         this.availablePlayersSet = new HashSet<>();
 
         initializePlayerSets(playerService, new HashSet<>());
         initializeFields();
-
         configureComboBoxes();
-
         initializeGrids(true);
-
         add(createDialogLayout(), createPlayersLayout(), createDialogButtons());
 
-        logger.debug("Initializing fields for editing...");
-
+        log.debug("Initializing fields for editing...");
         refreshGrids();
     }
 
@@ -69,43 +58,30 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
     {
         try
         {
-            //extract data
-            tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(typeComboBox.getValue());
-            tournament.setSetsToWin(setsCountComboBox.getValue());
-            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
-            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
+            boolean startNow = startNowCheckbox.getValue();
 
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setMaxPlayers(
-                    (selectedPlayersSet.size() < 8) ? 8 : TournamentUtils.calculateMaxPlayers( selectedPlayersSet.size()) );
+            tournament = tournamentService.createAndSaveTournament(
+                    tournamentNameField.getValue(),
+                    typeComboBox.getValue(),
+                    setsCountComboBox.getValue(),
+                    semifinalsSetsCountComboBox.getValue(),
+                    finalsSetsCountComboBox.getValue(),
+                    selectedPlayersSet,
+                    startNow
+            );
 
-            tournament = tournamentService.saveTournament(tournament);
-
-            for (Player player : selectedPlayersSet) {
-                player.getTournaments().add(tournament);
-                tournament.getPlayers().add(player);
+            if(startNow) {
+                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
             }
 
-            tournament = tournamentService.saveTournament(tournament);
+            log.info("Tournament saved successfully: {}", tournament.getId());
 
-
-            if (startNowCheckbox.getValue()) {
-
-                tournamentService.startTournament(tournament);
-
-                UI.getCurrent().getPage().setLocation("tournament/matches/" + tournament.getId());
-            }
-
-            logger.info("Tournament saved successfully: {}", tournament.getId());
             onSaveCallback.run();
             close();
-            NotificationManager.showInfoNotification(Constraints.TOURNAMENT_UPDATE_SUCCESS);
-
-        } catch (Exception e)
-        {
-            logger.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showErrorNotification(Constraints.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS);
+        } catch (Exception e) {
+            log.error("Error saving tournament: {}", e.getMessage(), e);
+            NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

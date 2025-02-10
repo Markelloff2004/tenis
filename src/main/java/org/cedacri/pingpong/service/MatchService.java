@@ -5,7 +5,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.MatchRepository;
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,13 +125,13 @@ public class MatchService {
 
     private String validateScore(int topScore, int bottomScore)
     {
-        if (Math.min(topScore, bottomScore) >= Constraints.MINIMAL_POINTS_IN_SET - 1)
+        if (Math.min(topScore, bottomScore) >= Constants.MINIMAL_POINTS_IN_SET - 1)
         {
-            if (Math.abs(topScore - bottomScore) != Constraints.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET)
+            if (Math.abs(topScore - bottomScore) != Constants.MINIMAL_DIFFERENCE_OF_POINTS_IN_SET)
             {
                 return "The difference between the scores {" + topScore + "-" + bottomScore + "} should be 2 points.";
             }
-        } else if (Math.max(topScore, bottomScore) == Constraints.MINIMAL_POINTS_IN_SET)
+        } else if (Math.max(topScore, bottomScore) == Constants.MINIMAL_POINTS_IN_SET)
         {
             return null;
         } else

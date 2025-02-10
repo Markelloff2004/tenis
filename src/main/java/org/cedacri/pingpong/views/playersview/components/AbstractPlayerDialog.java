@@ -9,7 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public abstract class AbstractPlayerDialog extends Dialog {
         birthDatePicker = ViewUtils.createDatePicker("Birth Date");
         birthDatePicker.setRequired(true);
 
-        handComboBox = ViewUtils.createComboBox("Hand", Constraints.PLAYING_HAND);
+        handComboBox = ViewUtils.createComboBox("Hand", Constants.PLAYING_HAND);
         handComboBox.setRequired(true);
     }
 

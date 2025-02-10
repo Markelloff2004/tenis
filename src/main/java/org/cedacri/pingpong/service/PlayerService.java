@@ -1,13 +1,10 @@
 package org.cedacri.pingpong.service;
 
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.PlayerRepository;
-import org.cedacri.pingpong.utils.Constraints;
-import org.cedacri.pingpong.utils.ExceptionUtils;
-import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -18,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Validated
@@ -42,7 +41,7 @@ public class PlayerService {
     public Stream<Player> list(long page) {
         logger.info("Fetching list of players for page {}", page);
 
-        Pageable pageable = PageRequest.of((int) page, Constraints.PAGE_SIZE);
+        Pageable pageable = PageRequest.of((int) page, Constants.PAGE_SIZE);
 
         Page<Player> playerPage = playerRepository.findAll(pageable);
 
@@ -76,5 +75,11 @@ public class PlayerService {
             logger.error("Attempting to delete player with null id");
             throw new IllegalArgumentException("Player Id cannot be null");
         }
+    }
+
+    public Set<Player> getAvailablePlayersForTournament(Tournament tournament) {
+        return playerRepository.findAll().stream()
+                .filter(p -> !p.getTournaments().contains(tournament))
+                .collect(Collectors.toSet());
     }
 }

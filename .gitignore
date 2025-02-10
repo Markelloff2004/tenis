@@ -4,9 +4,15 @@
 .settings
 .project
 .classpath
-
+*.zip
 *.iml
 .DS_Store
+package-lock.json
+*dev.bundle
+*.ts
+*.mjs
+*application.properties
+
 
 # The following files are generated/updated by vaadin-maven-plugin
 node_modules/

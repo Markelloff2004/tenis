@@ -37,7 +37,7 @@ public class Tournament implements ITournament {
     @Column(name = "tournament_name", nullable = false, length = 100)
     private String tournamentName;
 
-    @NotNull(message = "Add at least one player")
+    @NotNull(message = "Max amount of players should be calculated")
     @Column(name = "max_players", nullable = false)
     private Integer maxPlayers;
 

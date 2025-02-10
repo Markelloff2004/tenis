@@ -3,7 +3,7 @@ package org.cedacri.pingpong.views.playersview.components;
 import jakarta.validation.ConstraintViolationException;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
-import org.cedacri.pingpong.utils.Constraints;
+import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 
@@ -41,8 +41,8 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
             close();
             NotificationManager.showInfoNotification("Player saved successfully!");
         } catch (ConstraintViolationException e) {
-            logger.error(Constraints.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
-            NotificationManager.showErrorNotification(Constraints.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            logger.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
+            NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

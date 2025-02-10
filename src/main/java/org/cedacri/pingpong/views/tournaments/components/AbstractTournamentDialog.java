@@ -9,22 +9,19 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.util.GridUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public abstract class AbstractTournamentDialog extends Dialog {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractTournamentDialog.class);
 
     protected TextField tournamentNameField;
     protected ComboBox<TournamentTypeEnum> typeComboBox;
@@ -37,7 +34,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected Grid<Player> availablePlayersGrid;
 
     protected AbstractTournamentDialog(String headerTitle) {
-        logger.info("Initializing {}", headerTitle);
+        log.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
         setWidth("80%");
@@ -77,8 +74,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     }
 
-    protected void initializePlayerSets(PlayerService playerService, Set<Player> players) {
-        selectedPlayersSet = players;
+    protected void initializePlayerSets(PlayerService playerService, Set<Player> selectedPlayers) {
         availablePlayersSet.addAll(
                 playerService.getAll()
                         .filter(p -> !selectedPlayersSet.contains(p))
@@ -133,7 +129,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected abstract void onSave();
 
     protected void onCancel() {
-        logger.info("Cancel button clicked. Closing dialog.");
+        log.info("Cancel button clicked. Closing dialog.");
         close();
     }
 }
