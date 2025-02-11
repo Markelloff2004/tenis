@@ -135,7 +135,7 @@ public class TournamentService {
         tournament.setSemifinalsSetsToWin(semiSetsToWin);
         tournament.setFinalsSetsToWin(finalSetsToWin);
         tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-        tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(players.size()));
+        tournament.setMaxPlayers(TournamentUtils.determineMaxPlayers(players));
         tournament.setPlayers(players);
     }
 }
