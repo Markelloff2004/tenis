@@ -21,8 +21,6 @@ import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -77,7 +75,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         add(createRoundButtonsLayout());
 
-        matchContainer = createMatchContainer();
+        matchContainer = ViewUtils.createVerticalLayout(JustifyContentMode.CENTER);
 
         add(matchContainer);
 
@@ -91,13 +89,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         {
             refreshMatchesInRound("All");
         }
-    }
-
-    private VerticalLayout createMatchContainer() {
-        VerticalLayout container = new VerticalLayout();
-        container.setSpacing(true);
-        container.setHorizontalComponentAlignment(Alignment.STRETCH);
-        return container;
     }
 
     private HorizontalLayout createRoundButtonsLayout() {
@@ -121,6 +112,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         playerList.forEach(p -> playerOptions.add(p.getName() + " " + p.getSurname()));
 
         playerOptionsComboBox = ViewUtils.createComboBox("Player Options", playerOptions);
+        playerOptionsComboBox.setValue(playerOptions.get(0));
         playerOptionsComboBox.addValueChangeListener(event -> refreshMatchesInRound(event.getValue()));
 
         return ViewUtils.createHorizontalLayout(JustifyContentMode.START, playerOptionsComboBox);
@@ -153,7 +145,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private void refreshMatchesInRound(Object round) {
 
         log.info("Refreshing matches for round {}", round);
-        matchContainer.removeAll();
 
         if(round instanceof Integer)
         {
@@ -179,6 +170,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private void displayMatches(List<Match> matches) {
 
         log.info("Displaying {} matches", matches.size());
+        matchContainer.removeAll();
 
         for (Match match : matches) {
             log.debug("Processed match {}", match);
