@@ -6,6 +6,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 
 import java.util.List;
 import java.util.Objects;
@@ -101,7 +102,8 @@ public class TournamentUtils {
 
 
         match.setWinner(winner);
-        moveWinner(match);
+        if(match.getTournament().getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
+            moveWinner(match);
 
     }
 

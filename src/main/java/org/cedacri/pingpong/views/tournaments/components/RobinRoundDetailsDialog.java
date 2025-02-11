@@ -39,7 +39,7 @@ public class RobinRoundDetailsDialog extends Dialog {
             close();
         });
 
-        add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN, closeDialog));
+        add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, closeDialog));
 
     }
 
