@@ -106,6 +106,10 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
                     startNow
             );
 
+            if(startNow) {
+                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
+            }
+
             log.info("Tournament saved successfully: {}", tournament.getId());
             onSaveCallback.run();
             NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
