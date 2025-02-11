@@ -32,6 +32,13 @@ public class MatchService {
         return matches;
     }
 
+    public List<Match> getMatchesByTournament(Tournament tournament) {
+        log.debug("Fetching matches for tournament: {} ", tournament.getId());
+        List<Match> matches = matchRepository.findByTournament(tournament);
+        log.info("Found {} matches for tournament: {}", matches.size(), tournament.getId());
+        return matches;
+    }
+
     public List<Match> getMatchesByPlayerNameSurname(Tournament tournament, String playerName, String playerSurname) {
         log.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
 

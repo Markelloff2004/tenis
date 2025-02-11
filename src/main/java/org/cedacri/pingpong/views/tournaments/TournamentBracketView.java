@@ -21,6 +21,7 @@ import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
+import org.cedacri.pingpong.views.tournaments.components.RobinRoundDetailsDialog;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -115,7 +116,12 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         playerOptionsComboBox.setValue(playerOptions.get(0));
         playerOptionsComboBox.addValueChangeListener(event -> refreshMatchesInRound(event.getValue()));
 
-        return ViewUtils.createHorizontalLayout(JustifyContentMode.START, playerOptionsComboBox);
+        Button openRating = ViewUtils.createButton("View Rating","button", () -> {
+            RobinRoundDetailsDialog robinRoundDetailsDialog = new RobinRoundDetailsDialog(tournamentService.find(tournament.getId()));
+            robinRoundDetailsDialog.open();
+        });
+
+        return ViewUtils.createHorizontalLayout(JustifyContentMode.BETWEEN, playerOptionsComboBox, openRating);
     }
 
     private HorizontalLayout createOlympicRoundButtons() {
@@ -148,15 +154,11 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         if(round instanceof Integer)
         {
-
-            displayMatches(tournament.getMatches()
-                    .stream()
-                    .filter(m -> m.getRound() == round)
-                    .sorted(Comparator.comparingInt(Match::getPosition))
-                    .toList());
+            displayMatches(matchService.getMatchesByTournamentAndRound(tournament, (Integer) round));
         } else if( round instanceof String) {
             if("All".equals(round) || ((String) round).isEmpty() || ((String) round).isBlank()) {
-                displayMatches(tournament.getMatches().stream().toList());
+//                displayMatches(tournament.getMatches().stream().toList());
+                displayMatches(matchService.getMatchesByTournament(tournament));
             }
             else {
                 String[] playerNameSurname = ((String) round).split(" ");

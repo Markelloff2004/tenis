@@ -15,8 +15,8 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.utils.GridUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
-import org.cedacri.pingpong.views.util.GridUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
