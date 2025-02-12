@@ -8,9 +8,7 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 public class TournamentUtils {
@@ -104,7 +102,14 @@ public class TournamentUtils {
         match.setWinner(winner);
         if(match.getTournament().getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
             moveWinner(match);
+        else if(isFinished(match.getTournament()))
+            finishTournament(match.getTournament());
+    }
 
+    private static boolean isFinished(Tournament tournament){
+        return tournament.getMatches().stream()
+                .filter(match -> match.getWinner() == null)
+                .toList().isEmpty();
     }
 
     private static void moveWinner(Match match) {
@@ -117,7 +122,8 @@ public class TournamentUtils {
             }
         } else {
             //fine tournament
-            fineTournament(match.getTournament());
+            match.getTournament().setWinner(match.getWinner());
+            finishTournament(match.getTournament());
         }
     }
 
@@ -144,47 +150,36 @@ public class TournamentUtils {
         }
     }
 
-    private static void fineTournament(Tournament tournament) {
+    private static void finishTournament(Tournament tournament) {
         tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
-        updateRating(tournament);
+
+        if (tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC) {
+            updateOlympicRating(tournament);
+        } else if (tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND) {
+            updateRatingRobinRound(tournament);
+        }
     }
 
-    private static void updateRating(Tournament tournament) {
+    private static void updateRatingRobinRound(Tournament tournament) {
+        Map<Player, Integer> wonMatchesMap = new HashMap<>();
+        Map<Player, Integer> goalsScoredMap = new HashMap<>();
+        Map<Player, Integer> goalsLostMap = new HashMap<>();
+        Map<Player, Integer> lostMatchesMap = new HashMap<>();
+
         for (Player player : tournament.getPlayers()) {
+            wonMatchesMap.put(player, calculateNewWonMatches(player, tournament));
+            lostMatchesMap.put(player, calculateNewLostMatches(player, tournament));
+            goalsScoredMap.put(player, calculateNewGoalsScored(player, tournament));
+            goalsLostMap.put(player, calculateNewGoalsLost(player, tournament));
+        }
 
-            List<Match> playedMatches = tournament.getMatches().stream()
-                    .filter(match ->
-                            (Objects.nonNull(match.getBottomPlayer())
-                                    && match.getBottomPlayer().equals(player))
-                                    || (Objects.nonNull(match.getTopPlayer())
-                                    && match.getTopPlayer().equals(player))
-                    ).toList();
-
+        for (Player player : tournament.getPlayers()) {
             int oldRating = player.getRating();
-            int newGoalsScored = 0;
-            int newGoalsLost = 0;
-            int newWonMatches = 0;
-            int newLostMatches = 0;
+            int newWonMatches = wonMatchesMap.get(player);
+            int newGoalsScored = goalsScoredMap.get(player);
+            int newGoalsLost = goalsLostMap.get(player);
+            int newLostMatches = lostMatchesMap.get(player);
 
-            for (Match match : playedMatches) {
-                boolean isTopPlayer = match.getTopPlayer().equals(player);
-
-                for (Score score : match.getScore()) {
-                    newGoalsScored += isTopPlayer
-                            ? score.getTopPlayerScore()
-                            : score.getBottomPlayerScore();
-
-                    newGoalsLost += isTopPlayer
-                            ? score.getBottomPlayerScore()
-                            : score.getTopPlayerScore();
-                }
-
-                if (match.getWinner().equals(player)) {
-                    newWonMatches++;
-                } else {
-                    newLostMatches++;
-                }
-            }
 
             int newRating = oldRating + (5 * newWonMatches - 3 * newLostMatches) + (2 * newGoalsScored - newGoalsLost);
 
@@ -194,6 +189,93 @@ public class TournamentUtils {
             player.setWonMatches(player.getWonMatches() + newWonMatches);
             player.setLostMatches(player.getLostMatches() + newLostMatches);
         }
+
+        determineRobinRoundWinner(tournament, wonMatchesMap, goalsScoredMap, goalsLostMap);
+
+    }
+
+    private static void determineRobinRoundWinner(Tournament tournament, Map<Player, Integer> wonMatches, Map<Player, Integer> goalsScored, Map<Player, Integer> goalsLost) {
+
+        Player bestPlayer = null;
+        int maxWins = -1;
+        int bestGoalDifference = Integer.MIN_VALUE;
+
+        for (Player player : tournament.getPlayers()) {
+            int wins = wonMatches.get(player);
+            int goalDifference = goalsScored.get(player) - goalsLost.get(player);
+
+            if (wins > maxWins || (wins == maxWins && goalDifference > bestGoalDifference)) {
+                maxWins = wins;
+                bestGoalDifference = goalDifference;
+                bestPlayer = player;
+            }
+
+        }
+
+        if (bestPlayer != null) {
+            tournament.setWinner(bestPlayer);
+        }
+
+    }
+
+
+
+    private static void updateOlympicRating(Tournament tournament) {
+        for (Player player : tournament.getPlayers()) {
+            int oldRating = player.getRating();
+            int newGoalsScored = calculateNewGoalsScored(player, tournament);
+            int newGoalsLost = calculateNewGoalsLost(player, tournament);
+            int newWonMatches = calculateNewWonMatches(player, tournament);
+            int newLostMatches = calculateNewLostMatches(player, tournament);
+
+            int newRating = oldRating + calculateNewRating(newWonMatches, newLostMatches, newGoalsScored, newGoalsLost);
+
+            player.setRating(newRating);
+            player.setGoalsScored(player.getGoalsScored() + newGoalsScored);
+            player.setGoalsLost(player.getGoalsLost() + newGoalsLost);
+            player.setWonMatches(player.getWonMatches() + newWonMatches);
+            player.setLostMatches(player.getLostMatches() + newLostMatches);
+        }
+    }
+
+    public static int calculateNewRating(int newWonMatches, int newLostMatches, int newGoalsScored, int newGoalsLost) {
+        return (5 * newWonMatches - 3 * newLostMatches) + (2 * newGoalsScored - newGoalsLost);
+    }
+
+    public static int calculateNewGoalsScored(Player player, Tournament tournament) {
+        return tournament.getMatches().stream()
+                .filter(match -> match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player))
+                .flatMapToInt(match -> match.getScore().stream()
+                        .mapToInt(score -> match.getTopPlayer().equals(player)
+                                ? score.getTopPlayerScore()
+                                : score.getBottomPlayerScore())
+                )
+                .sum();
+    }
+
+    public static int calculateNewGoalsLost(Player player, Tournament tournament) {
+        return tournament.getMatches().stream()
+                .filter(match -> match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player))
+                .flatMapToInt(match -> match.getScore().stream()
+                        .mapToInt(score -> match.getTopPlayer().equals(player)
+                                ? score.getBottomPlayerScore()
+                                : score.getTopPlayerScore())
+                )
+                .sum();
+    }
+
+    public static int calculateNewWonMatches(Player player, Tournament tournament) {
+        return (int) tournament.getMatches().stream()
+                .filter(match -> match.getWinner() != null && match.getWinner().equals(player))
+                .count();
+    }
+
+    public static int calculateNewLostMatches(Player player, Tournament tournament) {
+        return (int) tournament.getMatches().stream()
+                .filter(match -> match.getWinner() != null
+                        && !match.getWinner().equals(player)
+                        && (match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player)))
+                .count();
     }
 
     public static int determineMaxPlayers(Set<Player> players) {

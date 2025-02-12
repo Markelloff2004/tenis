@@ -45,76 +45,36 @@ public class RobinRoundDetailsDialog extends Dialog {
 
 
     private void configureGrid() {
-        playerRatingGrid.addColumn(this::calculateNewRating)
-                .setHeader("Rating")
-                .setSortable(true);
+        playerRatingGrid.addColumn(player ->
+                TournamentUtils.calculateNewRating(
+                        TournamentUtils.calculateNewWonMatches(player, tournament),
+                        TournamentUtils.calculateNewLostMatches(player, tournament),
+                        TournamentUtils.calculateNewGoalsScored(player, tournament),
+                        TournamentUtils.calculateNewGoalsLost(player, tournament))
+        )
+        .setHeader("Rating")
+        .setSortable(true);
 
         playerRatingGrid.addColumn(Player::getName).setHeader("Name");
         playerRatingGrid.addColumn(Player::getSurname).setHeader("Surname");
 
-        playerRatingGrid.addColumn(this::calculateNewGoalsScored)
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsScored(player, tournament))
                 .setHeader("Goals Scored")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(this::calculateNewGoalsLost)
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsLost(player, tournament))
                 .setHeader("Goals Lost")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(this::calculateNewWonMatches)
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewWonMatches(player, tournament))
                 .setHeader("Won Matches")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(this::calculateNewLostMatches)
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewLostMatches(player, tournament))
                 .setHeader("Lost Matches")
                 .setSortable(true);
     }
 
-    private int calculateNewRating(Player player) {
-        int newWonMatches = calculateNewWonMatches(player);
-        int newLostMatches = calculateNewLostMatches(player);
-        int newGoalsScored = calculateNewGoalsScored(player);
-        int newGoalsLost = calculateNewGoalsLost(player);
-
-        return (5 * newWonMatches - 3 * newLostMatches) + (2 * newGoalsScored - newGoalsLost);
-    }
-
-    private int calculateNewGoalsScored(Player player) {
-        return tournament.getMatches().stream()
-                .filter(match -> match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player))
-                .flatMapToInt(match -> match.getScore().stream()
-                                .mapToInt(score -> match.getTopPlayer().equals(player)
-                                        ? score.getTopPlayerScore()
-                                        : score.getBottomPlayerScore()
-                                )
-                )
-                .sum();
-    }
-
-    private int calculateNewGoalsLost(Player player) {
-        return tournament.getMatches().stream()
-                .filter(match -> match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player))
-                .flatMapToInt(match -> match.getScore().stream()
-                        .mapToInt(score -> match.getTopPlayer().equals(player)
-                                ? score.getBottomPlayerScore()
-                                : score.getTopPlayerScore()
-                        )
-                )
-                .sum();
-    }
-
-    private int calculateNewWonMatches(Player player) {
-        return (int) tournament.getMatches().stream()
-                .filter(match -> match.getWinner() != null && match.getWinner().equals(player))
-                .count();
-    }
-
-    private int calculateNewLostMatches(Player player) {
-        return (int) tournament.getMatches().stream()
-                .filter(match -> match.getWinner() != null
-                        && !match.getWinner().equals(player)
-                        && (match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player)))
-                .count();
-    }
 
     private void loadPlayersIntoGrid() {
         List<Player> players = new ArrayList<>(tournament.getPlayers());

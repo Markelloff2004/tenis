@@ -112,11 +112,7 @@ public class TournamentService {
     }
 
     public Player getTournamentWinner(Tournament tournament) {
-        return tournament.getMatches().stream()
-                .filter(match -> match.getNextMatch() == null)
-                .map(Match::getWinner)
-                .findFirst()
-                .orElse(null);
+        return tournament.getWinner();
     }
 
     @Transactional

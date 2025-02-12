@@ -45,9 +45,9 @@ VALUES
 
 use tournament_db;
 
-INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type) VALUES ('2025-02-05', 1, 16, 'cedacri', 'BEST_OF_THREE', 'BEST_OF_THREE', 'BEST_OF_THREE', 'FINISHED', 'OLYMPIC');
-INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type) VALUES ('2025-02-05', 2, 16, 'Test1', 'BEST_OF_ONE', 'BEST_OF_ONE', 'BEST_OF_ONE', 'FINISHED', 'OLYMPIC');
-INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type) VALUES ('2025-02-05', 3, 16, 'Test2', 'BEST_OF_ONE', 'BEST_OF_ONE', 'BEST_OF_ONE', 'PENDING', 'OLYMPIC');
+INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type, winner_id) VALUES ('2025-02-05', 1, 16, 'cedacri', 'BEST_OF_THREE', 'BEST_OF_THREE', 'BEST_OF_THREE', 'FINISHED', 'OLYMPIC', 6);
+INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type, winner_id) VALUES ('2025-02-05', 2, 16, 'Test1', 'BEST_OF_ONE', 'BEST_OF_ONE', 'BEST_OF_ONE', 'FINISHED', 'OLYMPIC', 3);
+INSERT INTO tournament_db.tournaments (created_at, id, max_players, tournament_name, finals_sets_to_win, semifinals_sets_to_win, sets_to_win, tournament_status, tournament_type, winner_id) VALUES ('2025-02-05', 3, 16, 'Test2', 'BEST_OF_ONE', 'BEST_OF_ONE', 'BEST_OF_ONE', 'PENDING', 'OLYMPIC', null);
 
 INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (1, 1);
 INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (2, 1);
