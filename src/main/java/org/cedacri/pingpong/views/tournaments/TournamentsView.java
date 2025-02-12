@@ -4,10 +4,12 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -24,6 +26,7 @@ import org.cedacri.pingpong.views.tournaments.components.TournamentDeleteDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentEditDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentInfoDialog;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -113,7 +116,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     private void refreshGridData() {
-        tournamentsGrid.setItems(tournamentService.findAll().collect(Collectors.toSet()));
+        tournamentsGrid.setItems(tournamentService.findAll().collect(Collectors.toList()));
         log.info("Grid data refreshed, tournaments loaded.");
     }
 
