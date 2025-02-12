@@ -20,6 +20,7 @@ public interface ITournament {
     TournamentTypeEnum getTournamentType();
     LocalDate getCreatedAt();
     Set<Player> getPlayers();
+    Player getWinner();
 
 }
 

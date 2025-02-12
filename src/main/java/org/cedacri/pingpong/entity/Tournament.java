@@ -68,7 +68,7 @@ public class Tournament implements ITournament {
     private LocalDate createdAt = LocalDate.now();
 
 
- @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "tournament_id"),
@@ -78,4 +78,8 @@ public class Tournament implements ITournament {
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Match> matches = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "winner_id")
+    private Player winner;
 }
