@@ -137,8 +137,8 @@ public class ViewUtils {
 
         span.getStyle().setFontSize("18px");
         span.getStyle().setTop("15px");
-        span.setMaxWidth("200px");
-        span.setWidth("150px");
+        span.setMaxWidth("300px");
+        span.setWidth("250px");
 
         return span;
     }
