@@ -88,8 +88,7 @@ public class Player {
     @ManyToMany(mappedBy = "players", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Tournament> tournaments = new HashSet<>();
 
-    public Player(String name, String surname, LocalDate birthDate, String email, String address, LocalDate createdAt, Integer rating, String hand,
-                  Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
+    public Player(String name, String surname, LocalDate birthDate, String email, String address, LocalDate createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
 
         this.name = name;
         this.surname = surname;
@@ -114,8 +113,7 @@ public class Player {
         this.lostMatches = lostMatches;
     }
 
-    public Player(Long id, String name, String surname, LocalDate birthDate, String email, String address, Integer rating,
-                  String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
+    public Player(Long id, String name, String surname, LocalDate birthDate, String email, String address, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
         this.id = id;
         this.name = name;
         this.surname = surname;

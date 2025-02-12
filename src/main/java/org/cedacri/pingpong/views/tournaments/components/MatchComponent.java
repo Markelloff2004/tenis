@@ -19,6 +19,7 @@ import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -187,18 +188,19 @@ public class MatchComponent extends HorizontalLayout {
 
     private Span getPreviousMatchWinner(Match match, boolean isTop) {
 //
-        List<Match> previousMatches = tournament
-                .getMatches()
-                .stream().filter(m -> m.getNextMatch() == match).toList();
+        List<Match> previousMatches = tournament.getMatches().stream()
+                .filter(m -> Objects.nonNull(m.getNextMatch()) && Objects.equals(m.getNextMatch().getId(), match.getId()))
+                .toList();
 
         if (previousMatches.isEmpty()) {
+//        if(match.getRound() == 1){
             return ViewUtils.createPlayerLabel("BYE");
         }
 
         if (isTop) {
             if (match.getTopPlayer() == null) {
                 //value top player
-                Optional<Match> topMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 0).findFirst();
+                Optional<Match> topMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 1).findFirst();
 
                 if (topMatch.isPresent())
                     return ViewUtils.createPlayerLabel("Match " + topMatch.get().getId() + " winner");
@@ -206,7 +208,7 @@ public class MatchComponent extends HorizontalLayout {
             }
         } else {
             if (match.getBottomPlayer() == null) {
-                Optional<Match> bottomMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 1).findFirst();
+                Optional<Match> bottomMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 0).findFirst();
 
                 if (bottomMatch.isPresent())
                     return ViewUtils.createPlayerLabel("Match " + bottomMatch.get().getId() + " winner");
@@ -214,6 +216,6 @@ public class MatchComponent extends HorizontalLayout {
             }
         }
 
-        return new Span("");
+        return new Span("Ne dorobotal");
     }
 }

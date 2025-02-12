@@ -10,10 +10,8 @@ import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,14 +25,23 @@ public class MatchService {
 
     public List<Match> getMatchesByTournamentAndRound(Tournament tournament, int round) {
         log.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
-        List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round);
+        List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round)
+                .stream()
+                .sorted(Comparator.comparing(Match::getPosition)).toList();
+//                        .thenComparing(Match::getPosition))
+
         log.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournament, round);
         return matches;
     }
 
     public List<Match> getMatchesByTournament(Tournament tournament) {
         log.debug("Fetching matches for tournament: {} ", tournament.getId());
-        List<Match> matches = matchRepository.findByTournament(tournament);
+        List<Match> matches = matchRepository.findByTournament(tournament)
+                .stream()
+                .sorted(Comparator.comparing(Match::getPosition)
+                        .thenComparing(Match::getRound))
+                .collect(Collectors.toList());
+
         log.info("Found {} matches for tournament: {}", matches.size(), tournament.getId());
         return matches;
     }

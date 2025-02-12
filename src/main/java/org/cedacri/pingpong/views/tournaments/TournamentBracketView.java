@@ -154,7 +154,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         if(round instanceof Integer)
         {
-            displayMatches(matchService.getMatchesByTournamentAndRound(tournament, (Integer) round));
+            displayMatches( matchService.getMatchesByTournamentAndRound(tournament, (Integer) round));
         } else if( round instanceof String) {
             if("All".equals(round) || ((String) round).isEmpty() || ((String) round).isBlank()) {
 //                displayMatches(tournament.getMatches().stream().toList());
