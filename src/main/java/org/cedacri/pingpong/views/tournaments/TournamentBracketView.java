@@ -24,8 +24,8 @@ import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
 import org.cedacri.pingpong.views.tournaments.components.RobinRoundDetailsDialog;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -130,10 +130,16 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         List<Button> buttons = new ArrayList<>();
 
         int roundsCount = TournamentUtils.calculateNumberOfRounds(tournament.getMaxPlayers());
+        Map<Integer, String> specialRounds = Map.of(
+                roundsCount - 1, "Semifinals",
+                roundsCount, "Finals"
+        );
 
         for (int i = 1; i <= roundsCount; i++) {
             int round = i;
-            Button roundButton = new Button("Stage " + round, event -> {
+            String label = specialRounds.getOrDefault(i, "Stage " + round);
+
+            Button roundButton = new Button(label, event -> {
                 refreshMatchesInRound(round);
                 ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
             });
