@@ -26,6 +26,7 @@ import org.cedacri.pingpong.views.tournaments.components.TournamentDeleteDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentEditDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentInfoDialog;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -116,7 +117,10 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     private void refreshGridData() {
-        tournamentsGrid.setItems(tournamentService.findAll().collect(Collectors.toList()));
+        tournamentsGrid.setItems(
+                tournamentService.findAll()
+                        .sorted(Comparator.comparingInt(Tournament::getId).reversed())
+                        .toList());
         log.info("Grid data refreshed, tournaments loaded.");
     }
 
