@@ -25,6 +25,7 @@ import org.cedacri.pingpong.views.playersview.components.PlayerSaveDialog;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -95,7 +96,9 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
     @Override
     public void showAllPlayers() {
         log.info("Loading all players");
-        playersGrid.setItems(playerService.getAll().collect(Collectors.toSet()));
+        playersGrid.setItems(playerService.getAll().
+                sorted(Comparator.comparingInt(Player::getRating).reversed())
+                .toList());
     }
 
     @Override
