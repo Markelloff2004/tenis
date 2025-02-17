@@ -38,7 +38,7 @@ public class Player {
 
     @Size(max = 100)
     @NotBlank(message = "Surname cannot be null or blank")
-    @Pattern(regexp = "^[A-Za-z.-]+$", message = "Name must contain only letters")
+    @Pattern(regexp = "^[A-Za-z.-]+$", message = "Surname must contain only letters")
     @Size(min = 2, max = 50, message = "Surname must be between 2 and 50 characters")
     @Column(name = "surname", nullable = false, length = 100)
     private String surname;
@@ -64,9 +64,11 @@ public class Player {
     @Column(name = "rating", nullable = false, columnDefinition = "int default 0")
     private Integer rating = 0;
 
-    @Size(max = 5)
+//    @Size(max = 5)
     @NotNull(message = "Select a hand playing style")
-    @Column(name = "hand", length = 5)
+//    @Column(name = "hand", length = 5)
+    @Column(name = "hand")
+    @Pattern(regexp = "^(RIGHT|LEFT)$", message = "Hand must be either 'RIGHT' or 'LEFT'")
     private String hand;
 
     @Min(value = 0, message = "Won matches cannot be negative")

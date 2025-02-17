@@ -35,9 +35,6 @@ public class Match {
     @Column(name = "position")
     private Integer position;
 
-    /*
-    score is in formate topPlayer:bottomPlayer;
-     */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "match_scores", joinColumns = @JoinColumn(name = "match_id"))
     @Column(name = "score")
@@ -45,6 +42,7 @@ public class Match {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "tournament_id", nullable = false)
+    @NotNull(message = "TournamentId cannot be null")
     private Tournament tournament;
 
     @ManyToOne(fetch = FetchType.EAGER)
