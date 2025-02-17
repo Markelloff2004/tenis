@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
@@ -21,6 +22,7 @@ import java.util.List;
 @PageTitle("Home")
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "home", layout = MainLayout.class)
+@AnonymousAllowed
 @PermitAll
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
 public class HomeView extends VerticalLayout {
@@ -69,3 +71,6 @@ public class HomeView extends VerticalLayout {
         tournamentContainer.add(noTournamentsMessage);
     }
 }
+
+
+

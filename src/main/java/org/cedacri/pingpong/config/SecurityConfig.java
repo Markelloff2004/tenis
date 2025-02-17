@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.security;
+package org.cedacri.pingpong.config;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.cedacri.pingpong.views.loginview.LoginView;
@@ -15,6 +15,15 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/**").permitAll()
+                )
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable());
+
         super.configure(http);
         setLoginView(http, LoginView.class);
     }

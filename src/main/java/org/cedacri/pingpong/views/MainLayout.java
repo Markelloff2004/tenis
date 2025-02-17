@@ -3,9 +3,12 @@ package org.cedacri.pingpong.views;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -23,8 +26,8 @@ import java.util.Optional;
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
 public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
-    private List<Button> menuButtons;
     private final List<String> routes = Arrays.asList("home", "tournaments", "players");
+    private List<Button> menuButtons;
 
     public MainLayout() {
         configureView();
@@ -33,30 +36,49 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     private void configureView() {
         setPrimarySection(Section.DRAWER);
 
+        VerticalLayout logoLayout = createLogoSection();
+
+        VerticalLayout menuItemsLayout = createMenuItems();
+
+        HorizontalLayout userSection = createUserSection();
+
+        VerticalLayout drawerLayout = new VerticalLayout(logoLayout, menuItemsLayout);
+        drawerLayout.setSizeFull();
+        drawerLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        drawerLayout.addClassName("side-menu");
+
+        drawerLayout.setFlexGrow(1, menuItemsLayout);
+
+        drawerLayout.add(userSection);
+        drawerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        addToDrawer(drawerLayout);
+    }
+
+    private VerticalLayout createLogoSection() {
         H4 appName = new H4("TOURNAMENT");
         Image logo = new Image("images/logo.png", "Tournament Logo");
         logo.setWidth("160px");
-        logo.setHeight("auto");
 
-        VerticalLayout logoLayout = ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.START, logo, appName);
+        VerticalLayout logoLayout = new VerticalLayout(logo, appName);
+        logoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         logoLayout.addClassName("logo-section");
 
+        return logoLayout;
+    }
+
+    private VerticalLayout createMenuItems() {
         menuButtons = Arrays.asList(
                 ViewUtils.createButton("Home", "transparent-button", () -> navigateTo("home")),
                 ViewUtils.createButton("Tournament", "transparent-button", () -> navigateTo("tournaments")),
                 ViewUtils.createButton("Players", "transparent-button", () -> navigateTo("players"))
         );
 
-        VerticalLayout menuItemsLayout = ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.START, menuButtons.toArray(new Button[0]));
+        VerticalLayout menuItemsLayout = new VerticalLayout(menuButtons.toArray(new Button[0]));
+        menuItemsLayout.setAlignItems(FlexComponent.Alignment.START);
         menuItemsLayout.addClassName("menu-items");
 
-        // User Authentication Section
-        HorizontalLayout userSection = createUserSection();
-
-        VerticalLayout drawerLayout = ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.START, logoLayout, menuItemsLayout, userSection);
-        drawerLayout.addClassName("side-menu");
-
-        addToDrawer(drawerLayout);
+        return menuItemsLayout;
     }
 
     private HorizontalLayout createUserSection() {
@@ -64,23 +86,24 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         userLayout.setWidthFull();
         userLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         userLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+//        userLayout.addClassName("user-section");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            // If user is authenticated, show greeting and logout button
             String username = auth.getName();
-            H4 greeting = new H4("Hi, " + username);
-            greeting.addClassName("user-greeting");
+            MenuBar userMenu = new MenuBar();
+//            userMenu.addClassName("user-menu");
 
-            Button logoutButton = new Button("Logout", e -> logout());
-            logoutButton.addClassName("logout-button");
+            MenuItem userItem = userMenu.addItem("Hi, " + username);
+//            userItem.getElement().getThemeList().add("user-menu"); // Apply button styling
 
-            userLayout.add(greeting, logoutButton);
+            SubMenu subMenu = userItem.getSubMenu();
+            subMenu.addItem("Logout", e -> logout());
+
+            userLayout.add(userMenu);
         } else {
-            // If user is not authenticated, show login button
             Button loginButton = new Button("Login", e -> navigateTo("login"));
-            loginButton.addClassName("login-button");
-
+//            loginButton.addClassName("colored-button"); // Apply the button style
             userLayout.add(loginButton);
         }
 
@@ -89,7 +112,7 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private void logout() {
         VaadinSession.getCurrent().getSession().invalidate();
-        UI.getCurrent().getPage().setLocation("/login"); // Redirect to login page
+        UI.getCurrent().getPage().setLocation("/login");
     }
 
     private void navigateTo(String route) {

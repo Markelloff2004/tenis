@@ -12,8 +12,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
@@ -36,6 +39,8 @@ import java.util.stream.Collectors;
 @PageTitle("TournamentsView")
 @Route(value = "tournaments", layout = MainLayout.class)
 @Uses(Icon.class)
+@PreserveOnRefresh
+@AnonymousAllowed
 @PermitAll
 public class TournamentsView extends VerticalLayout implements TournamentManagement {
 

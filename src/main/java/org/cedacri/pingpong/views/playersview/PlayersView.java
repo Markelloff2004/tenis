@@ -12,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 @Route(value = "players", layout = MainLayout.class)
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
 @Uses(Icon.class)
+@AnonymousAllowed
 @PermitAll
 public class PlayersView extends VerticalLayout implements PlayerViewManagement {
 

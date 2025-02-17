@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.security;
+package org.cedacri.pingpong.service;
 
 import org.cedacri.pingpong.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,11 +7,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
