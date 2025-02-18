@@ -15,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.server.VaadinSession;
+import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,8 +71,18 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     private VerticalLayout createMenuItems() {
         menuButtons = Arrays.asList(
                 ViewUtils.createButton("Home", "transparent-button", () -> navigateTo("home")),
-                ViewUtils.createButton("Tournament", "transparent-button", () -> navigateTo("tournaments")),
-                ViewUtils.createButton("Players", "transparent-button", () -> navigateTo("players"))
+                ViewUtils.createSecuredButton(
+                        "Tournament",
+                        "transparent-button",
+                        () -> navigateTo("tournaments"),
+                        RoleEnum.ADMIN, RoleEnum.MANAGER
+
+                ),
+                ViewUtils.createSecuredButton("Players",
+                        "transparent-button",
+                        () -> navigateTo("players"),
+                        RoleEnum.ADMIN, RoleEnum.MANAGER
+                )
         );
 
         VerticalLayout menuItemsLayout = new VerticalLayout(menuButtons.toArray(new Button[0]));
@@ -86,16 +97,13 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         userLayout.setWidthFull();
         userLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         userLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-//        userLayout.addClassName("user-section");
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             String username = auth.getName();
             MenuBar userMenu = new MenuBar();
-//            userMenu.addClassName("user-menu");
 
             MenuItem userItem = userMenu.addItem("Hi, " + username);
-//            userItem.getElement().getThemeList().add("user-menu"); // Apply button styling
 
             SubMenu subMenu = userItem.getSubMenu();
             subMenu.addItem("Logout", e -> logout());
@@ -103,7 +111,6 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
             userLayout.add(userMenu);
         } else {
             Button loginButton = new Button("Login", e -> navigateTo("login"));
-//            loginButton.addClassName("colored-button"); // Apply the button style
             userLayout.add(loginButton);
         }
 

@@ -4,21 +4,18 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
@@ -31,17 +28,13 @@ import org.cedacri.pingpong.views.tournaments.components.TournamentEditDialog;
 import org.cedacri.pingpong.views.tournaments.components.TournamentInfoDialog;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
 @PageTitle("TournamentsView")
 @Route(value = "tournaments", layout = MainLayout.class)
 @Uses(Icon.class)
-@PreserveOnRefresh
-@AnonymousAllowed
-@PermitAll
+@RolesAllowed({"ROLE_ADMIN", "ROLE_MANAGER"})
 public class TournamentsView extends VerticalLayout implements TournamentManagement {
 
     private final Grid<Tournament> tournamentsGrid = new Grid<>(Tournament.class, false);
@@ -50,12 +43,12 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     public TournamentsView(TournamentService tournamentService, PlayerService playerService) {
         this.tournamentService = tournamentService;
+        this.playerService = playerService;
 
         configureView();
         configureGrid();
 
         refreshGridData();
-        this.playerService = playerService;
 
         log.info("TournamentsView initialized");
     }
@@ -68,10 +61,11 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         H1 title = new H1("Tournaments list");
         title.addClassName("tournaments-title");
 
-        Button addTournamentButton = ViewUtils.createButton(
+        Button addTournamentButton = ViewUtils.createSecuredButton(
                 "Add Tournament",
                 "colored-button",
-                this::showCreateTournament
+                this::showCreateTournament,
+                RoleEnum.ADMIN, RoleEnum.MANAGER
         );
 
         HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, addTournamentButton);
@@ -105,14 +99,30 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     private HorizontalLayout createActionButtons(Tournament tournament) {
-        Button viewButton = ViewUtils.createButton("View", "compact-button", () -> showInfoTournament(tournament));
+        Button viewButton = ViewUtils.createButton(
+                "View",
+                "compact-button",
+                () -> showInfoTournament(tournament)
+        );
 
-        Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeleteTournament(tournament));
+        Button deleteButton = ViewUtils.createSecuredButton(
+                "Delete",
+                "compact-button",
+                () -> showDeleteTournament(tournament),
+                RoleEnum.ADMIN
+        );
 
         HorizontalLayout layout;
 
-        if (tournament.getTournamentStatus() != null && tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
-            Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditTournament(tournament));
+        if (tournament.getTournamentStatus() != null
+                && tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
+
+            Button editButton = ViewUtils.createSecuredButton(
+                    "Edit",
+                    "compact-button",
+                    () -> showEditTournament(tournament),
+                    RoleEnum.ADMIN
+            );
 
             layout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, editButton, viewButton, deleteButton);
 

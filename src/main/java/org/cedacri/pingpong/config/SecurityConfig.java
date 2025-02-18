@@ -1,6 +1,7 @@
 package org.cedacri.pingpong.config;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.views.loginview.LoginView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,17 +16,23 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/", "/home", "/login").permitAll()
+                        .requestMatchers("/tournaments", "/tournament/**", "/tournament/matches", "/players")
+                        .hasAnyRole(RoleEnum.ADMIN.name(), RoleEnum.MANAGER.name())
+                        .requestMatchers("/VAADIN/**", "/frontend/**", "/images/**", "/line-awesome/**", "/styles/**").permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
-                .formLogin(form -> form.disable())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .permitAll()
+                )
                 .logout(logout -> logout.disable());
 
-        super.configure(http);
         setLoginView(http, LoginView.class);
+        super.configure(http);
     }
 
     @Bean

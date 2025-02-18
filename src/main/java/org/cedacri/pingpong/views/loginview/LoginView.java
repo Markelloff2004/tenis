@@ -3,13 +3,12 @@ package org.cedacri.pingpong.views.loginview;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 
 @Route("login")
 @PageTitle("Login | Ping Pong")
@@ -30,7 +29,7 @@ public class LoginView extends VerticalLayout {
         loginForm.setI18n(createLoginI18n());
         loginForm.setAction("login");
         loginForm.addClassName("custom-login-form");
-
+        loginForm.setForgotPasswordButtonVisible(false);
         loginForm.addLoginListener(event -> loginForm.setError(true));
 
         VerticalLayout container = new VerticalLayout(title, loginForm);

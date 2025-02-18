@@ -1,6 +1,5 @@
 package org.cedacri.pingpong.views.home;
 
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -24,7 +23,6 @@ import java.util.List;
 @RouteAlias(value = "home", layout = MainLayout.class)
 @AnonymousAllowed
 @PermitAll
-@CssImport("./themes/ping-pong-tournament/main-layout.css")
 public class HomeView extends VerticalLayout {
 
     private final TournamentService tournamentService;

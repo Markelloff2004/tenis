@@ -11,6 +11,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.utils.NotificationManager;
@@ -117,16 +118,26 @@ public class MatchComponent extends HorizontalLayout {
 
         Button editScoreButton;
         if (tournament.getTournamentStatus().equals(TournamentStatusEnum.ONGOING)) {
-            editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
-                updateMatchScore(match);
-                onEditScoreCallback.run();
-            });
+            editScoreButton = ViewUtils.createSecuredButton(
+                    "",
+                    "colored-button",
+                    () -> {
+                        updateMatchScore(match);
+                        onEditScoreCallback.run();
+                    },
+                    RoleEnum.MANAGER, RoleEnum.ADMIN
+            );
 
         } else {
-            editScoreButton = ViewUtils.createButton("", "colored-button", () -> {
-                NotificationManager.showInfoNotification("Unable to edit the score for a match in a finished tournament");
-                onEditScoreCallback.run();
-            });
+            editScoreButton = ViewUtils.createSecuredButton(
+                    "",
+                    "colored-button",
+                    () -> {
+                        NotificationManager.showInfoNotification("Unable to edit the score for a match in a finished tournament");
+                        onEditScoreCallback.run();
+                    },
+                    RoleEnum.MANAGER, RoleEnum.ADMIN
+            );
 
         }
         editScoreButton.setIcon(VaadinIcon.PENCIL.create());

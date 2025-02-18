@@ -12,6 +12,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.service.SecurityService;
 
 import java.util.List;
 
@@ -30,6 +32,23 @@ public class ViewUtils {
             clickListener.run();
         });
         log.debug("Button created: {}", button);
+        return button;
+    }
+
+    public static Button createSecuredButton(String text,
+                                             String className,
+                                             Runnable clickListener,
+                                             RoleEnum... allowedRoles) {
+        log.debug("Creating secured button with text: '{}' and className: '{}'", text, className);
+
+        Button button = new Button(text);
+        button.addClassName(className);
+        button.setVisible(SecurityUtils.hasAnyRole(allowedRoles));
+        button.addClickListener(e -> {
+            log.info("Secured button with text: '{}' clicked", text);
+            clickListener.run();
+        });
+        log.debug("Secured button created: {}", button);
         return button;
     }
 

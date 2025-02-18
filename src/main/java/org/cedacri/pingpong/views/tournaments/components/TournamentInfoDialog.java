@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -68,7 +69,12 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     protected HorizontalLayout createDialogButtons() {
 
         if (!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
-            Button saveButton = ViewUtils.createButton("Matches", "colored-button", this::onSave);
+            Button saveButton = ViewUtils.createSecuredButton(
+                    "Matches",
+                    "colored-button",
+                    this::onSave,
+                    RoleEnum.ADMIN, RoleEnum.MANAGER
+            );
             Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);

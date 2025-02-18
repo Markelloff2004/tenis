@@ -1,7 +1,6 @@
 package org.cedacri.pingpong.views.playersview;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -12,10 +11,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
@@ -24,19 +24,17 @@ import org.cedacri.pingpong.views.playersview.components.PlayerDeleteDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerEditDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerInfoDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerSaveDialog;
+import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 @Slf4j
 @PageTitle("PlayersView")
 @Route(value = "players", layout = MainLayout.class)
-@CssImport("./themes/ping-pong-tournament/main-layout.css")
 @Uses(Icon.class)
-@AnonymousAllowed
-@PermitAll
+@RolesAllowed({"ROLE_ADMIN", "ROLE_MANAGER"})
 public class PlayersView extends VerticalLayout implements PlayerViewManagement {
 
     private final PlayerService playerService;
@@ -63,7 +61,12 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
         H1 title = new H1("Players list");
         title.addClassName("players-title");
 
-        Button addPlayerButton = ViewUtils.createButton("New player", "colored-button", this::showCreatePlayer);
+        Button addPlayerButton = ViewUtils.createSecuredButton(
+                "New player",
+                "colored-button",
+                this::showCreatePlayer,
+                RoleEnum.ADMIN
+        );
 
         add(ViewUtils.createHorizontalLayout(JustifyContentMode.START, title));
         add(ViewUtils.createHorizontalLayout(JustifyContentMode.END, addPlayerButton));
@@ -82,8 +85,20 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
                         new ComponentRenderer<>(player ->
                         {
                             Button detailsButton = ViewUtils.createButton("Details", "compact-button", () -> showDetailsPlayer(player));
-                            Button editButton = ViewUtils.createButton("Edit", "compact-button", () -> showEditPlayer(player));
-                            Button deleteButton = ViewUtils.createButton("Delete", "compact-button", () -> showDeletePlayer(player));
+
+                            Button editButton = ViewUtils.createSecuredButton(
+                                    "Edit",
+                                    "compact-button",
+                                    () -> showEditPlayer(player),
+                                    RoleEnum.ADMIN
+                            );
+
+                            Button deleteButton = ViewUtils.createSecuredButton(
+                                    "Delete",
+                                    "compact-button",
+                                    () -> showDeletePlayer(player),
+                                    RoleEnum.ADMIN
+                            );
 
                             return ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, detailsButton, editButton, deleteButton);
                         })
