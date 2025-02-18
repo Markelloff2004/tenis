@@ -1,5 +1,6 @@
 package org.cedacri.pingpong.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,15 +52,34 @@ public class PlayerService {
 
     public Stream<Player> getAll() {
         log.info("Fetching list of players");
-        return playerRepository.findAll().stream();
+
+        List<Player> players = playerRepository.findAll();
+
+        if (players == null) {
+            players = Collections.emptyList();
+        }
+
+        return players.stream();
     }
 
     @Transactional
-    public void save(@Valid Player player) {
+    public Player save(@Valid Player player) {
         log.debug("Attempting to save player {}", player);
 
-        playerRepository.save(player);
+        if (player == null) {
+            throw new IllegalArgumentException("Player cannot be null");
+        }
+
+        if (player.getId() != null) {
+            if (playerRepository.findById(player.getId()).isEmpty()) {
+                throw new IllegalArgumentException("Cannot update non-existing player with ID: " + player.getId());
+            }
+        }
+
+        Player savedPlayer = playerRepository.save(player);
+
         log.debug("Successfully saved player {}", player);
+        return savedPlayer;
     }
 
     @Modifying
@@ -66,8 +88,12 @@ public class PlayerService {
         if (id != null) {
             log.debug("Attempting to delete player with id {}", id);
 
-            playerRepository.deleteById(id);
-            log.debug("Successfully deleted player with id {}", id);
+            if (playerRepository.existsById(id)) {
+                playerRepository.deleteById(id);
+                log.debug("Successfully deleted player with id {}", id);
+            } else {
+                throw new EntityNotFoundException("Cannot delete a player that doesn't exist in database");
+            }
         } else {
             log.error("Attempting to delete player with null id");
             throw new IllegalArgumentException("Player Id cannot be null");

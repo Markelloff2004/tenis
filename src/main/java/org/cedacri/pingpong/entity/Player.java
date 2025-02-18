@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cedacri.pingpong.entity.Tournament;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -90,44 +89,12 @@ public class Player {
     @ManyToMany(mappedBy = "players", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Tournament> tournaments = new HashSet<>();
 
-    public Player(String name, String surname, LocalDate birthDate, String email, String address, LocalDate createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
-
+    public Player(String name, String surname, String address, String email, String hand) {
         this.name = name;
         this.surname = surname;
-        this.birthDate = birthDate;
         this.address = address;
         this.email = email;
-        this.createdAt = createdAt;
-        this.rating = rating;
         this.hand = hand;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-        this.goalsScored = goalsScored;
-        this.goalsLost = goalsLost;
-    }
-
-    public Player(Integer rating, String name, String surname, LocalDate birthDate, Integer wonMatches, Integer lostMatches) {
-        this.rating = rating;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-    }
-
-    public Player(Long id, String name, String surname, LocalDate birthDate, String email, String address, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.address = address;
-        this.rating = rating;
-        this.hand = hand;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-        this.goalsScored = goalsScored;
-        this.goalsLost = goalsLost;
     }
 
     @Override

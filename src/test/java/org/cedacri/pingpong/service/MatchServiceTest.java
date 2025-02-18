@@ -545,7 +545,7 @@ class MatchServiceTest {
     }
 
     @Nested
-    @DisplayName("Tests for the saveMatch method")
+    @DisplayName("Tests for the deleteMatch method")
     class DeleteMatchTests {
 
         @BeforeEach
