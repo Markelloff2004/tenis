@@ -120,16 +120,16 @@ public class MatchService {
         return allMatches;
     }
 
-    public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, int round, int position) {
-        log.debug("Fetching match for tournament: {}, round: {} and position: {}", tournament, round, position);
-        Optional<Match> match = matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
-        if (match.isPresent()) {
-            log.info("Match found: {}", match.get());
-        } else {
-            log.warn("Match not found!");
-        }
-        return match;
-    }
+//    public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, int round, int position) {
+//        log.debug("Fetching match for tournament: {}, round: {} and position: {}", tournament, round, position);
+//        Optional<Match> match = matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
+//        if (match.isPresent()) {
+//            log.info("Match found: {}", match.get());
+//        } else {
+//            log.warn("Match not found!");
+//        }
+//        return match;
+//    }
 
     @Transactional
     public Match saveMatch(Match match) {
@@ -197,7 +197,7 @@ public class MatchService {
             TournamentUtils.determinateWinner(match);
             this.saveMatch(match);
         } else {
-            throw new IllegalArgumentException("No scores provided to update.");
+            throw new IllegalArgumentException("No valid scores provided to update.");
         }
 
         return infoMessage.toString();

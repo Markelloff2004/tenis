@@ -40,15 +40,15 @@ public class PlayerService {
                 });
     }
 
-    public Stream<Player> list(long page) {
-        log.info("Fetching list of players for page {}", page);
-
-        Pageable pageable = PageRequest.of((int) page, Constants.PAGE_SIZE);
-
-        Page<Player> playerPage = playerRepository.findAll(pageable);
-
-        return playerPage.stream();
-    }
+//    public Stream<Player> list(long page) {
+//        log.info("Fetching list of players for page {}", page);
+//
+//        Pageable pageable = PageRequest.of((int) page, Constants.PAGE_SIZE);
+//
+//        Page<Player> playerPage = playerRepository.findAll(pageable);
+//
+//        return playerPage.stream();
+//    }
 
     public Stream<Player> getAll() {
         log.info("Fetching list of players");
@@ -100,9 +100,9 @@ public class PlayerService {
         }
     }
 
-    public Set<Player> getAvailablePlayersForTournament(Tournament tournament) {
-        return playerRepository.findAll().stream()
-                .filter(p -> !p.getTournaments().contains(tournament))
-                .collect(Collectors.toSet());
-    }
+//    public Set<Player> getAvailablePlayersForTournament(Tournament tournament) {
+//        return playerRepository.findAll().stream()
+//                .filter(p -> !p.getTournaments().contains(tournament))
+//                .collect(Collectors.toSet());
+//    }
 }

@@ -28,14 +28,12 @@ public class Player {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Size(max = 100)
     @NotBlank(message = "Name cannot be null or blank")
     @Pattern(regexp = "^[A-Za-z.-]+$", message = "Name must contain only letters")
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Size(max = 100)
     @NotBlank(message = "Surname cannot be null or blank")
     @Pattern(regexp = "^[A-Za-z.-]+$", message = "Surname must contain only letters")
     @Size(min = 2, max = 50, message = "Surname must be between 2 and 50 characters")
