@@ -121,7 +121,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
                     "Edit",
                     "compact-button",
                     () -> showEditTournament(tournament),
-                    RoleEnum.ADMIN
+                    RoleEnum.ADMIN, RoleEnum.MANAGER
             );
 
             layout = ViewUtils.createHorizontalLayout(JustifyContentMode.END, editButton, viewButton, deleteButton);

@@ -263,13 +263,10 @@ INSERT INTO tournament_db.roles (name) VALUE ('MANAGER');
 INSERT INTO tournament_db.roles (name) VALUE ('ADMIN');
 
 INSERT INTO tournament_db.users (username, password)
-VALUES ('andrei', '$2a$12$53DrOtZ0lM517o9Dh8fZ/edj/qzQ/h1tXPX6tBSPqBY0zeYtSlJ8S'),
-       ('admin', '$2a$12$53DrOtZ0lM517o9Dh8fZ/edj/qzQ/h1tXPX6tBSPqBY0zeYtSlJ8S'),
-       ('manager', '$2a$12$4cvsXLfXFsMXV.2mP7zTeukWVycfo.iFeg3WmNCH5n6S2E534Ote2'),
-       ('user', '$2a$12$Rb1824dn553ed/pik0K7uej7WHEVrCBRg8u.YuesIbtIG5oryIVD2')
-       ;
+VALUES ('user', '$2a$12$Rb1824dn553ed/pik0K7uej7WHEVrCBRg8u.YuesIbtIG5oryIVD2'),
+    ('manager', '$2a$12$4cvsXLfXFsMXV.2mP7zTeukWVycfo.iFeg3WmNCH5n6S2E534Ote2'),
+    ('admin', '$2a$12$53DrOtZ0lM517o9Dh8fZ/edj/qzQ/h1tXPX6tBSPqBY0zeYtSlJ8S');
 
-INSERT INTO tournament_db.user_roles (role_id, user_id) VALUES (3, 1),
-                                                               (3, 2),
-                                                               (2, 3),
-                                                               (1, 4);
+INSERT INTO tournament_db.user_roles (role_id, user_id) VALUES (1, 1),
+                                                               (2, 2),
+                                                               (3, 3);
