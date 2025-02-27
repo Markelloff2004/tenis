@@ -20,7 +20,7 @@ public class MatchTest {
     private static Validator validator;
     private Match match;
 
-    private final Tournament mockTournament = Mockito.mock(Tournament.class);;
+    private final Tournament mockTournament = Mockito.mock(Tournament.class);
 
     @BeforeAll
     static void setUp() {

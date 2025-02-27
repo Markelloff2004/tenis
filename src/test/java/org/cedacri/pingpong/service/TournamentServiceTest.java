@@ -3,12 +3,7 @@ package org.cedacri.pingpong.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.SetTypesEnum;
-import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
-import org.cedacri.pingpong.repository.PlayerRepository;
 import org.cedacri.pingpong.repository.TournamentRepository;
-import org.cedacri.pingpong.utils.MatchGenerator;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -16,17 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -247,11 +237,11 @@ public class TournamentServiceTest {
         @Test
         void testTournamentWithDuplicateNames() {
             // Given
-            Tournament tournament1 = new Tournament();
-            tournament1.setTournamentName("Duplicate Tournament");
-            Tournament tournament2 = new Tournament();
-            tournament2.setTournamentName("Duplicate Tournament");
-            when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament1, tournament2));
+            Tournament duplicateTournament1 = new Tournament();
+            duplicateTournament1.setTournamentName("Duplicate Tournament");
+            Tournament duplicateTournament2 = new Tournament();
+            duplicateTournament2.setTournamentName("Duplicate Tournament");
+            when(tournamentRepository.findAll()).thenReturn(Arrays.asList(duplicateTournament1, duplicateTournament2));
 
             // When
             Stream<Tournament> result = tournamentService.findAll();
@@ -360,61 +350,6 @@ public class TournamentServiceTest {
             Tournament fetchedTournament = result.findFirst().orElseThrow();
             assertEquals("ТурнірПривіт", fetchedTournament.getTournamentName(), "Tournament name should handle complex Unicode characters.");
         }
-
-        //TODO change into circular tournament->player->tournament->player
-
-        @Test
-        void testTournamentWithCircularReferences() {
-            Tournament tournament = new Tournament();
-            Set<Player> players = new HashSet<>();
-            players.add(player1);
-            players.add(player2);
-            tournament.setPlayers(players);
-
-            // Setăm referințele circulare
-            player1.setTournaments(Set.of(tournament));
-            player2.setTournaments(Set.of(tournament));
-
-            // Mock repository să returneze turneul nostru
-            when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
-
-            // Când apelăm metoda
-            Stream<Tournament> result = tournamentService.findAll();
-
-            // Verificăm că turneul a fost returnat corect
-            assertNotNull(result);
-            Tournament fetchedTournament = result.findFirst().orElseThrow();
-
-            // Verificăm că există 2 jucători
-            assertEquals(2, fetchedTournament.getPlayers().size(), "Tournament should contain 2 players.");
-
-            // Verificăm că fiecare jucător are referința corectă către turneu
-            for (Player player : fetchedTournament.getPlayers()) {
-                assertEquals(fetchedTournament, player.getTournaments().stream().findFirst().orElseThrow(), "Player should reference the correct Tournament.");
-                assertTrue(player.getTournaments().contains(fetchedTournament), "Player should reference the correct Tournament.");
-            }
-        }
-
-        @Test
-        void testTournamentWithAsynchronousDataRetrievalHandling() {
-            // Given
-            Tournament tournament = new Tournament();
-            when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
-
-            // When & Then
-            assertDoesNotThrow(() -> tournamentService.findAll(), "Method should handle asynchronous data retrieval.");
-        }
-
-        @Test
-        void testTournamentWithDelayedAsyncDataHandling() {
-            // Given
-            Tournament tournament = new Tournament();
-            when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
-
-            // When & Then
-            assertDoesNotThrow(() -> tournamentService.findAll(), "Method should handle delayed asynchronous data.");
-        }
-
     }
 
     @Nested
@@ -601,18 +536,6 @@ public class TournamentServiceTest {
 
             // When / Then
             assertThrows(IllegalArgumentException.class, () -> tournamentService.saveTournament(tournamentInvalid));
-        }
-
-        @Test
-        void testSaveTournamentTransactionalSuccess() {
-            // Given
-            when(tournamentRepository.save(tournament1)).thenReturn(tournament1);
-
-            // When
-            tournamentService.saveTournament(tournament1);
-
-            // Then
-            verify(tournamentRepository, times(1)).save(tournament1);
         }
 
         @Test

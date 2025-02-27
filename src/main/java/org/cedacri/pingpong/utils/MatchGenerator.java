@@ -51,9 +51,7 @@ public class MatchGenerator {
 
                 generateOlympicTournament(tournament);
             }
-            case ROBIN_ROUND -> {
-                generateRobinRoundTournament(tournament);
-            }
+            case ROBIN_ROUND -> generateRobinRoundTournament(tournament);
             default -> {
                 NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
                 log.error("Tournament type {} not supported", tournamentType);
@@ -139,13 +137,12 @@ public class MatchGenerator {
     }
 
     private Match createMatch(int round, int position, Match nextMatch, Tournament tournament) {
-        Match match = Match.builder()
+        return Match.builder()
                 .round(round)
                 .position(position)
                 .nextMatch(nextMatch)
                 .tournament(tournament)
                 .build();
 
-        return match;
     }
 }

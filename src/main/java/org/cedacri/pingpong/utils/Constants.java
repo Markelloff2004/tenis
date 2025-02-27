@@ -32,4 +32,6 @@ public class Constants {
     //Exceptions
     public static final String NOT_ENOUGH_PLAYERS_MESSAGE = "Not enough players!";
     public static final String ROBIN_ROUND_NOT_SUPPORTED = "At moment matches for this type of tournament cannot be generated";
+
+    public static final String TOURNAMENT_CANNOT_BE_NULL = "Tournament cannot be null";
 }

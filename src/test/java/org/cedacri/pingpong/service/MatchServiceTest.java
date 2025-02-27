@@ -146,7 +146,7 @@ class MatchServiceTest {
 
             List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
 
-            assertEquals(result, Collections.emptyList());
+            assertEquals(Collections.emptyList(), result);
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
         }
 
@@ -259,7 +259,7 @@ class MatchServiceTest {
 
             List<Match> matches = matchService.getMatchesByTournament(tournament);
 
-            assertEquals(matches, Collections.emptyList());
+            assertEquals(Collections.emptyList(), matches);
             verify(matchRepository, times(1)).findByTournament(tournament);
         }
 
@@ -426,7 +426,7 @@ class MatchServiceTest {
 
             List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
 
-            assertEquals(matches, Collections.emptyList());
+            assertEquals(Collections.emptyList(), matches);
             verify(matchRepository, times(1)).findByTournament(tournament);
         }
 

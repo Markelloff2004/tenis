@@ -1,7 +1,6 @@
 package org.cedacri.pingpong.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Score;
@@ -12,7 +11,7 @@ import org.cedacri.pingpong.utils.TournamentUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -28,7 +27,7 @@ public class MatchService {
         log.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
 
         if (tournament == null) {
-            throw new IllegalArgumentException("Tournament cannot be null");
+            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
         if (round <= 0 || round == Integer.MAX_VALUE) {
@@ -55,7 +54,7 @@ public class MatchService {
     public List<Match> getMatchesByTournament(Tournament tournament) {
 
         if (tournament == null) {
-            throw new IllegalArgumentException("Tournament cannot be null");
+            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
         log.debug("Fetching matches for tournament: {} ", tournament.getId());
@@ -67,7 +66,7 @@ public class MatchService {
                     .distinct()
                     .sorted(Comparator.comparing(Match::getPosition)
                             .thenComparing(Match::getRound))
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             matches = Collections.emptyList();
         }
@@ -81,7 +80,7 @@ public class MatchService {
         log.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
 
         if (tournament == null) {
-            throw new IllegalArgumentException("Tournament cannot be null");
+            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
         if (playerName == null) {
@@ -89,7 +88,7 @@ public class MatchService {
         }
 
         if (playerSurname == null) {
-            throw new IllegalArgumentException("Tournament cannot be null");
+            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
         List<Match> matchesFromTournament = matchRepository.findByTournament(tournament);
@@ -119,17 +118,6 @@ public class MatchService {
 
         return allMatches;
     }
-
-//    public Optional<Match> getMatchByTournamentRoundAndPosition(Tournament tournament, int round, int position) {
-//        log.debug("Fetching match for tournament: {}, round: {} and position: {}", tournament, round, position);
-//        Optional<Match> match = matchRepository.findByTournamentAndRoundAndPosition(tournament, round, position);
-//        if (match.isPresent()) {
-//            log.info("Match found: {}", match.get());
-//        } else {
-//            log.warn("Match not found!");
-//        }
-//        return match;
-//    }
 
     @Transactional
     public Match saveMatch(Match match) {

@@ -5,7 +5,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
-import org.springframework.security.core.parameters.P;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlayerTest {
+class PlayerTest {
 
     private static Validator validator;
     private Player player;
@@ -48,26 +49,20 @@ public class PlayerTest {
     @DisplayName("Tests for invalid name")
     class InvalidNameTests {
 
-        @Test
-        void testNameTooShort() {
-            player.setName("J");
+        @ParameterizedTest
+        @CsvSource({
+                "'J', 'Name must be between 2 and 50 characters'",
+                "'UvuvwevwevweonyetenvewveugwemubwemvwevweonyetenvewveugwemubwemOssas', 'Name must be between 2 and 50 characters'",
+                " , 'Name cannot be null or blank'"
+        })
+        void testInvalidName(String name, String expectedMessage) {
+            player.setName(name);
 
             Set<ConstraintViolation<Player>> violations = validator.validate(player);
 
             assertFalse(violations.isEmpty());
             assertEquals(1, violations.size());
-            assertEquals("Name must be between 2 and 50 characters", violations.iterator().next().getMessage());
-        }
-
-        @Test
-        void testNameTooLong() {
-            player.setName("UvuvwevwevweonyetenvewveugwemubwemvwevweonyetenvewveugwemubwemOssas");
-
-            Set<ConstraintViolation<Player>> violations = validator.validate(player);
-
-            assertFalse(violations.isEmpty());
-            assertEquals(1, violations.size());
-            assertEquals("Name must be between 2 and 50 characters", violations.iterator().next().getMessage());
+            assertEquals(expectedMessage, violations.iterator().next().getMessage());
         }
 
         @Test
@@ -105,17 +100,6 @@ public class PlayerTest {
 
             assertTrue(errorMessages.contains("Name cannot be null or blank"));
             assertTrue(errorMessages.contains("Name must contain only letters"));
-        }
-
-        @Test
-        void testNameNull() {
-            player.setName(null);
-
-            Set<ConstraintViolation<Player>> violations = validator.validate(player);
-
-            assertFalse(violations.isEmpty());
-            assertEquals(1, violations.size());
-            assertEquals("Name cannot be null or blank", violations.iterator().next().getMessage());
         }
 
         @Test
@@ -202,31 +186,23 @@ public class PlayerTest {
     @DisplayName("Tests for invalid email")
     class InvalidEmailTests {
 
-        @Test
-        void testInvalidEmail() {
-            player.setEmail("invalid-email");
-            Set<ConstraintViolation<Player>> violations = validator.validate(player);
-            assertFalse(violations.isEmpty());
-            assertEquals(1, violations.size());
-            assertEquals("Invalid email format", violations.iterator().next().getMessage());
-        }
+        @ParameterizedTest
+        @CsvSource({
+                "invalid-email, Invalid email format",
+                " '', Email cannot be null or blank",
+                " , Email cannot be null or blank"
+        })
+        void testInvalidEmail(String email, String expectedMessage) {
+            if ("null".equals(email)) {
+                email = null;
+            }
 
-        @Test
-        void testEmailBlank() {
-            player.setEmail("");
+            player.setEmail(email);
             Set<ConstraintViolation<Player>> violations = validator.validate(player);
-            assertFalse(violations.isEmpty());
-            assertEquals(1, violations.size());
-            assertEquals("Email cannot be null or blank", violations.iterator().next().getMessage());
-        }
 
-        @Test
-        void testEmailNull() {
-            player.setEmail(null);
-            Set<ConstraintViolation<Player>> violations = validator.validate(player);
             assertFalse(violations.isEmpty());
             assertEquals(1, violations.size());
-            assertEquals("Email cannot be null or blank", violations.iterator().next().getMessage());
+            assertEquals(expectedMessage, violations.iterator().next().getMessage());
         }
     }
 
@@ -234,31 +210,24 @@ public class PlayerTest {
     @DisplayName("Tests for invalid hand")
     class InvalidHandTests {
 
-        @Test
-        void testInvalidHand() {
-            player.setHand("RightHand");
-            Set<ConstraintViolation<Player>> violations = validator.validate(player);
-            assertFalse(violations.isEmpty());
-            assertEquals(1, violations.size());
-            assertEquals("Hand must be either 'RIGHT' or 'LEFT'", violations.iterator().next().getMessage());
-        }
+        @ParameterizedTest
+        @CsvSource({
+                "'RightHand', Hand must be either 'RIGHT' or 'LEFT'",
+                "'', Hand must be either 'RIGHT' or 'LEFT'",
+                "null, Select a hand playing style"
+        })
+        void testHandValidation(String hand, String expectedMessage) {
+            if ("null".equals(hand)) {
+                player.setHand(null);
+            } else {
+                player.setHand(hand);
+            }
 
-        @Test
-        void testNullHand() {
-            player.setHand(null);
             Set<ConstraintViolation<Player>> violations = validator.validate(player);
-            assertFalse(violations.isEmpty());
-            assertEquals(1, violations.size());
-            assertEquals("Select a hand playing style", violations.iterator().next().getMessage());
-        }
 
-        @Test
-        void testBlankHand() {
-            player.setHand("");
-            Set<ConstraintViolation<Player>> violations = validator.validate(player);
             assertFalse(violations.isEmpty());
             assertEquals(1, violations.size());
-            assertEquals("Hand must be either 'RIGHT' or 'LEFT'", violations.iterator().next().getMessage());
+            assertEquals(expectedMessage, violations.iterator().next().getMessage());
         }
     }
 

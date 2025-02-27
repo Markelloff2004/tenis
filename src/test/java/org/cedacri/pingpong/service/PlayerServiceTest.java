@@ -4,7 +4,6 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,12 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.slf4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlayerServiceTest {
 
@@ -132,7 +129,7 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertEquals(2, result.size());
             assertEquals(players, result);
         }
@@ -141,7 +138,7 @@ public class PlayerServiceTest {
         void testGetAll_noPlayers() {
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertTrue(result.isEmpty());
         }
 
@@ -154,7 +151,7 @@ public class PlayerServiceTest {
             when(playerRepository.findAll()).thenReturn(players);
 
             long startTime = System.nanoTime();
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             long duration = System.nanoTime() - startTime;
 
             assertEquals(10000, result.size());
@@ -165,9 +162,9 @@ public class PlayerServiceTest {
         void testGetAll_nullPlayersList() {
             when(playerRepository.findAll()).thenReturn(null);
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
 
-            assertEquals(result, Collections.emptyList());
+            assertEquals(Collections.emptyList(), result);
         }
 
         @Test
@@ -178,7 +175,7 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(playerWithEmptyCollection);
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertNotNull(result);
             assertEquals(1, result.size());
             assertTrue(result.get(0).getTournaments().isEmpty());
@@ -189,7 +186,7 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            Runnable task = () -> playerService.getAll().collect(Collectors.toList());
+            Runnable task = () -> playerService.getAll().toList();
 
             Thread thread1 = new Thread(task);
             Thread thread2 = new Thread(task);
@@ -208,7 +205,7 @@ public class PlayerServiceTest {
             Player player2 = new Player();
             when(playerRepository.findAll()).thenReturn(Arrays.asList(player1, player1, player2));
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
 
             assertEquals(3, result.size());
             assertTrue(result.contains(player1));
@@ -220,12 +217,12 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            playerService.getAll().collect(Collectors.toList());
+            playerService.getAll().toList();
 
             playerRepository.deleteAll();
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertTrue(result.isEmpty());
         }
     }

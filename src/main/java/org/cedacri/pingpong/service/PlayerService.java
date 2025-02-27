@@ -40,16 +40,6 @@ public class PlayerService {
                 });
     }
 
-//    public Stream<Player> list(long page) {
-//        log.info("Fetching list of players for page {}", page);
-//
-//        Pageable pageable = PageRequest.of((int) page, Constants.PAGE_SIZE);
-//
-//        Page<Player> playerPage = playerRepository.findAll(pageable);
-//
-//        return playerPage.stream();
-//    }
-
     public Stream<Player> getAll() {
         log.info("Fetching list of players");
 
@@ -70,11 +60,10 @@ public class PlayerService {
             throw new IllegalArgumentException("Player cannot be null");
         }
 
-        if (player.getId() != null) {
-            if (playerRepository.findById(player.getId()).isEmpty()) {
+        if (player.getId() != null && playerRepository.findById(player.getId()).isEmpty()) {
                 throw new IllegalArgumentException("Cannot update non-existing player with ID: " + player.getId());
             }
-        }
+
 
         Player savedPlayer = playerRepository.save(player);
 
@@ -99,10 +88,4 @@ public class PlayerService {
             throw new IllegalArgumentException("Player Id cannot be null");
         }
     }
-
-//    public Set<Player> getAvailablePlayersForTournament(Tournament tournament) {
-//        return playerRepository.findAll().stream()
-//                .filter(p -> !p.getTournaments().contains(tournament))
-//                .collect(Collectors.toSet());
-//    }
 }
