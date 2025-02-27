@@ -39,23 +39,45 @@ public class TournamentService {
     }
 
     public Tournament find(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Tournament ID cannot be null");
+        } else if (id <= 0) {
+            throw new IllegalArgumentException("Tournament ID cannot be 0 (zero) or bellow");
+        }
+
         Tournament tournament = tournamentRepository.findById(id).orElseThrow();
+
         Hibernate.initialize(tournament.getPlayers());
         return tournament;
     }
 
     @Transactional
     public void saveTournament(Tournament tournament) {
+        if (tournament == null) {
+            throw new IllegalArgumentException("Tournament cannot be null");
+        }
         tournamentRepository.save(tournament);
     }
 
     @Transactional
     public void deleteById(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Tournament ID cannot be null");
+        }
         Tournament tournamentToDelete = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
 
         tournamentToDelete.getPlayers().forEach(player -> player.getTournaments().remove(tournamentToDelete));
         tournamentRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Tournament updateTournament(Tournament tournament, String name, TournamentTypeEnum tournamentType,
+                                       SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin,
+                                       Set<Player> players, boolean startNow) throws NotEnoughPlayersException {
+        Tournament managedTournament = find(tournament.getId());
+        setTournamentParams(managedTournament, name, tournamentType, setsToWin, semiSetsToWin, finalSetsToWin, players);
+        return saveTournamentWithPlayers(managedTournament, new ArrayList<>(players), startNow);
     }
 
     @Transactional
@@ -101,27 +123,6 @@ public class TournamentService {
         }
 
         return savedTournament;
-    }
-
-    @Transactional
-    public Stream<Tournament> findTournamentsByStatus(TournamentStatusEnum status) {
-        List<Tournament> tournaments = tournamentRepository.findAll();
-        return tournaments.stream()
-                .filter(tournament -> tournament.getTournamentStatus().equals(status))
-                .sorted(Comparator.comparing(Tournament::getCreatedAt).reversed());
-    }
-
-    public Player getTournamentWinner(Tournament tournament) {
-        return tournament.getWinner();
-    }
-
-    @Transactional
-    public Tournament updateTournament(Tournament tournament, String name, TournamentTypeEnum tournamentType,
-                                       SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin,
-                                       Set<Player> players, boolean startNow) throws NotEnoughPlayersException {
-        Tournament managedTournament = find(tournament.getId());
-        setTournamentParams(managedTournament, name, tournamentType, setsToWin, semiSetsToWin, finalSetsToWin, players);
-        return saveTournamentWithPlayers(managedTournament, new ArrayList<>(players), startNow);
     }
 
     private void setTournamentParams(Tournament tournament, String name, TournamentTypeEnum tournamentType, SetTypesEnum setsToWin, SetTypesEnum semiSetsToWin, SetTypesEnum finalSetsToWin, Set<Player> players) {
