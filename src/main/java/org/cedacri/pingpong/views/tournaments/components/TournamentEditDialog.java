@@ -10,12 +10,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constants;
-import org.cedacri.pingpong.utils.ExceptionUtils;
-import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.ViewUtils;
+import org.cedacri.pingpong.utils.*;
 
 import java.util.HashSet;
 
@@ -23,7 +21,6 @@ import java.util.HashSet;
 public class TournamentEditDialog extends AbstractTournamentDialog {
 
     private final TournamentService tournamentService;
-    private final PlayerService playerService;
     private final Runnable onSaveCallback;
     private Tournament tournament;
 
@@ -34,7 +31,6 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         super("Edit Tournament");
 
         this.tournamentService = tournamentService;
-        this.playerService = playerService;
         this.tournament = tournament;
         this.onSaveCallback = onSaveCallback;
         this.selectedPlayersSet = tournament.getPlayers();
@@ -92,36 +88,50 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
     protected void onSave() {
         log.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
 
+        boolean startNow;
         try {
-            boolean startNow = startNowCheckbox.getValue();
+            startNow = startNowCheckbox.getValue();
 
-            tournament = tournamentService.updateTournament(
-                    tournament,
-                    tournamentNameField.getValue(),
-                    typeComboBox.getValue(),
-                    setsCountComboBox.getValue(),
-                    semifinalsSetsCountComboBox.getValue(),
-                    finalsSetsCountComboBox.getValue(),
-                    selectedPlayersSet,
-                    startNow
-            );
+            tournament.setTournamentName(tournamentNameField.getValue());
+            tournament.setTournamentType(typeComboBox.getValue());
+            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournament.setSetsToWin(setsCountComboBox.getValue());
+            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
+            tournament.setPlayers(selectedPlayersSet);
+            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournament));
 
-            if(startNow) {
-                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
-            }
+        } catch (Exception e) {
+            log.error("Error fetching data from Vaadin Components for saving tournament: {}", e.getMessage(), e);
+            NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+
+            return;
+        }
+
+        try {
+            tournament = tournamentService.saveTournament(tournament);
 
             log.info("Tournament saved successfully: {}", tournament.getId());
-            onSaveCallback.run();
             NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + illegalArgumentException.getMessage());
 
-            if (startNow) {
-                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
-            }
-
-            close();
-        } catch (Exception e) {
-            log.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            return;
         }
+
+        if (startNow) {
+            try {
+                tournamentService.startTournament(tournament);
+
+                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
+
+                NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
+            } catch (NotEnoughPlayersException notEnoughPlayersException) {
+                NotificationManager.showErrorNotification(Constants.TOURNAMENT_START_ERROR + " " + notEnoughPlayersException.getMessage());
+            }
+        }
+
+        onSaveCallback.run();
+        close();
     }
 }

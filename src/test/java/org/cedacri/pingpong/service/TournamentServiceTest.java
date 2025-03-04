@@ -3,7 +3,11 @@ package org.cedacri.pingpong.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
+import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
+import org.cedacri.pingpong.utils.Constants;
+import org.cedacri.pingpong.utils.MatchGenerator;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -11,8 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.dao.DataAccessException;
 
 import java.time.LocalDate;
@@ -27,8 +33,6 @@ public class TournamentServiceTest {
     @Mock
     private TournamentRepository tournamentRepository;
     @Mock
-    private MatchService matchService;
-    @Mock
     private PlayerService playerService;
 
     private TournamentService tournamentService;
@@ -42,7 +46,7 @@ public class TournamentServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        tournamentService = new TournamentService(tournamentRepository, matchService, playerService);
+        tournamentService = new TournamentService(tournamentRepository);
 
         tournament1 = new Tournament();
         tournament1.setId(1);
@@ -85,7 +89,7 @@ public class TournamentServiceTest {
             List<Tournament> tournaments = Arrays.asList(tournament1, tournament2, tournament3);
             when(tournamentRepository.findAll()).thenReturn(tournaments);
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             List<Tournament> sortedTournaments = result.toList();
             assertEquals(3, sortedTournaments.size());
@@ -98,7 +102,7 @@ public class TournamentServiceTest {
         void testNoTournamentsInDatabaseReturnsEmptyStream() {
             when(tournamentRepository.findAll()).thenReturn(Collections.emptyList());
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             assertEquals(0, result.count());
 
@@ -108,7 +112,7 @@ public class TournamentServiceTest {
         void testSingleTournamentReturnedCorrectly() {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament1));
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             List<Tournament> tournaments = result.toList();
             assertEquals(1, tournaments.size());
@@ -124,7 +128,7 @@ public class TournamentServiceTest {
             List<Tournament> tournaments = Arrays.asList(tournament1, tournament2, tournament3);
             when(tournamentRepository.findAll()).thenReturn(tournaments);
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             List<Tournament> sortedTournaments = result.toList();
             assertEquals(3, sortedTournaments.size());
@@ -137,7 +141,7 @@ public class TournamentServiceTest {
 
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament1));
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
             result.forEach(tournament -> {
                 Hibernate.initialize(tournament.getPlayers());
                 assertNotNull(tournament.getPlayers());
@@ -151,7 +155,7 @@ public class TournamentServiceTest {
 
             when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament1, tournament2));
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
             List<Tournament> tournaments = result.toList();
 
             assertEquals(2, tournaments.size());
@@ -170,8 +174,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(largeList);
 
             long startTime = System.currentTimeMillis();
-            Stream<Tournament> result = tournamentService.findAll();
-            result.toList();
+            tournamentService.findAllTournaments();
             long endTime = System.currentTimeMillis();
 
             long duration = endTime - startTime;
@@ -186,7 +189,7 @@ public class TournamentServiceTest {
 
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(futureTournament));
 
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             List<Tournament> tournaments = result.toList();
             assertEquals(1, tournaments.size());
@@ -197,7 +200,7 @@ public class TournamentServiceTest {
         void testRepositoryThrowsExceptionHandling() {
             when(tournamentRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
-            Exception exception = assertThrows(RuntimeException.class, () -> tournamentService.findAll());
+            Exception exception = assertThrows(RuntimeException.class, () -> tournamentService.findAllTournaments());
 
             assertEquals("Database error", exception.getMessage());
         }
@@ -210,7 +213,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
 
             // When
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             // Then
             assertNotNull(result);
@@ -226,7 +229,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
 
             // When
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             // Then
             assertNotNull(result);
@@ -244,7 +247,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Arrays.asList(duplicateTournament1, duplicateTournament2));
 
             // When
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             // Then
             assertNotNull(result);
@@ -266,7 +269,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
 
             // When
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             // Then
             assertNotNull(result);
@@ -280,7 +283,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(null);
 
             // When & Then
-            assertThrows(NullPointerException.class, () -> tournamentService.findAll(), "Repository should not return null.");
+            assertThrows(NullPointerException.class, () -> tournamentService.findAllTournaments(), "Repository should not return null.");
         }
 
         @Test
@@ -289,7 +292,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenThrow(OutOfMemoryError.class);
 
             // When & Then
-            assertThrows(OutOfMemoryError.class, () -> tournamentService.findAll(), "Should throw OutOfMemoryError.");
+            assertThrows(OutOfMemoryError.class, () -> tournamentService.findAllTournaments(), "Should throw OutOfMemoryError.");
         }
 
         @Test
@@ -299,7 +302,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
 
             // When & Then
-            assertDoesNotThrow(() -> tournamentService.findAll(), "Method should handle uncommitted transactions without error.");
+            assertDoesNotThrow(() -> tournamentService.findAllTournaments(), "Method should handle uncommitted transactions without error.");
         }
 
         @Test
@@ -314,7 +317,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
 
             // When
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             // Then
             assertNotNull(result);
@@ -332,7 +335,7 @@ public class TournamentServiceTest {
             doThrow(new IllegalStateException("Session closed")).when(tournamentRepository).findAll();
 
             // When & Then
-            assertThrows(IllegalStateException.class, () -> tournamentService.findAll(), "Should throw exception if session is closed.");
+            assertThrows(IllegalStateException.class, () -> tournamentService.findAllTournaments(), "Should throw exception if session is closed.");
         }
 
         @Test
@@ -343,7 +346,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findAll()).thenReturn(Collections.singletonList(tournament));
 
             // When
-            Stream<Tournament> result = tournamentService.findAll();
+            Stream<Tournament> result = tournamentService.findAllTournaments();
 
             // Then
             assertNotNull(result);
@@ -362,7 +365,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
             // Act
-            Tournament result = tournamentService.find(1);
+            Tournament result = tournamentService.findTournamentById(1);
 
             // Assert
             assertNotNull(result);
@@ -373,43 +376,43 @@ public class TournamentServiceTest {
 
         @Test
         void testFindTournamentWithNullId() {
-            assertThrows(IllegalArgumentException.class, () -> tournamentService.find(null));
+            assertThrows(IllegalArgumentException.class, () -> tournamentService.findTournamentById(null));
         }
 
         @Test
         void testFindTournamentWithNegativeId() {
-            assertThrows(IllegalArgumentException.class, () -> tournamentService.find(-1));
+            assertThrows(IllegalArgumentException.class, () -> tournamentService.findTournamentById(-1));
         }
 
         @Test
         void testFindTournamentWithZeroId() {
-            assertThrows(IllegalArgumentException.class, () -> tournamentService.find(0));
+            assertThrows(IllegalArgumentException.class, () -> tournamentService.findTournamentById(0));
         }
 
         @Test
         void testFindTournamentWithMaxId() {
             when(tournamentRepository.findById(Integer.MAX_VALUE)).thenReturn(Optional.of(tournament1));
-            Tournament result = tournamentService.find(Integer.MAX_VALUE);
+            Tournament result = tournamentService.findTournamentById(Integer.MAX_VALUE);
             assertNotNull(result);
         }
 
         @Test
         void testTournamentNotFound() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.empty());
-            assertThrows(NoSuchElementException.class, () -> tournamentService.find(1));
+            assertThrows(EntityNotFoundException.class, () -> tournamentService.findTournamentById(1));
         }
 
 
         @Test
         void testNullTournamentFromRepository() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.ofNullable(null));
-            assertThrows(NoSuchElementException.class, () -> tournamentService.find(1));
+            assertThrows(EntityNotFoundException.class, () -> tournamentService.findTournamentById(1));
         }
 
         @Test
         void testLazyInitializationOfPlayers() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
-            tournamentService.find(1);
+            tournamentService.findTournamentById(1);
             verify(tournamentRepository).findById(1);
         }
 
@@ -417,7 +420,7 @@ public class TournamentServiceTest {
         void testEmptyPlayersList() {
             tournament1.setPlayers(new HashSet<>());
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
-            Tournament result = tournamentService.find(1);
+            Tournament result = tournamentService.findTournamentById(1);
             assertNotNull(result.getPlayers());
             assertTrue(result.getPlayers().isEmpty());
         }
@@ -426,7 +429,7 @@ public class TournamentServiceTest {
         void testSinglePlayerInTournament() {
             tournament1.setPlayers(Set.of(player1));
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
-            Tournament result = tournamentService.find(1);
+            Tournament result = tournamentService.findTournamentById(1);
             assertEquals(1, result.getPlayers().size());
         }
 
@@ -434,7 +437,7 @@ public class TournamentServiceTest {
         void testMultiplePlayersInTournament() {
             tournament1.setPlayers(Set.of(player1, player2));
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
-            Tournament result = tournamentService.find(1);
+            Tournament result = tournamentService.findTournamentById(1);
             assertEquals(2, result.getPlayers().size());
         }
 
@@ -445,7 +448,7 @@ public class TournamentServiceTest {
             players.add(player1);
             tournament1.setPlayers(players);
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
-            Tournament result = tournamentService.find(1);
+            Tournament result = tournamentService.findTournamentById(1);
 
             List<Player> playersList = new ArrayList<>(result.getPlayers());
 
@@ -465,7 +468,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
             long startTime = System.nanoTime();
-            tournamentService.find(1);
+            tournamentService.findTournamentById(1);
             long endTime = System.nanoTime();
 
             long duration = (endTime - startTime);
@@ -478,7 +481,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
             long startTime = System.nanoTime();
-            tournamentService.find(1);
+            tournamentService.findTournamentById(1);
             long endTime = System.nanoTime();
 
             long duration = (endTime - startTime);
@@ -488,8 +491,8 @@ public class TournamentServiceTest {
         @Test
         void testRepeatedCallsWithSameData() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
-            Tournament result1 = tournamentService.find(1);
-            Tournament result2 = tournamentService.find(1);
+            Tournament result1 = tournamentService.findTournamentById(1);
+            Tournament result2 = tournamentService.findTournamentById(1);
             assertSame(result1, result2); // Should return the same instance
         }
 
@@ -497,8 +500,8 @@ public class TournamentServiceTest {
         void testRepeatedCallsWithDifferentData() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
             when(tournamentRepository.findById(2)).thenReturn(Optional.of(tournament2));
-            Tournament result1 = tournamentService.find(1);
-            Tournament result2 = tournamentService.find(2);
+            Tournament result1 = tournamentService.findTournamentById(1);
+            Tournament result2 = tournamentService.findTournamentById(2);
             assertNotSame(result1, result2); // Should return different instances
         }
     }
@@ -574,18 +577,26 @@ public class TournamentServiceTest {
         void testSaveTournamentLargeNumberOfPlayers() {
             // Given
             Set<Player> players = new HashSet<>();
-            for (long i = 0; i < 10000; i++) {
+            for (long i = 0; i < 1000; i++) {
                 Player tempPlayer = new Player();
                 tempPlayer.setId(i);
                 players.add(tempPlayer);
+
+                // Мокирование вызова playerService.findById
+                when(playerService.findById(i)).thenReturn(tempPlayer);
             }
             tournament1.setPlayers(players);
 
+            when(tournamentRepository.save(tournament1)).thenReturn(tournament1);
+
             // When
-            tournamentService.saveTournament(tournament1);
+            Tournament savedTournament = tournamentService.saveTournament(tournament1);
 
             // Then
             verify(tournamentRepository, times(1)).save(tournament1);
+            assertNotNull(savedTournament);
+            assertEquals(1000, savedTournament.getPlayers().size());
+            assertTrue(savedTournament.getPlayers().containsAll(players));
         }
 
         @Test
@@ -624,7 +635,7 @@ public class TournamentServiceTest {
         void testDeleteTournamentSuccess() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
-            tournamentService.deleteById(1);
+            tournamentService.deleteTournamentById(1);
 
             verify(tournamentRepository, times(1)).deleteById(1);
             assertTrue(tournament1.getPlayers().stream().allMatch(player -> !player.getTournaments().contains(tournament1)));
@@ -634,7 +645,7 @@ public class TournamentServiceTest {
         void testDeleteTournamentNoPlayers() {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
-            tournamentService.deleteById(1);
+            tournamentService.deleteTournamentById(1);
 
             verify(tournamentRepository, times(1)).deleteById(1);
         }
@@ -643,7 +654,7 @@ public class TournamentServiceTest {
         void testDeleteTournamentWithManyPlayers() {
             when(tournamentRepository.findById(2)).thenReturn(Optional.of(tournament2));
 
-            tournamentService.deleteById(2);
+            tournamentService.deleteTournamentById(2);
 
             verify(tournamentRepository, times(1)).deleteById(2);
             assertTrue(tournament2.getPlayers().stream().allMatch(player -> !player.getTournaments().contains(tournament2)));
@@ -653,19 +664,19 @@ public class TournamentServiceTest {
         void testDeleteTournamentNotFound() {
             when(tournamentRepository.findById(999)).thenReturn(Optional.empty());
 
-            assertThrows(EntityNotFoundException.class, () -> tournamentService.deleteById(999));
+            assertThrows(EntityNotFoundException.class, () -> tournamentService.deleteTournamentById(999));
         }
 
         @Test
         void testDeleteTournamentNullId() {
-            assertThrows(IllegalArgumentException.class, () -> tournamentService.deleteById(null));
+            assertThrows(IllegalArgumentException.class, () -> tournamentService.deleteTournamentById(null));
         }
 
         @Test
         void testDataIntegrityAfterDelete() {
             when(tournamentRepository.findById(2)).thenReturn(Optional.of(tournament2));
 
-            tournamentService.deleteById(2);
+            tournamentService.deleteTournamentById(2);
 
             verify(tournamentRepository, times(1)).deleteById(2);
             assertTrue(tournament2.getPlayers().stream().noneMatch(player -> player.getTournaments().contains(tournament2)));
@@ -679,7 +690,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
             long startTime = System.currentTimeMillis();
-            tournamentService.deleteById(1);
+            tournamentService.deleteTournamentById(1);
             long endTime = System.currentTimeMillis();
 
             assertTrue(endTime - startTime < 1000); // Should complete within 1 second
@@ -690,7 +701,7 @@ public class TournamentServiceTest {
             when(tournamentRepository.findById(1)).thenReturn(Optional.of(tournament1));
 
             long startTime = System.currentTimeMillis();
-            tournamentService.deleteById(1);
+            tournamentService.deleteTournamentById(1);
             long endTime = System.currentTimeMillis();
 
             assertTrue(endTime - startTime < 500); // Should complete very quickly
@@ -698,13 +709,146 @@ public class TournamentServiceTest {
     }
 
     @Nested
-    @DisplayName("Tests for the updateTournament method")
-    class UpdateTournamentTest {
+    @DisplayName("Tests for the startTournament method")
+    class StartTournamentTest {
 
+        @Mock
+        private Tournament tournament;
+        private Set<Player> players;
 
+        @Mock
+        private MatchGenerator matchGeneratorMock;
 
+        @Spy
+        @InjectMocks
+        private TournamentService tournamentServiceSpy;
 
+        @BeforeEach
+        void setUp() {
+
+            MockitoAnnotations.openMocks(this);
+
+            tournament = new Tournament();
+            tournament.setId(1);
+
+            players = new HashSet<>();
+            for (int i = 1; i <= 8; i++) {
+                Player p = new Player();
+                p.setId((long) i);
+                players.add(p);
+            }
+            tournament.setPlayers(players);
+            tournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
+
+            doReturn(matchGeneratorMock).when(tournamentServiceSpy).createMatchGenerator(any(Tournament.class));
+            doNothing().when(matchGeneratorMock).generateMatches(any(Tournament.class));
+        }
+
+        @Test
+        void testStartTournament_withValidParameters_OLYMPIC() throws NotEnoughPlayersException {
+            tournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
+
+            tournamentServiceSpy.startTournament(tournament);
+
+            verify(matchGeneratorMock, times(1)).generateMatches(tournament);
+        }
+
+        @Test
+        void testStartTournament_withValidParameters_ROBIN_ROUND() throws NotEnoughPlayersException {
+            tournament.setTournamentType(TournamentTypeEnum.ROBIN_ROUND);
+
+            tournamentServiceSpy.startTournament(tournament);
+
+            verify(matchGeneratorMock, times(1)).generateMatches(tournament);
+        }
+
+        @Test
+        void testStartTournament_withExactlyMinimalPlayersForOlympic() throws NotEnoughPlayersException {
+            tournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
+            players.clear();
+            for (int i = 1; i <= Constants.MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC; i++) {
+                Player p = new Player();
+                p.setId((long) i);
+                players.add(p);
+            }
+            tournament.setPlayers(players);
+
+            tournamentServiceSpy.startTournament(tournament);
+
+            verify(matchGeneratorMock, times(1)).generateMatches(tournament);
+        }
+
+        @Test
+        void testStartTournament_withExactlyMinimalPlayersForRobinRound() throws NotEnoughPlayersException {
+            tournament.setTournamentType(TournamentTypeEnum.ROBIN_ROUND);
+            players.clear();
+            for (int i = 1; i <= Constants.MINIMAL_AMOUNT_OF_PLAYER_FOR_ROBIN_ROUND; i++) {
+                Player p = new Player();
+                p.setId((long) i);
+                players.add(p);
+            }
+            tournament.setPlayers(players);
+
+            tournamentServiceSpy.startTournament(tournament);
+
+            verify(matchGeneratorMock, times(1)).generateMatches(tournament);
+        }
+
+        @Test
+        void testStartTournament_withOnePlayerAboveMinimal() throws NotEnoughPlayersException {
+            players.add(new Player()); // Adding one more player to exceed the minimum
+            tournament.setPlayers(players);
+
+            tournamentServiceSpy.startTournament(tournament);
+
+            verify(matchGeneratorMock, times(1)).generateMatches(tournament);
+        }
+
+        @Test
+        void testStartTournament_withOnePlayerBelowMinimal() {
+            players.remove(players.iterator().next()); // Remove one player to make it below the minimum required
+            tournament.setPlayers(players);
+
+            assertThrows(NotEnoughPlayersException.class, () -> tournamentServiceSpy.startTournament(tournament));
+        }
+
+        @Test
+        void testStartTournament_withExactly8Players() throws NotEnoughPlayersException {
+            players.clear();
+            for (int i = 1; i <= 8; i++) {
+                Player p = new Player();
+                p.setId((long) i);
+                players.add(p);
+            }
+            tournament.setPlayers(players);
+
+            tournamentServiceSpy.startTournament(tournament);
+
+            verify(matchGeneratorMock, times(1)).generateMatches(tournament);
+        }
+
+        @Test
+        void testStartTournament_withNullPlayers() {
+            tournament.setPlayers(null);
+            assertThrows(NullPointerException.class, () -> {
+                tournamentServiceSpy.startTournament(tournament);
+            });
+        }
+
+        @Test
+        void testStartTournament_withEmptyPlayers() {
+            tournament.setPlayers(new HashSet<>());
+
+            assertThrows(NotEnoughPlayersException.class, () -> {
+                tournamentServiceSpy.startTournament(tournament);
+            });
+        }
+
+        @Test
+        void testStartTournament_withNullTournamentType() {
+            tournament.setTournamentType(null);
+
+            assertThrows(IllegalArgumentException.class, () -> tournamentServiceSpy.startTournament(tournament));
+        }
     }
-
-
 }

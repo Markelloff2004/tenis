@@ -36,14 +36,12 @@ public class MatchService {
 
         List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round);
 
-        if(matches != null)
-        {
+        if (matches != null) {
             matches = matches
                     .stream()
                     .distinct()
                     .sorted(Comparator.comparing(Match::getPosition)).toList();
-        } else
-        {
+        } else {
             matches = Collections.emptyList();
         }
 
@@ -60,7 +58,7 @@ public class MatchService {
         log.debug("Fetching matches for tournament: {} ", tournament.getId());
         List<Match> matches = matchRepository.findByTournament(tournament);
 
-        if(matches != null) {
+        if (matches != null) {
             matches = matches
                     .stream()
                     .distinct()
@@ -93,8 +91,7 @@ public class MatchService {
 
         List<Match> matchesFromTournament = matchRepository.findByTournament(tournament);
 
-        if(matchesFromTournament == null || matchesFromTournament.isEmpty())
-        {
+        if (matchesFromTournament == null || matchesFromTournament.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -127,13 +124,8 @@ public class MatchService {
             throw new IllegalArgumentException("Cannot save a null Match");
         }
 
-        Match savedMatch = matchRepository.save(match);
+        return matchRepository.save(match);
 
-        if (savedMatch == null) {
-            throw new IllegalStateException("Match repository returned null, save operation failed.");
-        }
-
-        return savedMatch;
     }
 
     @Transactional
@@ -157,13 +149,10 @@ public class MatchService {
     public String validateAndUpdateScores(Match match, List<Score> newMatchScores) {
 
         if (match == null) {
-            throw new IllegalArgumentException("Match cannot be null");
+            throw new IllegalArgumentException("Match cannot be null.");
         }
-        if (newMatchScores == null) {
-            throw new IllegalArgumentException("Score list cannot be null");
-        }
-        if (newMatchScores.isEmpty()) {
-            throw new IllegalArgumentException("No scores provided to update.");
+        if (newMatchScores == null || newMatchScores.isEmpty()) {
+            throw new IllegalArgumentException("Invalid score list: must not be null or empty.");
         }
 
         StringBuilder infoMessage = new StringBuilder();
@@ -178,15 +167,14 @@ public class MatchService {
             }
         }
 
-        if (!validScores.isEmpty()) {
-            match.setScore(validScores);
-            this.saveMatch(match);
-
-            TournamentUtils.determinateWinner(match);
-            this.saveMatch(match);
-        } else {
+        if (validScores.isEmpty()) {
             throw new IllegalArgumentException("No valid scores provided to update.");
         }
+
+        match.setScore(validScores);
+        TournamentUtils.determinateWinner(match);
+
+        matchRepository.saveAndFlush(match); //throws IllegalArgumentException
 
         return infoMessage.toString();
     }

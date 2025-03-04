@@ -65,7 +65,7 @@ public class Player {
     @NotNull(message = "Select a hand playing style")
 //    @Column(name = "hand", length = 5)
     @Column(name = "hand")
-    @Pattern(regexp = "^(RIGHT|LEFT)$", message = "Hand must be either 'RIGHT' or 'LEFT'")
+    @Pattern(regexp = "^(?i)(RIGHT|LEFT)$", message = "Hand must be either 'RIGHT' or 'LEFT'")
     private String hand;
 
     @Min(value = 0, message = "Won matches cannot be negative")
@@ -84,7 +84,7 @@ public class Player {
     @Column(name = "goals_lost", nullable = false, columnDefinition = "int default 0")
     private Integer goalsLost = 0;
 
-    @ManyToMany(mappedBy = "players", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Tournament> tournaments = new HashSet<>();
 
     public Player(String name, String surname, String address, String email, String hand) {

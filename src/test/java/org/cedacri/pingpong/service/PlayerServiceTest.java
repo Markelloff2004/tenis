@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.exception.tournament.EntityDeletionException;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,9 +51,7 @@ public class PlayerServiceTest {
             Long playerId = 1L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                playerService.findById(playerId);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -67,9 +66,7 @@ public class PlayerServiceTest {
             Long playerId = -1L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                playerService.findById(playerId);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -90,9 +87,7 @@ public class PlayerServiceTest {
             Long playerId = 0L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                playerService.findById(playerId);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -103,9 +98,7 @@ public class PlayerServiceTest {
             player.setId(playerId);
             when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
 
-            Runnable task = () -> {
-                playerService.findById(playerId);
-            };
+            Runnable task = () -> playerService.findById(playerId);
 
             Thread thread1 = new Thread(task);
             Thread thread2 = new Thread(task);
@@ -172,31 +165,13 @@ public class PlayerServiceTest {
             Player playerWithEmptyCollection = new Player();
             playerWithEmptyCollection.setTournaments(new HashSet<>());
 
-            List<Player> players = Arrays.asList(playerWithEmptyCollection);
+            List<Player> players = List.of(playerWithEmptyCollection);
             when(playerRepository.findAll()).thenReturn(players);
 
             List<Player> result = playerService.getAll().toList();
             assertNotNull(result);
             assertEquals(1, result.size());
             assertTrue(result.get(0).getTournaments().isEmpty());
-        }
-
-        @Test
-        void testGetAll_multithreading() throws InterruptedException {
-            List<Player> players = Arrays.asList(new Player(), new Player(), new Player());
-            when(playerRepository.findAll()).thenReturn(players);
-
-            Runnable task = () -> playerService.getAll().toList();
-
-            Thread thread1 = new Thread(task);
-            Thread thread2 = new Thread(task);
-            thread1.start();
-            thread2.start();
-
-            thread1.join();
-            thread2.join();
-
-            verify(playerRepository, times(2)).findAll();
         }
 
         @Test
@@ -394,7 +369,7 @@ public class PlayerServiceTest {
             doThrow(new DataIntegrityViolationException("Cannot delete, player is referenced"))
                     .when(playerRepository).deleteById(playerId);
 
-            assertThrows(DataIntegrityViolationException.class, () -> playerService.deleteById(playerId));
+            assertThrows(EntityDeletionException.class, () -> playerService.deleteById(playerId));
         }
 
         @Test

@@ -7,12 +7,11 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constants;
-import org.cedacri.pingpong.utils.ExceptionUtils;
-import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.ViewUtils;
+import org.cedacri.pingpong.utils.*;
 
 import java.util.HashSet;
 
@@ -22,8 +21,6 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
     private final TournamentService tournamentService;
     private final Runnable onSaveCallback;
-
-    private Tournament tournament = new Tournament();
 
     private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
@@ -55,31 +52,53 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
     @Override
     protected void onSave() {
+
+        Tournament tournament = new Tournament();
+        boolean startNow;
         try {
-            boolean startNow = startNowCheckbox.getValue();
+            startNow = startNowCheckbox.getValue();
 
-            tournament = tournamentService.createAndSaveTournament(
-                    tournamentNameField.getValue(),
-                    typeComboBox.getValue(),
-                    setsCountComboBox.getValue(),
-                    semifinalsSetsCountComboBox.getValue(),
-                    finalsSetsCountComboBox.getValue(),
-                    selectedPlayersSet,
-                    startNow
-            );
+            tournament.setTournamentName(tournamentNameField.getValue());
+            tournament.setTournamentType(typeComboBox.getValue());
+            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournament.setSetsToWin(setsCountComboBox.getValue());
+            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
+            tournament.setPlayers(selectedPlayersSet);
+            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournament));
 
-            if (startNow) {
-                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
-            }
+        } catch (Exception e) {
+            log.error("Error fetching data from Vaadin Components for saving tournament: {}", e.getMessage(), e);
+            NotificationManager.showErrorNotification(Constants.TOURNAMENT_SAVE_ERROR + ExceptionUtils.getExceptionMessage(e));
+
+            return;
+        }
+
+        try {
+            tournament = tournamentService.saveTournament(tournament);
 
             log.info("Tournament saved successfully: {}", tournament.getId());
+            NotificationManager.showInfoNotification(Constants.TOURNAMENT_SAVE_SUCCESS_MESSAGE);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            NotificationManager.showErrorNotification(Constants.TOURNAMENT_SAVE_ERROR + illegalArgumentException.getMessage());
 
-            onSaveCallback.run();
-            close();
-            NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
-        } catch (Exception e) {
-            log.error("Error saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            return;
         }
+
+        if (startNow) {
+            try {
+                tournamentService.startTournament(tournament);
+
+                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
+
+                NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
+            } catch (NotEnoughPlayersException notEnoughPlayersException) {
+                NotificationManager.showErrorNotification(Constants.TOURNAMENT_START_ERROR + " " + notEnoughPlayersException.getMessage());
+            }
+        }
+
+        onSaveCallback.run();
+        close();
+
     }
 }

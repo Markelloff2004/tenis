@@ -511,19 +511,6 @@ class MatchServiceTest {
         }
 
         @Test
-        void shouldHandleRepositorySaveReturningNull() {
-            when(matchRepository.save(any(Match.class))).thenReturn(null);
-
-            IllegalStateException exception = assertThrows(
-                    IllegalStateException.class,
-                    () -> matchService.saveMatch(match1)
-            );
-
-            assertEquals("Match repository returned null, save operation failed.", exception.getMessage());
-            verify(matchRepository).save(match1);
-        }
-
-        @Test
         void shouldHandleInvalidMatchData() {
             Match invalidMatch = new Match();
             when(matchRepository.save(any(Match.class))).thenReturn(invalidMatch);
