@@ -583,7 +583,7 @@ public class TournamentServiceTest {
                 players.add(tempPlayer);
 
                 // Мокирование вызова playerService.findById
-                when(playerService.findById(i)).thenReturn(tempPlayer);
+                when(playerService.findPlayerById(i)).thenReturn(tempPlayer);
             }
             tournament1.setPlayers(players);
 

@@ -60,7 +60,7 @@ public class TournamentUtils {
         int rounds = 0;
         int players = 1;
 
-        if (num < 8) {
+        if (num < Constants.MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC) {
             log.error("Invalid number of rounds: {}", num);
             throw new IllegalArgumentException("Number of players must be at least 8.");
         }

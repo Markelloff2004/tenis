@@ -36,7 +36,7 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
         player.setHand(handComboBox.getValue());
 
         try {
-            playerService.save(player);
+            playerService.savePlayer(player);
             onSaveCallback.run();
             close();
             NotificationManager.showInfoNotification("Player saved successfully!");

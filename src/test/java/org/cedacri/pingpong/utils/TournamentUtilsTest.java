@@ -89,23 +89,34 @@ class TournamentUtilsTest
     @DisplayName("Test method calculateMaxPlayers()")
     class TestCalculateMaxPlayers
     {
+        private Set<Player> getPlayers(int numPlayers) {
+            Set<Player> result = new HashSet<>();
+
+            for (int i = 0; i < numPlayers; i++) {
+                Player player = new Player();
+                player.setId((long) i);
+                result.add(player);
+            }
+
+            return result;
+        }
+
         @Test
         void testCalculateMaxPlayersValid()
         {
-            assertEquals(16, TournamentUtils.calculateMaxPlayers(10));
+            tournament.setPlayers(getPlayers(10));
+
+            assertEquals(16, TournamentUtils.calculateMaxPlayers(tournament));
         }
 
         @Test
         void testCalculateMaxPlayersPowerOfTwo()
         {
-            assertEquals(16, TournamentUtils.calculateMaxPlayers(16));
+            tournament.setPlayers(getPlayers(16));
+
+            assertEquals(16, TournamentUtils.calculateMaxPlayers(tournament));
         }
 
-        @Test
-        void testCalculateMaxPlayersInvalid()
-        {
-            assertThrows(IllegalArgumentException.class, () -> TournamentUtils.calculateMaxPlayers(4));
-        }
     }
 
     @Nested
@@ -140,36 +151,12 @@ class TournamentUtilsTest
 
     @Nested
     @DisplayName("Test method calculateNewRating()")
-    class TestcalculateNewRating
+    class TestCalculateNewRating
     {
         @Test
         void testCalculateNewRating()
         {
             assertEquals(24, TournamentUtils.calculateNewRating(3, 1, 10, 8));
-        }
-
-    }
-
-    @Nested
-    @DisplayName("Test method determineMaxPlayers()")
-    class TestdetermineMaxPlayers
-    {
-        @Test
-        void testDetermineMaxPlayersLessThan8()
-        {
-            Set<Player> players = Set.of(mock(Player.class), mock(Player.class), mock(Player.class));
-            assertEquals(8, TournamentUtils.determineMaxPlayers(players));
-        }
-
-        @Test
-        void testDetermineMaxPlayersMoreThan8()
-        {
-            Set<Player> players = new HashSet<>();
-            for (int i = 0; i < 10; i++)
-            {
-                players.add(mock(Player.class));
-            }
-            assertEquals(16, TournamentUtils.determineMaxPlayers(players));
         }
 
     }

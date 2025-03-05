@@ -1,20 +1,16 @@
 package org.cedacri.pingpong.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.exception.tournament.EntityDeletionException;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @Validated
@@ -27,7 +23,7 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
-    public Player findById(Long id) {
+    public Player findPlayerById(Long id) {
         return playerRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Player with id {} not found", id);
@@ -35,16 +31,14 @@ public class PlayerService {
                 });
     }
 
-    public Stream<Player> getAll() {
+    public List<Player> getAllPlayers() {
         log.info("Fetching list of players");
 
-        List<Player> players = playerRepository.findAll();
-
-        return players.stream();
+        return playerRepository.findAll();
     }
 
     @Transactional
-    public Player save(@Valid Player player) {
+    public Player savePlayer(Player player) {
         log.debug("Attempting to save player {}", player);
 
         if (player == null) {
@@ -62,9 +56,8 @@ public class PlayerService {
         return savedPlayer;
     }
 
-    @Modifying
     @Transactional
-    public void deleteById(Long id) {
+    public void deletePlayerById(Long id) {
         if (id == null) {
             log.error("Attempting to delete a player with null ID");
             throw new IllegalArgumentException("Player ID cannot be null.");
@@ -87,7 +80,6 @@ public class PlayerService {
         } catch (Exception ex) {
             log.error("Unexpected error while deleting player with ID {}", id, ex);
             throw new IllegalStateException("An unexpected error occurred while deleting the player with ID " + id, ex);
-
         }
     }
 

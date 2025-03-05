@@ -41,7 +41,7 @@ public class PlayerServiceTest {
             player.setId(playerId);
             when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
 
-            Player result = playerService.findById(playerId);
+            Player result = playerService.findPlayerById(playerId);
             assertNotNull(result);
             assertEquals(playerId, result.getId());
         }
@@ -51,14 +51,14 @@ public class PlayerServiceTest {
             Long playerId = 1L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findPlayerById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
         @Test
         void testFindById_nullId() {
             Long playerId = null;
-            assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
+            assertThrows(IllegalArgumentException.class, () -> playerService.findPlayerById(playerId));
         }
 
         @Test
@@ -66,7 +66,7 @@ public class PlayerServiceTest {
             Long playerId = -1L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findPlayerById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -77,7 +77,7 @@ public class PlayerServiceTest {
             player.setId(playerId);
             when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
 
-            Player result = playerService.findById(playerId);
+            Player result = playerService.findPlayerById(playerId);
             assertNotNull(result);
             assertEquals(playerId, result.getId());
         }
@@ -87,7 +87,7 @@ public class PlayerServiceTest {
             Long playerId = 0L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findPlayerById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -98,7 +98,7 @@ public class PlayerServiceTest {
             player.setId(playerId);
             when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
 
-            Runnable task = () -> playerService.findById(playerId);
+            Runnable task = () -> playerService.findPlayerById(playerId);
 
             Thread thread1 = new Thread(task);
             Thread thread2 = new Thread(task);
@@ -122,7 +122,7 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
             assertEquals(2, result.size());
             assertEquals(players, result);
         }
@@ -131,7 +131,7 @@ public class PlayerServiceTest {
         void testGetAll_noPlayers() {
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
             assertTrue(result.isEmpty());
         }
 
@@ -144,7 +144,7 @@ public class PlayerServiceTest {
             when(playerRepository.findAll()).thenReturn(players);
 
             long startTime = System.nanoTime();
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
             long duration = System.nanoTime() - startTime;
 
             assertEquals(10000, result.size());
@@ -155,7 +155,7 @@ public class PlayerServiceTest {
         void testGetAll_nullPlayersList() {
             when(playerRepository.findAll()).thenReturn(null);
 
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
 
             assertEquals(Collections.emptyList(), result);
         }
@@ -168,7 +168,7 @@ public class PlayerServiceTest {
             List<Player> players = List.of(playerWithEmptyCollection);
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
             assertNotNull(result);
             assertEquals(1, result.size());
             assertTrue(result.get(0).getTournaments().isEmpty());
@@ -180,7 +180,7 @@ public class PlayerServiceTest {
             Player player2 = new Player();
             when(playerRepository.findAll()).thenReturn(Arrays.asList(player1, player1, player2));
 
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
 
             assertEquals(3, result.size());
             assertTrue(result.contains(player1));
@@ -192,12 +192,12 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            playerService.getAll().toList();
+            playerService.getAllPlayers();
 
             playerRepository.deleteAll();
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAll().toList();
+            List<Player> result = playerService.getAllPlayers();
             assertTrue(result.isEmpty());
         }
     }
@@ -217,7 +217,7 @@ public class PlayerServiceTest {
             validPlayer.setBirthDate(LocalDate.of(1995, 1, 1));
             when(playerRepository.save(validPlayer)).thenReturn(validPlayer);
 
-            Player savedPlayer = playerService.save(validPlayer);
+            Player savedPlayer = playerService.savePlayer(validPlayer);
             assertEquals(validPlayer, savedPlayer);
             verify(playerRepository).save(validPlayer);
         }
@@ -230,7 +230,7 @@ public class PlayerServiceTest {
             when(playerRepository.findById(existingPlayer.getId())).thenReturn(Optional.of(existingPlayer));
             when(playerRepository.save(existingPlayer)).thenReturn(existingPlayer);
 
-            Player updatedPlayer = playerService.save(existingPlayer);
+            Player updatedPlayer = playerService.savePlayer(existingPlayer);
             assertEquals(existingPlayer, updatedPlayer);
             verify(playerRepository).save(existingPlayer);
             verify(playerRepository).findById(existingPlayer.getId());
@@ -243,13 +243,13 @@ public class PlayerServiceTest {
             nonExistingPlayer.setRating(8);
             when(playerRepository.findById(nonExistingPlayer.getId())).thenReturn(Optional.empty());
 
-            assertThrows(IllegalArgumentException.class, () -> playerService.save(nonExistingPlayer));
+            assertThrows(IllegalArgumentException.class, () -> playerService.savePlayer(nonExistingPlayer));
             verify(playerRepository).findById(nonExistingPlayer.getId());
         }
 
         @Test
         void testSave_playerIsNull() {
-            assertThrows(IllegalArgumentException.class, () -> playerService.save(null));
+            assertThrows(IllegalArgumentException.class, () -> playerService.savePlayer(null));
         }
 
         @Test
@@ -257,7 +257,7 @@ public class PlayerServiceTest {
             Player playerToSave = new Player("Error Player", "Unknown", "789 Main St", "error.player@example.com", "RIGHT");
             when(playerRepository.save(playerToSave)).thenThrow(new RuntimeException("Database error"));
 
-            assertThrows(RuntimeException.class, () -> playerService.save(playerToSave));
+            assertThrows(RuntimeException.class, () -> playerService.savePlayer(playerToSave));
         }
 
         @Test
@@ -271,7 +271,7 @@ public class PlayerServiceTest {
             when(playerRepository.findById(2L)).thenReturn(Optional.of(existingPlayer));
             when(playerRepository.save(any(Player.class))).thenReturn(updatedPlayer);
 
-            Player result = playerService.save(updatedPlayer);
+            Player result = playerService.savePlayer(updatedPlayer);
 
             assertNotNull(result);
             assertEquals("Alice", result.getName());
@@ -285,7 +285,7 @@ public class PlayerServiceTest {
             Player playerWithSpecialFormat = new Player("Special", "Format", "123 Address", "special+format@example.com", "RIGHT");
             when(playerRepository.save(playerWithSpecialFormat)).thenReturn(playerWithSpecialFormat);
 
-            Player savedPlayer = playerService.save(playerWithSpecialFormat);
+            Player savedPlayer = playerService.savePlayer(playerWithSpecialFormat);
             assertEquals("special+format@example.com", savedPlayer.getEmail());
             verify(playerRepository).save(playerWithSpecialFormat);
         }
@@ -297,8 +297,8 @@ public class PlayerServiceTest {
                     .thenThrow(new RuntimeException("Network failure"))
                     .thenReturn(playerWithNetworkIssue);
 
-            assertThrows(RuntimeException.class, () -> playerService.save(playerWithNetworkIssue));
-            Player savedPlayer = playerService.save(playerWithNetworkIssue);
+            assertThrows(RuntimeException.class, () -> playerService.savePlayer(playerWithNetworkIssue));
+            Player savedPlayer = playerService.savePlayer(playerWithNetworkIssue);
             assertEquals(playerWithNetworkIssue, savedPlayer);
         }
     }
@@ -313,7 +313,7 @@ public class PlayerServiceTest {
             when(playerRepository.existsById(playerId)).thenReturn(true);
             doNothing().when(playerRepository).deleteById(playerId);
 
-            assertDoesNotThrow(() -> playerService.deleteById(playerId));
+            assertDoesNotThrow(() -> playerService.deletePlayerById(playerId));
             verify(playerRepository).deleteById(playerId);
         }
 
@@ -323,8 +323,8 @@ public class PlayerServiceTest {
             when(playerRepository.existsById(playerId)).thenReturn(true).thenReturn(false);
             doNothing().when(playerRepository).deleteById(playerId);
 
-            assertDoesNotThrow(() -> playerService.deleteById(playerId));
-            assertThrows(EntityNotFoundException.class, () -> playerService.deleteById(playerId));
+            assertDoesNotThrow(() -> playerService.deletePlayerById(playerId));
+            assertThrows(EntityNotFoundException.class, () -> playerService.deletePlayerById(playerId));
 
             verify(playerRepository, times(1)).deleteById(playerId);
             verify(playerRepository, times(2)).existsById(playerId);
@@ -332,7 +332,7 @@ public class PlayerServiceTest {
 
         @Test
         void testDeleteById_nullId() {
-            assertThrows(IllegalArgumentException.class, () -> playerService.deleteById(null));
+            assertThrows(IllegalArgumentException.class, () -> playerService.deletePlayerById(null));
         }
 
         @Test
@@ -340,7 +340,7 @@ public class PlayerServiceTest {
             Long playerId = 99L;
             when(playerRepository.existsById(playerId)).thenReturn(false);
 
-            assertThrows(EntityNotFoundException.class, () -> playerService.deleteById(playerId));
+            assertThrows(EntityNotFoundException.class, () -> playerService.deletePlayerById(playerId));
         }
 
         @Test
@@ -350,7 +350,7 @@ public class PlayerServiceTest {
             doThrow(new RuntimeException("Database failure"))
                     .when(playerRepository).deleteById(playerId);
 
-            assertThrows(RuntimeException.class, () -> playerService.deleteById(playerId));
+            assertThrows(RuntimeException.class, () -> playerService.deletePlayerById(playerId));
         }
 
         @Test
@@ -358,7 +358,7 @@ public class PlayerServiceTest {
             Long playerId = 100L;
             when(playerRepository.existsById(playerId)).thenReturn(false);
 
-            assertThrows(EntityNotFoundException.class, () -> playerService.deleteById(playerId));
+            assertThrows(EntityNotFoundException.class, () -> playerService.deletePlayerById(playerId));
             verify(playerRepository, never()).deleteById(playerId);
         }
 
@@ -369,7 +369,7 @@ public class PlayerServiceTest {
             doThrow(new DataIntegrityViolationException("Cannot delete, player is referenced"))
                     .when(playerRepository).deleteById(playerId);
 
-            assertThrows(EntityDeletionException.class, () -> playerService.deleteById(playerId));
+            assertThrows(EntityDeletionException.class, () -> playerService.deletePlayerById(playerId));
         }
 
         @Test
@@ -379,7 +379,7 @@ public class PlayerServiceTest {
             doThrow(new IllegalStateException("Database schema update in progress"))
                     .when(playerRepository).deleteById(playerId);
 
-            assertThrows(IllegalStateException.class, () -> playerService.deleteById(playerId));
+            assertThrows(IllegalStateException.class, () -> playerService.deletePlayerById(playerId));
         }
     }
 }

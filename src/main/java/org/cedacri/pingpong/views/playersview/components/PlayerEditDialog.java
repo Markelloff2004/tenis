@@ -123,7 +123,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
         player.setGoalsLost(goalsLostField.getValue());
 
         try {
-            playerService.save(player);
+            playerService.savePlayer(player);
 
             onSaveCallback.run();
 

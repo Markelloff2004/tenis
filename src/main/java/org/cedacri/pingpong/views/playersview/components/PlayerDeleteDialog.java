@@ -29,7 +29,7 @@ public class PlayerDeleteDialog extends Dialog {
         {
             log.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
             try {
-                playerService.deleteById(player.getId());
+                playerService.deletePlayerById(player.getId());
 
                 log.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
 

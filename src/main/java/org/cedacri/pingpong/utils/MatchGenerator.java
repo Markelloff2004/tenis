@@ -38,8 +38,8 @@ public class MatchGenerator {
         this.tournamentService = tournamentService;
     }
 
-    public void generateMatches(Tournament tournamentRef) {
-        Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
+    public void generateMatches(Tournament tournament) {
+//        Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
 
         switch(tournamentType){
             case OLYMPIC -> {
@@ -87,8 +87,7 @@ public class MatchGenerator {
         tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
         tournamentService.saveTournament(tournament);
 
-        int numPlayers = tournament.getPlayers().size();
-        int maxPlayers = calculateMaxPlayers(numPlayers);
+        int maxPlayers = tournament.getMaxPlayers();
         int totalRounds = TournamentUtils.calculateNumberOfRounds(maxPlayers);
 
 
@@ -132,14 +131,6 @@ public class MatchGenerator {
                     tournament.getMatches().add(finalMatch);
             }
         }
-    }
-
-    private int calculateMaxPlayers(int numPlayers) {
-        int maxPlayers = 1;
-        while (maxPlayers < numPlayers) {
-            maxPlayers *= 2;
-        }
-        return maxPlayers;
     }
 
     private Match createMatch(int round, int position, Match nextMatch, Tournament tournament) {

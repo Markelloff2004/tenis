@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -39,8 +40,7 @@ class MatchGeneratorTest {
                 SetTypesEnum.BEST_OF_SEVEN,
                 TournamentTypeEnum.OLYMPIC,  // Default type
                 playerDistributer,
-                tournamentService,
-                matchService
+                tournamentService
         );
 
         tournament = mock(Tournament.class);
@@ -48,45 +48,54 @@ class MatchGeneratorTest {
         when(tournament.getTournamentType()).thenReturn(TournamentTypeEnum.OLYMPIC);
 
         when(tournament.getPlayers()).thenReturn(new HashSet<>(List.of(
-                createRealPlayer("Alice", 1000),
-                createRealPlayer("Bob", 950),
-                createRealPlayer("Charlie", 1100),
-                createRealPlayer("Dave", 900),
-                createRealPlayer("Eve", 1050),
-                createRealPlayer("Frank", 980),
-                createRealPlayer("Grace", 1020),
-                createRealPlayer("Hank", 970)
+                createRealPlayer(1L,"Alice", 1000),
+                createRealPlayer(2L,"Bob", 950),
+                createRealPlayer(3L, "Charlie", 1100),
+                createRealPlayer(4L, "Dave", 900),
+                createRealPlayer(5L, "Eve", 1050),
+                createRealPlayer(6L, "Frank", 980),
+                createRealPlayer(7L, "Grace", 1020),
+                createRealPlayer(8L, "Hank", 970)
         )));
 
-        when(tournamentService.find(anyInt())).thenReturn(tournament);
+        when(tournamentService.findTournamentById(anyInt())).thenReturn(tournament);
     }
 
     @Test
     void testGenerateMatches_Olympic() {
-        tournament.setPlayers(new HashSet<>(List.of(
-                createRealPlayer("Alice", 1000),
-                createRealPlayer("Bob", 950),
-                createRealPlayer("Charlie", 1100),
-                createRealPlayer("Dave", 900),
-                createRealPlayer("Eve", 1050),
-                createRealPlayer("Frank", 980),
-                createRealPlayer("Grace", 1020),
-                createRealPlayer("Hank", 970))
-        ));
-        System.out.println("Number of players: " + tournament.getPlayers().size());
-        assertNotNull(tournament.getPlayers(), "Players should not be null");
-        assertTrue(tournament.getPlayers().size() >= 8, "Tournament must have at least 8 players");
 
-        matchGenerator.generateMatches(tournament);
+        Tournament olympicTournament = new Tournament();
+        Set<Player> playerSet = Set.of(
+                createRealPlayer(1L, "Alice", 1000),
+                createRealPlayer(2L,"Bob", 950),
+                createRealPlayer(3L, "Charlie", 1100),
+                createRealPlayer(4L, "Dave", 900),
+                createRealPlayer(5L, "Eve", 1050),
+                createRealPlayer(6L, "Frank", 980),
+                createRealPlayer(7L, "Grace", 1020),
+                createRealPlayer(8L, "Hank", 970)
+        );
+        olympicTournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
+        olympicTournament.setPlayers(playerSet);
+        olympicTournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(olympicTournament));
 
-        verify(playerDistributer).distributePlayersInFirstRound(anyInt(), eq(tournament));
-        assertEquals(TournamentStatusEnum.ONGOING, tournament.getTournamentStatus());
+        when(tournamentService.findTournamentById(anyInt())).thenReturn(olympicTournament);
+
+        System.out.println("Number of players: " + olympicTournament.getPlayers().size());
+        assertNotNull(olympicTournament.getPlayers(), "Players should not be null");
+        assertTrue(olympicTournament.getPlayers().size() >= 8, "Tournament must have at least 8 players");
+
+        matchGenerator.generateMatches(olympicTournament);
+
+        verify(playerDistributer).distributePlayersInFirstRound(anyInt(), eq(olympicTournament));
+        assertEquals(TournamentStatusEnum.ONGOING, olympicTournament.getTournamentStatus());
     }
 
 
 
-    private Player createRealPlayer(String name, int rating) {
+    private Player createRealPlayer(Long playerId, String name, int rating) {
         Player player = new Player();
+        player.setId(playerId);
         player.setName(name);
         player.setRating(rating);
         return player;
@@ -108,7 +117,7 @@ class MatchGeneratorTest {
 
     @Test
     void testMinimumPlayers_OlympicTournament() {
-        when(tournament.getPlayers()).thenReturn(new HashSet<>(List.of(createRealPlayer("Alice", 1000))));
+        when(tournament.getPlayers()).thenReturn(new HashSet<>(List.of(createRealPlayer(1L, "Alice", 1000))));
         RuntimeException thrown = assertThrows(RuntimeException.class,
                 () -> matchGenerator.generateMatches(tournament));
         assertEquals("Number of players must be at least 8.", thrown.getMessage());

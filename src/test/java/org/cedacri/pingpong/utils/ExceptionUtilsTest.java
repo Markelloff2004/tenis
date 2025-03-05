@@ -19,7 +19,7 @@ class ExceptionUtilsTest {
 
     @Test
     void testHandleNotEnoughPlayersException() {
-        NotEnoughPlayersException ex = new NotEnoughPlayersException(5);
+        NotEnoughPlayersException ex = new NotEnoughPlayersException(5, 8);
 
         ResponseEntity<String> response = exceptionUtils.handleNotEnoughPlayersException(ex);
 
