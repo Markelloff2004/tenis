@@ -2,12 +2,8 @@ package org.cedacri.pingpong.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Score;
-import org.cedacri.pingpong.entity.Tournament;
 
 import java.util.List;
 

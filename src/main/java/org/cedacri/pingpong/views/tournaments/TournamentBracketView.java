@@ -50,7 +50,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     @Override
     public void setParameter(BeforeEvent beforeEvent, Integer tournamentId) {
         log.info("Received request to load tournament with ID {}", tournamentId);
-        tournament = tournamentService.find(tournamentId);
+        tournament = tournamentService.findTournamentById(tournamentId);
 
         if (tournament == null) {
             log.warn("Tournament with ID {} not found", tournamentId);
@@ -96,11 +96,15 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         log.info("Creating layout for Round buttons.");
 
-        return tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC
-                ? createOlympicRoundButtons()
-                : tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND
-                    ? createRobinRoundPlayerSelection()
-                    : createUnknownTournamentType();
+        TournamentTypeEnum type = tournament.getTournamentType();
+
+        if (type == TournamentTypeEnum.OLYMPIC) {
+            return createOlympicRoundButtons();
+        } else if (type == TournamentTypeEnum.ROBIN_ROUND) {
+            return createRobinRoundPlayerSelection();
+        } else {
+            return createUnknownTournamentType();
+        }
     }
 
     private HorizontalLayout createUnknownTournamentType() {
@@ -117,7 +121,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         playerOptionsComboBox.addValueChangeListener(event -> refreshMatchesInRound(event.getValue()));
 
         Button openRating = ViewUtils.createButton("View Rating","button", () -> {
-            RobinRoundDetailsDialog robinRoundDetailsDialog = new RobinRoundDetailsDialog(tournamentService.find(tournament.getId()));
+            RobinRoundDetailsDialog robinRoundDetailsDialog = new RobinRoundDetailsDialog(tournament.getId(), tournamentService);
             robinRoundDetailsDialog.open();
         });
 
@@ -158,20 +162,21 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         log.info("Refreshing matches for round {}", round);
 
-        if(round instanceof Integer)
-        {
-            displayMatches( matchService.getMatchesByTournamentAndRound(tournament, (Integer) round));
-        } else if( round instanceof String) {
-            if("All".equals(round) || ((String) round).isEmpty() || ((String) round).isBlank()) {
-//                displayMatches(tournament.getMatches().stream().toList());
+        if (round instanceof Integer roundInt) {
+            displayMatches(matchService.getMatchesByTournamentAndRound(tournament, roundInt));
+        } else if (round instanceof String roundStr) {
+            if ("All".equals(roundStr) || roundStr.isEmpty() || roundStr.isBlank()) {
                 displayMatches(matchService.getMatchesByTournament(tournament));
-            }
-            else {
-                String[] playerNameSurname = ((String) round).split(" ");
-
-                displayMatches(matchService.getMatchesByPlayerNameSurname(tournament, playerNameSurname[0], playerNameSurname[1]));
+            } else {
+                String[] playerNameSurname = roundStr.split(" ");
+                if (playerNameSurname.length == 2) {
+                    displayMatches(matchService.getMatchesByPlayerNameSurname(tournament, playerNameSurname[0], playerNameSurname[1]));
+                } else {
+                    log.warn("Invalid player name format: {}", roundStr);
+                }
             }
         }
+
 
     }
 
@@ -183,7 +188,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         for (Match match : matches) {
             log.debug("Processed match {}", match);
 
-            MatchComponent matchLayout = new MatchComponent(match, matchService, tournament,
+            MatchComponent matchLayout = new MatchComponent(match, matchService, tournamentService, tournament,
                     () -> {
                         if (tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC)
                             refreshMatchesInRound( match.getRound());

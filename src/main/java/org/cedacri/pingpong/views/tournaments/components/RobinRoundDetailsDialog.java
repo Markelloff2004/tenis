@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
@@ -16,15 +17,14 @@ import java.util.List;
 @Slf4j
 public class RobinRoundDetailsDialog extends Dialog {
 
-    private Grid<Player> playerRatingGrid = new Grid<>(Player.class, false);
+    private final Grid<Player> playerRatingGrid = new Grid<>(Player.class, false);
 
     private Tournament tournament;
 
-    public RobinRoundDetailsDialog(Tournament tournament) {
-
+    public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService) {
         log.info("Initializing {} Rating ", tournament.getTournamentName());
 
-        this.tournament = tournament;
+        this.tournament = tournamentService.findTournamentById(tournamentId);
 
         setHeaderTitle(tournament.getTournamentName() + " Rating");
         setWidth("80%");

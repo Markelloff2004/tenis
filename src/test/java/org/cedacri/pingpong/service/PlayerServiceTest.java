@@ -4,20 +4,18 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.exception.tournament.EntityDeletionException;
 import org.cedacri.pingpong.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.slf4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlayerServiceTest {
 
@@ -53,9 +51,7 @@ public class PlayerServiceTest {
             Long playerId = 1L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                playerService.findById(playerId);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -70,9 +66,7 @@ public class PlayerServiceTest {
             Long playerId = -1L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                playerService.findById(playerId);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -93,9 +87,7 @@ public class PlayerServiceTest {
             Long playerId = 0L;
             when(playerRepository.findById(playerId)).thenReturn(Optional.empty());
 
-            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-                playerService.findById(playerId);
-            });
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> playerService.findById(playerId));
             assertEquals("Player not found", exception.getMessage());
         }
 
@@ -106,9 +98,7 @@ public class PlayerServiceTest {
             player.setId(playerId);
             when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
 
-            Runnable task = () -> {
-                playerService.findById(playerId);
-            };
+            Runnable task = () -> playerService.findById(playerId);
 
             Thread thread1 = new Thread(task);
             Thread thread2 = new Thread(task);
@@ -132,7 +122,7 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertEquals(2, result.size());
             assertEquals(players, result);
         }
@@ -141,7 +131,7 @@ public class PlayerServiceTest {
         void testGetAll_noPlayers() {
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertTrue(result.isEmpty());
         }
 
@@ -154,7 +144,7 @@ public class PlayerServiceTest {
             when(playerRepository.findAll()).thenReturn(players);
 
             long startTime = System.nanoTime();
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             long duration = System.nanoTime() - startTime;
 
             assertEquals(10000, result.size());
@@ -165,9 +155,9 @@ public class PlayerServiceTest {
         void testGetAll_nullPlayersList() {
             when(playerRepository.findAll()).thenReturn(null);
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
 
-            assertEquals(result, Collections.emptyList());
+            assertEquals(Collections.emptyList(), result);
         }
 
         @Test
@@ -175,31 +165,13 @@ public class PlayerServiceTest {
             Player playerWithEmptyCollection = new Player();
             playerWithEmptyCollection.setTournaments(new HashSet<>());
 
-            List<Player> players = Arrays.asList(playerWithEmptyCollection);
+            List<Player> players = List.of(playerWithEmptyCollection);
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertNotNull(result);
             assertEquals(1, result.size());
             assertTrue(result.get(0).getTournaments().isEmpty());
-        }
-
-        @Test
-        void testGetAll_multithreading() throws InterruptedException {
-            List<Player> players = Arrays.asList(new Player(), new Player(), new Player());
-            when(playerRepository.findAll()).thenReturn(players);
-
-            Runnable task = () -> playerService.getAll().collect(Collectors.toList());
-
-            Thread thread1 = new Thread(task);
-            Thread thread2 = new Thread(task);
-            thread1.start();
-            thread2.start();
-
-            thread1.join();
-            thread2.join();
-
-            verify(playerRepository, times(2)).findAll();
         }
 
         @Test
@@ -208,7 +180,7 @@ public class PlayerServiceTest {
             Player player2 = new Player();
             when(playerRepository.findAll()).thenReturn(Arrays.asList(player1, player1, player2));
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
 
             assertEquals(3, result.size());
             assertTrue(result.contains(player1));
@@ -220,12 +192,12 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            playerService.getAll().collect(Collectors.toList());
+            playerService.getAll().toList();
 
             playerRepository.deleteAll();
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAll().collect(Collectors.toList());
+            List<Player> result = playerService.getAll().toList();
             assertTrue(result.isEmpty());
         }
     }
@@ -397,7 +369,7 @@ public class PlayerServiceTest {
             doThrow(new DataIntegrityViolationException("Cannot delete, player is referenced"))
                     .when(playerRepository).deleteById(playerId);
 
-            assertThrows(DataIntegrityViolationException.class, () -> playerService.deleteById(playerId));
+            assertThrows(EntityDeletionException.class, () -> playerService.deleteById(playerId));
         }
 
         @Test

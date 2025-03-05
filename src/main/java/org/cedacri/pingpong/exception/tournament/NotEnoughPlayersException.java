@@ -8,7 +8,7 @@ public class NotEnoughPlayersException  extends  Exception{
         super(Constants.NOT_ENOUGH_PLAYERS_MESSAGE);
     }
 
-    public NotEnoughPlayersException(int playersCount) {
-        super(Constants.NOT_ENOUGH_PLAYERS_MESSAGE +  " " + playersCount + ", should be at least 8");
+    public NotEnoughPlayersException(int playersCount, int minAmountPlayers) {
+        super(Constants.NOT_ENOUGH_PLAYERS_MESSAGE +  " " + playersCount + ", should be at least " + minAmountPlayers);
     }
 }

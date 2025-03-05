@@ -13,6 +13,7 @@ import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
+import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -28,9 +29,11 @@ public class MatchComponent extends HorizontalLayout {
     private final MatchService matchService;
     private final Tournament tournament;
     private final List<List<TextField>> scoreFields = new ArrayList<>();
+    private final TournamentService tournamentService;
 
-    public MatchComponent(Match match, MatchService matchService, Tournament tournament, Runnable refreshMatches) {
+    public MatchComponent(Match match, MatchService matchService, TournamentService tournamentService, Tournament tournament, Runnable refreshMatches) {
         this.matchService = matchService;
+        this.tournamentService = tournamentService;
         this.tournament = tournament;
         log.info("Initializing MatchComponent for match with id {}", match.getId());
 
@@ -153,7 +156,6 @@ public class MatchComponent extends HorizontalLayout {
 
     public void updateMatchScore(Match match) {
         List<Score> newMatchScores = new ArrayList<>();
-        StringBuilder infoMessage = new StringBuilder();
 
         for (List<TextField> scoreRow : scoreFields) {
             try {
@@ -161,22 +163,27 @@ public class MatchComponent extends HorizontalLayout {
                 int bottomScore = Integer.parseInt(scoreRow.get(1).getValue().trim());
                 newMatchScores.add(new Score(topScore, bottomScore));
 
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException ignored){
             }
         }
 
-        String validationMessages = matchService.validateAndUpdateScores(match, newMatchScores);
-        if (!validationMessages.isEmpty()) {
-            infoMessage.append(validationMessages);
-        }
+        String validationMessages = "";
 
-        if (!infoMessage.isEmpty()) {
-            NotificationManager.showErrorNotification(infoMessage.toString());
-        }
+        try {
+            validationMessages = matchService.validateAndUpdateScores(match, newMatchScores);
 
-        if (!newMatchScores.isEmpty()) {
-            NotificationManager.showInfoNotification("The Score for this match has been updated.");
-            log.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+            if (!validationMessages.isEmpty()) {
+                NotificationManager.showErrorNotification(validationMessages);
+            }
+
+            if (!newMatchScores.isEmpty()) {
+                NotificationManager.showInfoNotification("The Score for this match has been updated.");
+                log.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+
+                TournamentUtils.checkAndUpdateTournamentWinner(match, tournamentService);
+            }
+        } catch ( IllegalArgumentException illegalArgumentException) {
+            NotificationManager.showErrorNotification(illegalArgumentException.getMessage() + validationMessages);
         }
     }
 
@@ -193,7 +200,6 @@ public class MatchComponent extends HorizontalLayout {
                 .toList();
 
         if (previousMatches.isEmpty()) {
-//        if(match.getRound() == 1){
             return ViewUtils.createPlayerLabel("BYE");
         }
 

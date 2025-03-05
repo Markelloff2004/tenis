@@ -4,12 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.exception.tournament.EntityDeletionException;
 import org.cedacri.pingpong.repository.PlayerRepository;
-import org.cedacri.pingpong.utils.Constants;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +14,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -40,24 +35,10 @@ public class PlayerService {
                 });
     }
 
-//    public Stream<Player> list(long page) {
-//        log.info("Fetching list of players for page {}", page);
-//
-//        Pageable pageable = PageRequest.of((int) page, Constants.PAGE_SIZE);
-//
-//        Page<Player> playerPage = playerRepository.findAll(pageable);
-//
-//        return playerPage.stream();
-//    }
-
     public Stream<Player> getAll() {
         log.info("Fetching list of players");
 
         List<Player> players = playerRepository.findAll();
-
-        if (players == null) {
-            players = Collections.emptyList();
-        }
 
         return players.stream();
     }
@@ -70,11 +51,10 @@ public class PlayerService {
             throw new IllegalArgumentException("Player cannot be null");
         }
 
-        if (player.getId() != null) {
-            if (playerRepository.findById(player.getId()).isEmpty()) {
+        if (player.getId() != null && playerRepository.findById(player.getId()).isEmpty()) {
                 throw new IllegalArgumentException("Cannot update non-existing player with ID: " + player.getId());
             }
-        }
+
 
         Player savedPlayer = playerRepository.save(player);
 
@@ -85,24 +65,30 @@ public class PlayerService {
     @Modifying
     @Transactional
     public void deleteById(Long id) {
-        if (id != null) {
-            log.debug("Attempting to delete player with id {}", id);
+        if (id == null) {
+            log.error("Attempting to delete a player with null ID");
+            throw new IllegalArgumentException("Player ID cannot be null.");
+        }
 
-            if (playerRepository.existsById(id)) {
-                playerRepository.deleteById(id);
-                log.debug("Successfully deleted player with id {}", id);
-            } else {
-                throw new EntityNotFoundException("Cannot delete a player that doesn't exist in database");
-            }
-        } else {
-            log.error("Attempting to delete player with null id");
-            throw new IllegalArgumentException("Player Id cannot be null");
+        log.debug("Attempting to delete player with ID {}", id);
+
+        if (!playerRepository.existsById(id)) {
+            log.warn("Player with ID {} does not exist in the database.", id);
+            throw new EntityNotFoundException("Player with ID " + id + " does not exist and cannot be deleted.");
+        }
+
+        try {
+            playerRepository.deleteById(id);
+            playerRepository.flush();
+            log.info("Successfully deleted player with ID {}", id);
+        } catch (DataIntegrityViolationException ex) {
+            log.info("Cannot delete player with ID {} due to foreign key constraints, as it affects tournament statistics", id);
+            throw new EntityDeletionException("Player with ID " + id + " cannot be deleted because they are associated with one or more tournaments.", ex);
+        } catch (Exception ex) {
+            log.error("Unexpected error while deleting player with ID {}", id, ex);
+            throw new IllegalStateException("An unexpected error occurred while deleting the player with ID " + id, ex);
+
         }
     }
 
-//    public Set<Player> getAvailablePlayersForTournament(Tournament tournament) {
-//        return playerRepository.findAll().stream()
-//                .filter(p -> !p.getTournaments().contains(tournament))
-//                .collect(Collectors.toSet());
-//    }
 }
