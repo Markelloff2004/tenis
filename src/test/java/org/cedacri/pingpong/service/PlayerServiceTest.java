@@ -350,7 +350,7 @@ public class PlayerServiceTest {
             doThrow(new RuntimeException("Database failure"))
                     .when(playerRepository).deleteById(playerId);
 
-            assertThrows(RuntimeException.class, () -> playerService.deletePlayerById(playerId));
+            assertThrows(IllegalStateException.class, () -> playerService.deletePlayerById(playerId));
         }
 
         @Test

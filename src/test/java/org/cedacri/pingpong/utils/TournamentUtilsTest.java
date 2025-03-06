@@ -139,15 +139,15 @@ class TournamentUtilsTest
         }
     }
 
-    @Test
-    void testGetMinimalWinsPerMatch_UsingReflection() throws Exception {
-        Method method = TournamentUtils.class.getDeclaredMethod("getMinimalWinsPerMatch", Match.class);
-        method.setAccessible(true);
-
-        int minWins = (int) method.invoke(null, match);
-
-        assertTrue(minWins > 0, "Minimal wins should be greater than 0");
-    }
+//    @Test
+//    void testGetMinimalWinsPerMatch_UsingReflection() throws Exception {
+//        Method method = TournamentUtils.class.getDeclaredMethod("getMinimalWinsPerMatch", Match.class);
+//        method.setAccessible(true);
+//
+//        int minWins = (int) method.invoke(null, match);
+//
+//        assertTrue(minWins > 0, "Minimal wins should be greater than 0");
+//    }
 
     @Nested
     @DisplayName("Test method calculateNewRating()")

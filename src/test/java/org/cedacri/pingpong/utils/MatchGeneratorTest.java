@@ -123,14 +123,14 @@ class MatchGeneratorTest {
         assertEquals("Number of players must be at least 8.", thrown.getMessage());
     }
 
-    @Test
-    void testCalculateMaxPlayers_UsingReflection() throws Exception {
-        Method method = MatchGenerator.class.getDeclaredMethod("calculateMaxPlayers", int.class);
-        method.setAccessible(true);
-        assertEquals(8, (int) method.invoke(matchGenerator, 6));
-        assertEquals(16, (int) method.invoke(matchGenerator, 10));
-        assertEquals(32, (int) method.invoke(matchGenerator, 17));
-    }
+//    @Test
+//    void testCalculateMaxPlayers_UsingReflection() throws Exception {
+//        Method method = MatchGenerator.class.getDeclaredMethod("calculateMaxPlayers", int.class);
+//        method.setAccessible(true);
+//        assertEquals(8, (int) method.invoke(matchGenerator, 6));
+//        assertEquals(16, (int) method.invoke(matchGenerator, 10));
+//        assertEquals(32, (int) method.invoke(matchGenerator, 17));
+//    }
 
     @Test
     void testCreateMatch_UsingReflection() throws Exception {

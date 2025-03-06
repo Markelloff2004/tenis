@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -34,7 +35,11 @@ public class PlayerService {
     public List<Player> getAllPlayers() {
         log.info("Fetching list of players");
 
-        return playerRepository.findAll();
+        List<Player> players = playerRepository.findAll();
+
+        return players == null ?
+                    new ArrayList<>() :
+                    players;
     }
 
     @Transactional

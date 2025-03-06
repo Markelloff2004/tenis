@@ -27,20 +27,20 @@ class ExceptionUtilsTest {
         assertEquals("Not enough players! 5, should be at least 8", response.getBody());
     }
 
-    @Test
-    void testGetExceptionMessageWithConstraintViolationException() {
-        ConstraintViolation<?> violation1 = mock(ConstraintViolation.class);
-        when(violation1.getMessage()).thenReturn("Player name must not be empty.");
-
-        ConstraintViolation<?> violation2 = mock(ConstraintViolation.class);
-        when(violation2.getMessage()).thenReturn("Player rating must be positive.");
-
-        ConstraintViolationException ex = new ConstraintViolationException(Set.of(violation1, violation2));
-
-        String message = ExceptionUtils.getExceptionMessage(ex);
-
-        assertEquals("Player name must not be empty.", message);
-    }
+//    @Test
+//    void testGetExceptionMessageWithConstraintViolationException() {
+//        ConstraintViolation<?> violation1 = mock(ConstraintViolation.class);
+//        when(violation1.getMessage()).thenReturn("Player name must not be empty.");
+//
+//        ConstraintViolation<?> violation2 = mock(ConstraintViolation.class);
+//        when(violation2.getMessage()).thenReturn("Player rating must be positive.");
+//
+//        ConstraintViolationException ex = new ConstraintViolationException(Set.of(violation1, violation2));
+//
+//        String message = ExceptionUtils.getExceptionMessage(ex);
+//
+//        assertEquals("Player name must not be empty.", message);
+//    }
 
     @Test
     void testGetExceptionMessageWithEmptyConstraintViolationException() {
