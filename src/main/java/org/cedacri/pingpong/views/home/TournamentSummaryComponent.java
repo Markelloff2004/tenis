@@ -59,7 +59,7 @@ public class TournamentSummaryComponent extends HorizontalLayout {
         details.setAlignItems(Alignment.END);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        Player winner = tournamentService.getTournamentWinner(tournament);
+        Player winner = tournament.getWinner();
         Span winnerLabel = (winner != null)
                 ? ViewUtils.createPlayerLabel("🥇 " + winner.getName() + " " + winner.getSurname())
                 : ViewUtils.createPlayerLabel("No winner yet");

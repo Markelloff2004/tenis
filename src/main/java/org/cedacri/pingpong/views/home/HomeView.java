@@ -46,7 +46,7 @@ public class HomeView extends VerticalLayout {
     }
 
     private void displayTournaments() {
-        List<Tournament> tournaments = tournamentService.findAll().toList();
+        List<Tournament> tournaments = tournamentService.findAllTournaments().toList();
         log.info("Displaying {} tournaments", tournaments.size());
 
         tournamentContainer.removeAll();

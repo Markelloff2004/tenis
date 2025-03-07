@@ -29,7 +29,7 @@ public class GridUtils {
         }));
     }
 
-     public static void configureGrid(Grid grid) {
+     public static void configureGrid(Grid<Player> grid) {
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.setWidth("45%");
     }

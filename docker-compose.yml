@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_tournament_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: tournament_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 4384466
+      MYSQL_ROOT_PASSWORD: root4384466
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+
+  app:
+    build: .
+    image: my-tournament-app
+    container_name: tournament-app
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+
+volumes:
+  mysql_data:
+
+networks:
+  my-network:

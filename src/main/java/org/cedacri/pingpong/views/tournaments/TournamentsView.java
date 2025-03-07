@@ -135,7 +135,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
     private void refreshGridData() {
         tournamentsGrid.setItems(
-                tournamentService.findAll()
+                tournamentService.findAllTournaments()
                         .sorted(Comparator.comparingInt(Tournament::getId).reversed())
                         .toList());
         log.info("Grid data refreshed, tournaments loaded.");

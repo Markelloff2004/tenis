@@ -1,5 +1,6 @@
 package org.cedacri.pingpong.utils;
 
+import com.vaadin.flow.component.UI;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
@@ -7,23 +8,35 @@ import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
+import org.cedacri.pingpong.service.TournamentService;
 
 import java.util.*;
 
 @Slf4j
 public class TournamentUtils {
 
-    public static int calculateMaxPlayers(int num) {
+    private TournamentUtils() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
 
-        log.debug("calculateMaxPlayers called with arg: {}", num);
+    public static int calculateMaxPlayers(Tournament tournament) {
+        int numPlayers = tournament.getPlayers().size();
+        TournamentTypeEnum tournamentType = tournament.getTournamentType();
 
-        if (num < 8) {
-            log.error("Invalid number of players: {}", num);
-            throw new IllegalArgumentException("Number of players must be at least 8.");
+        log.debug("calculateMaxPlayers called with arg: {} {}", numPlayers, tournamentType);
+
+        int minimalAmountOfPlayers = getMinimalPlayersRequired(tournament.getTournamentType());
+
+        if (tournament.getPlayers().size() < minimalAmountOfPlayers) {
+            return minimalAmountOfPlayers;
+        }
+
+        if (tournamentType == TournamentTypeEnum.ROBIN_ROUND) {
+            return numPlayers;
         }
 
         int maxPlayers = 1;
-        while (maxPlayers < num) {
+        while (maxPlayers < numPlayers) {
             maxPlayers *= 2;
         }
 
@@ -31,11 +44,23 @@ public class TournamentUtils {
         return maxPlayers;
     }
 
+    public static int getMinimalPlayersRequired(TournamentTypeEnum tournamentType) {
+
+        if (tournamentType == null) {
+            throw new IllegalArgumentException("Tournament Type cannot be null");
+        }
+
+        return switch (tournamentType) {
+            case OLYMPIC -> Constants.MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC;
+            case ROBIN_ROUND -> Constants.MINIMAL_AMOUNT_OF_PLAYER_FOR_ROBIN_ROUND;
+        };
+    }
+
     public static int calculateNumberOfRounds(int num) {
         int rounds = 0;
         int players = 1;
 
-        if (num < 8) {
+        if (num < Constants.MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC) {
             log.error("Invalid number of rounds: {}", num);
             throw new IllegalArgumentException("Number of players must be at least 8.");
         }
@@ -89,7 +114,6 @@ public class TournamentUtils {
             return;
         }
 
-
         Player winner = null;
 
         if (topPlayerWins > bottomPlayerWins) {
@@ -100,16 +124,10 @@ public class TournamentUtils {
 
 
         match.setWinner(winner);
-        if(match.getTournament().getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
-            moveWinner(match);
-        else if(isFinished(match.getTournament()))
-            finishTournament(match.getTournament());
-    }
 
-    private static boolean isFinished(Tournament tournament){
-        return tournament.getMatches().stream()
-                .filter(match -> match.getWinner() == null)
-                .toList().isEmpty();
+        if (match.getTournament().getTournamentType() == TournamentTypeEnum.OLYMPIC) {
+            moveWinner(match);
+        }
     }
 
     private static void moveWinner(Match match) {
@@ -120,10 +138,6 @@ public class TournamentUtils {
             } else {
                 match.getNextMatch().setTopPlayer(match.getWinner());
             }
-        } else {
-            //fine tournament
-            match.getTournament().setWinner(match.getWinner());
-            finishTournament(match.getTournament());
         }
     }
 
@@ -138,7 +152,14 @@ public class TournamentUtils {
         int setsToWin = match.getTournament().getSetsToWin().getValue();
         int semifinalSetsToWin = match.getTournament().getSemifinalsSetsToWin().getValue();
         int finalSetsToWin = match.getTournament().getFinalsSetsToWin().getValue();
-        int numOfRound = calculateNumberOfRounds(match.getTournament().getMaxPlayers());
+        int numOfRound = 0;
+        if (match.getTournament().getTournamentType() == TournamentTypeEnum.ROBIN_ROUND) {
+            numOfRound = match.getTournament().getSetsToWin().getValue();
+        }
+        if (match.getTournament().getTournamentType() == TournamentTypeEnum.OLYMPIC) {
+            numOfRound = calculateNumberOfRounds(match.getTournament().getMaxPlayers());
+        }
+
         int currRound = match.getRound();
 
         if (currRound == numOfRound) {
@@ -154,13 +175,13 @@ public class TournamentUtils {
         tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
 
         if (tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC) {
-            updateOlympicRating(tournament);
+            updateRatingAndSetTournamentWinnerOlympic(tournament);
         } else if (tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND) {
-            updateRatingRobinRound(tournament);
+            updateRatingAndSetTournamentWinnerRobinRound(tournament);
         }
     }
 
-    private static void updateRatingRobinRound(Tournament tournament) {
+    private static void updateRatingAndSetTournamentWinnerRobinRound(Tournament tournament) {
         Map<Player, Integer> wonMatchesMap = new HashMap<>();
         Map<Player, Integer> goalsScoredMap = new HashMap<>();
         Map<Player, Integer> goalsLostMap = new HashMap<>();
@@ -219,8 +240,7 @@ public class TournamentUtils {
     }
 
 
-
-    private static void updateOlympicRating(Tournament tournament) {
+    private static void updateRatingAndSetTournamentWinnerOlympic(Tournament tournament) {
         for (Player player : tournament.getPlayers()) {
             int oldRating = player.getRating();
             int newGoalsScored = calculateNewGoalsScored(player, tournament);
@@ -236,6 +256,10 @@ public class TournamentUtils {
             player.setWonMatches(player.getWonMatches() + newWonMatches);
             player.setLostMatches(player.getLostMatches() + newLostMatches);
         }
+
+        tournament.getMatches()
+                .stream().filter(match -> match.getRound() == 1).findFirst()
+                .ifPresent(finalMatch -> tournament.setWinner(finalMatch.getWinner()));
     }
 
     public static int calculateNewRating(int newWonMatches, int newLostMatches, int newGoalsScored, int newGoalsLost) {
@@ -278,8 +302,20 @@ public class TournamentUtils {
                 .count();
     }
 
-    public static int determineMaxPlayers(Set<Player> players) {
-        int playerCount = players.size();
-        return (playerCount < 8) ? 8 : calculateMaxPlayers(playerCount);
+    public static void checkAndUpdateTournamentWinner(Match match, TournamentService tournamentService) {
+        Tournament tournament = tournamentService.findTournamentById(match.getTournament().getId());
+
+        if (isFinished(tournament)) {
+            finishTournament(tournament);
+            tournamentService.saveTournament(tournament);
+
+            UI.getCurrent().navigate("home");
+            NotificationManager.showInfoNotification(Constants.TOURNAMENT_WINNER_HAS_BEEN_DETERMINATED + tournament.getWinner().getName() + " " + tournament.getWinner().getSurname());
+        }
     }
+
+    private static boolean isFinished(Tournament tournament) {
+        return tournament.getMatches().stream().allMatch(match -> match.getWinner() != null);
+    }
+
 }

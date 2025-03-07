@@ -29,7 +29,8 @@ public class PlayerDeleteDialog extends Dialog {
         {
             log.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
             try {
-                playerService.deleteById(player.getId());
+                playerService.deletePlayerById(player.getId());
+
                 log.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
 
                 close();
@@ -38,8 +39,8 @@ public class PlayerDeleteDialog extends Dialog {
                         ": " + player.getId() + " deleted!");
 
                 onDeleteCallback.run();
-            } catch (Exception e) {
-                log.error("Error while deleting player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId(), e.getMessage());
+            } catch (Exception  e) {
+                log.warn("Cannot delete player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
                 NotificationManager.showErrorNotification("Player cannot be deleted : " + ExceptionUtils.getExceptionMessage(e));
             }
         });
@@ -52,7 +53,6 @@ public class PlayerDeleteDialog extends Dialog {
         HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, deleteButton, cancelButton);
 
 
-//        add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, confirmationText, buttonLayout, cancelButton));
         add(confirmationText, buttonLayout);
         log.debug("PlayerDeleteDialog initialize completed.");
     }

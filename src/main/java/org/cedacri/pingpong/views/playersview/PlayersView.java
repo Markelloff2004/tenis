@@ -115,9 +115,13 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
     @Override
     public void showAllPlayers() {
         log.info("Loading all players");
-        playersGrid.setItems(playerService.getAll().
-                sorted(Comparator.comparingInt(Player::getRating).reversed())
-                .toList());
+        playersGrid.setItems(playerService.getAllPlayers()
+                .stream()
+                .sorted(Comparator.comparingInt(Player::getRating)
+                        .reversed()
+                )
+                .toList()
+        );
     }
 
     @Override

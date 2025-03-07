@@ -16,8 +16,8 @@ public class ExceptionUtils {
     }
 
     public static String getExceptionMessage(Exception ex) {
-        if (ex instanceof ConstraintViolationException) {
-            return ((ConstraintViolationException) ex).getConstraintViolations()
+        if (ex instanceof ConstraintViolationException constraintViolationException) {
+            return constraintViolationException.getConstraintViolations()
                     .stream()
                     .map(ConstraintViolation::getMessage)
                     .findFirst()

@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cedacri.pingpong.entity.Tournament;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -29,16 +28,14 @@ public class Player {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Size(max = 100)
     @NotBlank(message = "Name cannot be null or blank")
     @Pattern(regexp = "^[A-Za-z.-]+$", message = "Name must contain only letters")
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Size(max = 100)
     @NotBlank(message = "Surname cannot be null or blank")
-    @Pattern(regexp = "^[A-Za-z.-]+$", message = "Name must contain only letters")
+    @Pattern(regexp = "^[A-Za-z.-]+$", message = "Surname must contain only letters")
     @Size(min = 2, max = 50, message = "Surname must be between 2 and 50 characters")
     @Column(name = "surname", nullable = false, length = 100)
     private String surname;
@@ -64,9 +61,11 @@ public class Player {
     @Column(name = "rating", nullable = false, columnDefinition = "int default 0")
     private Integer rating = 0;
 
-    @Size(max = 5)
+//    @Size(max = 5)
     @NotNull(message = "Select a hand playing style")
-    @Column(name = "hand", length = 5)
+//    @Column(name = "hand", length = 5)
+    @Column(name = "hand")
+    @Pattern(regexp = "^(?i)(RIGHT|LEFT)$", message = "Hand must be either 'RIGHT' or 'LEFT'")
     private String hand;
 
     @Min(value = 0, message = "Won matches cannot be negative")
@@ -85,47 +84,15 @@ public class Player {
     @Column(name = "goals_lost", nullable = false, columnDefinition = "int default 0")
     private Integer goalsLost = 0;
 
-    @ManyToMany(mappedBy = "players", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Tournament> tournaments = new HashSet<>();
 
-    public Player(String name, String surname, LocalDate birthDate, String email, String address, LocalDate createdAt, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
-
+    public Player(String name, String surname, String address, String email, String hand) {
         this.name = name;
         this.surname = surname;
-        this.birthDate = birthDate;
         this.address = address;
         this.email = email;
-        this.createdAt = createdAt;
-        this.rating = rating;
         this.hand = hand;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-        this.goalsScored = goalsScored;
-        this.goalsLost = goalsLost;
-    }
-
-    public Player(Integer rating, String name, String surname, LocalDate birthDate, Integer wonMatches, Integer lostMatches) {
-        this.rating = rating;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-    }
-
-    public Player(Long id, String name, String surname, LocalDate birthDate, String email, String address, Integer rating, String hand, Integer wonMatches, Integer lostMatches, Integer goalsScored, Integer goalsLost) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.address = address;
-        this.rating = rating;
-        this.hand = hand;
-        this.wonMatches = wonMatches;
-        this.lostMatches = lostMatches;
-        this.goalsScored = goalsScored;
-        this.goalsLost = goalsLost;
     }
 
     @Override
