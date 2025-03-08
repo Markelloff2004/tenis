@@ -15,7 +15,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./src/main/resources/db/migration/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./src/main/resources/db/migration/data_test.sql:/docker-entrypoint-initdb.d/data_test.sql
     networks:
       - my-network
     healthcheck:
