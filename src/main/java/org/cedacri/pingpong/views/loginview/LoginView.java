@@ -7,8 +7,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.cedacri.pingpong.service.UserDetailsServiceImpl;
 
 @Route("login")
 @PageTitle("Login | Ping Pong")
@@ -16,7 +16,8 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @PreserveOnRefresh
 public class LoginView extends VerticalLayout {
 
-    public LoginView() {
+    public LoginView(UserDetailsServiceImpl userDetailsService) {
+
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -30,7 +31,15 @@ public class LoginView extends VerticalLayout {
         loginForm.setAction("login");
         loginForm.addClassName("custom-login-form");
         loginForm.setForgotPasswordButtonVisible(false);
-        loginForm.addLoginListener(event -> loginForm.setError(true));
+        loginForm.addLoginListener(event -> {
+
+            String username = event.getUsername();
+            String password = event.getPassword();
+
+            if (!userDetailsService.existUserByUsernameAndPassword(username, password)) {
+                loginForm.setError(true);
+            }
+        });
 
         VerticalLayout container = new VerticalLayout(title, loginForm);
         container.setAlignItems(Alignment.CENTER);
