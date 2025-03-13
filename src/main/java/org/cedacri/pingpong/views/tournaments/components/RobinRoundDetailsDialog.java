@@ -22,7 +22,7 @@ public class RobinRoundDetailsDialog extends Dialog {
     private Tournament tournament;
 
     public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService) {
-        log.info("Initializing {} Rating ", tournament.getTournamentName());
+        log.info("Initializing tournament {} Rating ", tournamentId);
 
         this.tournament = tournamentService.findTournamentById(tournamentId);
 

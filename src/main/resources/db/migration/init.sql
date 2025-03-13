@@ -49,7 +49,7 @@ create table if not exists tournament_db.tournaments
 
 create table if not exists tournament_db.matches
 (
-    id               int    primary key,
+    id               int    auto_increment primary key,
     position         int    null,
     round            int    not null,
     bottom_player_id bigint null,

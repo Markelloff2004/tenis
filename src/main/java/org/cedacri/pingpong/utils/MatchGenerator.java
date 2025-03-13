@@ -38,8 +38,8 @@ public class MatchGenerator {
         this.tournamentService = tournamentService;
     }
 
-    public void generateMatches(Tournament tournament) {
-//        Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
+    public void generateMatches(Tournament tournamentRef) {
+        Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
 
         switch(tournamentType){
             case OLYMPIC -> {
@@ -58,8 +58,6 @@ public class MatchGenerator {
     }
 
     private void generateRobinRoundTournament(Tournament tournament) {
-
-
         List<Player> players = new ArrayList<>(tournament.getPlayers());
         int numPlayers = players.size();
 
@@ -78,7 +76,6 @@ public class MatchGenerator {
 
         // Распределение игроков в отдельном методе PlayerDistributer
         playerDistributer.distributePlayersInRobinRound(matches, players);
-
         tournamentService.saveTournament(tournament);
     }
 

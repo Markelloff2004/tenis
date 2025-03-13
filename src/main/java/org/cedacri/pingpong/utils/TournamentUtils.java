@@ -268,9 +268,10 @@ public class TournamentUtils {
 
     public static int calculateNewGoalsScored(Player player, Tournament tournament) {
         return tournament.getMatches().stream()
-                .filter(match -> match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player))
+                .filter(match -> (match.getTopPlayer() != null && match.getTopPlayer().equals(player)) ||
+                        (match.getBottomPlayer() != null && match.getBottomPlayer().equals(player)))
                 .flatMapToInt(match -> match.getScore().stream()
-                        .mapToInt(score -> match.getTopPlayer().equals(player)
+                        .mapToInt(score -> (match.getTopPlayer() != null && match.getTopPlayer().equals(player))
                                 ? score.getTopPlayerScore()
                                 : score.getBottomPlayerScore())
                 )
@@ -279,9 +280,10 @@ public class TournamentUtils {
 
     public static int calculateNewGoalsLost(Player player, Tournament tournament) {
         return tournament.getMatches().stream()
-                .filter(match -> match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player))
+                .filter(match -> (match.getTopPlayer() != null && match.getTopPlayer().equals(player)) ||
+                        (match.getBottomPlayer() != null && match.getBottomPlayer().equals(player)))
                 .flatMapToInt(match -> match.getScore().stream()
-                        .mapToInt(score -> match.getTopPlayer().equals(player)
+                        .mapToInt(score -> (match.getTopPlayer() != null && match.getTopPlayer().equals(player))
                                 ? score.getBottomPlayerScore()
                                 : score.getTopPlayerScore())
                 )
@@ -298,7 +300,8 @@ public class TournamentUtils {
         return (int) tournament.getMatches().stream()
                 .filter(match -> match.getWinner() != null
                         && !match.getWinner().equals(player)
-                        && (match.getTopPlayer().equals(player) || match.getBottomPlayer().equals(player)))
+                        && ((match.getTopPlayer() != null && match.getTopPlayer().equals(player)) ||
+                        (match.getBottomPlayer() != null && match.getBottomPlayer().equals(player))))
                 .count();
     }
 

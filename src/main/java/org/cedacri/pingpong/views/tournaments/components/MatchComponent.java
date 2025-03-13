@@ -40,7 +40,7 @@ public class MatchComponent extends HorizontalLayout {
 
         configureLayout();
         add(
-                createMatchIdDetails(match),
+                createMatchOrderDetails(match),
                 createPlayersDetails(match),
                 createScoreDetails(match, refreshMatches),
                 createWinnerDetails(match)
@@ -56,13 +56,13 @@ public class MatchComponent extends HorizontalLayout {
         getStyle().set("background-color", "#f8f8f8");
     }
 
-    private VerticalLayout createMatchIdDetails(Match match) {
+    private VerticalLayout createMatchOrderDetails(Match match) {
         VerticalLayout matchIdDetails = new VerticalLayout();
         matchIdDetails.setMaxWidth("120px");
         matchIdDetails.setAlignItems(Alignment.START);
         matchIdDetails.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        Span spanDetails = new Span("Match: " + match.getId());
+        Span spanDetails = new Span("Match: " + match.getPosition());
         matchIdDetails.add(spanDetails);
         return matchIdDetails;
     }
