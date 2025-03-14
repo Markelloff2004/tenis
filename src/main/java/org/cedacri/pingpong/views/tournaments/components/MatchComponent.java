@@ -160,7 +160,7 @@ public class MatchComponent extends HorizontalLayout {
         if (winner.getWinner() != null)
             winnerDetails.add(ViewUtils.createPlayerLabel(winner.getWinner().getName() + " " + winner.getWinner().getSurname()));
         else
-            winnerDetails.add(ViewUtils.createPlayerLabel("Match " + winner.getId() + " winner"));
+            winnerDetails.add(ViewUtils.createPlayerLabel("Match " + winner.getPosition() + " winner"));
 
         return winnerDetails;
     }
@@ -200,7 +200,7 @@ public class MatchComponent extends HorizontalLayout {
 
     private Span getPlayerLabel(Player player, Match match, boolean isTop) {
         return player != null
-                ? ViewUtils.createPlayerLabel(player.getRating() + " " + player.getName() + " " + player.getSurname())
+                ? ViewUtils.createPlayerLabel(player.getName() + " " + player.getSurname())
                 : getPreviousMatchWinner(match, isTop);
     }
 
@@ -220,7 +220,7 @@ public class MatchComponent extends HorizontalLayout {
                 Optional<Match> topMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 1).findFirst();
 
                 if (topMatch.isPresent())
-                    return ViewUtils.createPlayerLabel("Match " + topMatch.get().getId() + " winner");
+                    return ViewUtils.createPlayerLabel("Match " + topMatch.get().getPosition() + " winner");
 
             }
         } else {
@@ -228,7 +228,7 @@ public class MatchComponent extends HorizontalLayout {
                 Optional<Match> bottomMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 0).findFirst();
 
                 if (bottomMatch.isPresent())
-                    return ViewUtils.createPlayerLabel("Match " + bottomMatch.get().getId() + " winner");
+                    return ViewUtils.createPlayerLabel("Match " + bottomMatch.get().getPosition() + " winner");
 
             }
         }

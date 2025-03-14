@@ -73,7 +73,7 @@ public class TournamentUtils {
         return rounds;
     }
 
-    public static void updateWinnersAfterRound(int round, Tournament tournament) {
+    public static void movePlayersWithoutOpponent(int round, Tournament tournament) {
 
         List<Match> thisRoundMatches = tournament.getMatches()
                 .stream()
@@ -94,7 +94,7 @@ public class TournamentUtils {
 
     }
 
-    public static void determinateWinner(Match match) {
+    public static void determinateWinnerFromScore(Match match) {
 
         int topPlayerWins = 0;
         int bottomPlayerWins = 0;
@@ -134,9 +134,9 @@ public class TournamentUtils {
 
         if (match.getRound() < TournamentUtils.calculateNumberOfRounds(match.getTournament().getMaxPlayers())) {
             if (match.getPosition() % 2 == 0) {
-                match.getNextMatch().setBottomPlayer(match.getWinner());
-            } else {
                 match.getNextMatch().setTopPlayer(match.getWinner());
+            } else {
+                match.getNextMatch().setBottomPlayer(match.getWinner());
             }
         }
     }

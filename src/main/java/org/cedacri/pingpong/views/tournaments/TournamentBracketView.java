@@ -24,10 +24,7 @@ import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
 import org.cedacri.pingpong.views.tournaments.components.RobinRoundDetailsDialog;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Route(value = "tournament/matches", layout = MainLayout.class)
@@ -186,6 +183,8 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         log.info("Displaying {} matches", matches.size());
         matchContainer.removeAll();
+
+        matches = matches.stream().sorted(Comparator.comparing(Match::getPosition).reversed()).toList();
 
         for (Match match : matches) {
             log.debug("Processed match {}", match);

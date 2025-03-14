@@ -172,7 +172,7 @@ public class MatchService {
         }
 
         match.setScore(validScores);
-        TournamentUtils.determinateWinner(match);
+        TournamentUtils.determinateWinnerFromScore(match);
 
         matchRepository.saveAndFlush(match); //throws IllegalArgumentException
 

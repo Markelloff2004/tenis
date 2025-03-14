@@ -20,15 +20,17 @@ public class PlayerDistributer {
      * @param maxPlayers - maximum number of players (nearest power of 2)
      * @return list of player pairs for matches
      */
-    public List<Player[]> distributePlayers(Tournament tournament, int maxPlayers) {
+    public List<Player[]> distributePlayersIntoOlympicPairs(Tournament tournament, int maxPlayers) {
+        log.info("Ordering players by rating in {} tournament", tournament);
         List<Player[]> pairs = new ArrayList<>();
         List<Player> paddedPlayers =
-                new ArrayList<>(tournament.getPlayers().stream().sorted(Comparator.comparingInt(Player::getRating)).toList());
+                new ArrayList<>(tournament.getPlayers().stream().sorted(Comparator.comparingInt(Player::getRating).reversed()).toList());
 
         while (paddedPlayers.size() < maxPlayers) {
             paddedPlayers.add(null);
         }
 
+        log.info("Grouping players into pairs ");
         for (int i = 0; i < maxPlayers / 2; i++) {
             Player topPlayer = paddedPlayers.get(i);
             Player bottomPlayer = paddedPlayers.get(maxPlayers - i - 1);
@@ -40,8 +42,8 @@ public class PlayerDistributer {
 
             pairs.add(new Player[]{topPlayer, bottomPlayer});
             log.info("Generated new pair: TopPlayer={}, BottomPlayer={}",
-                    topPlayer != null ? topPlayer.getName() : "null",
-                    bottomPlayer != null ? bottomPlayer.getName() : "null");
+                    topPlayer != null ? topPlayer.getName()+" "+topPlayer.getSurname() : "null",
+                    bottomPlayer != null ? bottomPlayer.getName()+" "+bottomPlayer.getSurname() : "null");
         }
 
         return pairs;
@@ -54,21 +56,29 @@ public class PlayerDistributer {
      * @param tournament - tournament
      */
     public void distributePlayersInFirstRound(int maxPlayers, Tournament tournament) {
-        List<Player[]> pairs = distributePlayers(tournament, maxPlayers);
+        List<Player[]> pairs = distributePlayersIntoOlympicPairs(tournament, maxPlayers);
 
         List<Match> firstRoundMatches = tournament.getMatches().stream()
                 .filter(m -> m.getRound() == 1)
-                .sorted(Comparator.comparingInt(Match::getPosition))
+                .sorted(Comparator.comparingInt(Match::getPosition).reversed())
                 .toList();
 
         if (firstRoundMatches.size() != pairs.size()) {
-            log.error("Error while trying distributing pairs of players through first round matches");
+            log.error("Error while trying distributing pairs of players through first round matches: Amount of first round matches does not match with number of pairs!");
             throw new IllegalStateException("Amount of first round matches does not match with number of pairs!");
         }
 
+        int[] positions = Constants.OLYMPIC_POSITIONS.get(maxPlayers);
+        if (positions == null) {
+            log.error("Error while trying distributing pairs of players through first round matches: Unsupported number of players {}", maxPlayers);
+            throw new IllegalArgumentException("Unsupported number of players: " + maxPlayers);
+        }
+
         for (int i = 0; i < firstRoundMatches.size(); i++) {
+            int index = positions[i] - 1;
+
             Match match = firstRoundMatches.get(i);
-            Player[] pair = pairs.get(i);
+            Player[] pair = pairs.get(index);
 
             match.setTopPlayer(pair[0]);
             match.setBottomPlayer(pair[1]);

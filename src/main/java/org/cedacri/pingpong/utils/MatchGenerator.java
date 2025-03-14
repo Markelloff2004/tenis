@@ -42,12 +42,8 @@ public class MatchGenerator {
         Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
 
         switch(tournamentType){
-            case OLYMPIC -> {
-                List<Player> sortedPlayers = new ArrayList<>(tournament.getPlayers());
-                sortedPlayers.sort(Comparator.comparingInt(Player::getRating).reversed());
+            case OLYMPIC -> generateOlympicTournament(tournament);
 
-                generateOlympicTournament(tournament);
-            }
             case ROBIN_ROUND -> generateRobinRoundTournament(tournament);
             default -> {
                 NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
@@ -82,36 +78,40 @@ public class MatchGenerator {
     private void generateOlympicTournament(Tournament tournament) {
 
         tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
-        tournamentService.saveTournament(tournament);
 
         int maxPlayers = tournament.getMaxPlayers();
         int totalRounds = TournamentUtils.calculateNumberOfRounds(maxPlayers);
 
 
-        generatePreviousRounds(tournament, totalRounds);
+        generateOlympicMatches(tournament, totalRounds);
         playerDistributer.distributePlayersInFirstRound(maxPlayers, tournament);
-        TournamentUtils.updateWinnersAfterRound(1, tournament);
+        TournamentUtils.movePlayersWithoutOpponent(1, tournament);
 
+        tournamentService.saveTournament(tournament);
     }
 
-    private void generatePreviousRounds(Tournament tournament, int totalRounds) {
+    private void generateOlympicMatches(Tournament tournament, int totalRounds) {
         int currentMatches = 1;
+        int position = 1;
         for (int round = totalRounds; round > 0; round--) {
-            if(round != totalRounds) {
+            if (round != totalRounds) {
                 currentMatches *= 2;
 
                 List<Match> currentRoundMatches = new ArrayList<>();
 
                 for (int i = 0; i < currentMatches; i++) {
-                    int position = i + 1;
+                    position++;
 
                     int currentRound = round;
+
                     List<Match> previousRoundMatches = tournament.getMatches().stream()
                             .filter(m -> m.getRound() == (currentRound + 1))
                             .toList();
 
-                        int nextMatchIndex = (((i + 1) / 2) + ((i + 1) % 2));
+                    int nextMatchIndex = position / 2;
+
                     Optional<Match> nextMatch = previousRoundMatches.stream().filter(m -> m.getPosition() == nextMatchIndex).findFirst();
+
                     if (nextMatch.isPresent()) {
                         Match match = createMatch(round, position, nextMatch.orElse(null), tournament);
                         currentRoundMatches.add(match);
@@ -122,10 +122,9 @@ public class MatchGenerator {
                     }
                 }
                 tournament.getMatches().addAll(currentRoundMatches);
-            }
-            else {
-                Match finalMatch = createMatch(totalRounds, 1, null, tournament);
-                    tournament.getMatches().add(finalMatch);
+            } else {
+                Match finalMatch = createMatch(totalRounds, position, null, tournament);
+                tournament.getMatches().add(finalMatch);
             }
         }
     }
