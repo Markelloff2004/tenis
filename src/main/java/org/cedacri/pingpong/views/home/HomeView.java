@@ -15,6 +15,7 @@ import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -46,7 +47,19 @@ public class HomeView extends VerticalLayout {
     }
 
     private void displayTournaments() {
-        List<Tournament> tournaments = tournamentService.findAllTournaments().toList();
+        List<Tournament> tournaments = tournamentService.findAllTournaments()
+                .sorted(
+                        Comparator.comparing(
+                                        Tournament::getStartedAt,
+                                        Comparator.nullsFirst(Comparator.naturalOrder())
+                                )
+                                .thenComparing(
+                                        Tournament::getCreatedAt,
+                                        Comparator.nullsFirst(Comparator.naturalOrder())
+                                )
+                                .reversed()
+                )
+                .toList();
         log.info("Displaying {} tournaments", tournaments.size());
 
         tournamentContainer.removeAll();

@@ -10,6 +10,8 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 
+import java.time.LocalDate;
+
 @Slf4j
 public class TournamentSummaryComponent extends HorizontalLayout
 {
@@ -54,7 +56,18 @@ public class TournamentSummaryComponent extends HorizontalLayout
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        Span dateCreated = new Span("📅 " + tournament.getCreatedAt().toString());
+        String startedAtInfo;
+        LocalDate startedAt = tournament.getStartedAt();
+        if (startedAt == null)
+        {
+            startedAtInfo = "Tournament has not started yet";
+        }
+        else
+        {
+            startedAtInfo = startedAt.toString();
+        }
+
+        Span dateCreated = new Span("📅 " + startedAtInfo);
         dateCreated.getStyle().set("font-size", "16px");
         details.add(dateCreated);
         return details;

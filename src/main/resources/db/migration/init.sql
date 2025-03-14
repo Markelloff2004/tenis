@@ -35,6 +35,7 @@ create table if not exists tournament_db.tournaments
     id                     int auto_increment
         primary key,
     created_at             date                                                                   null,
+    started_at             date                                                                   null,
     finals_sets_to_win     enum ('BEST_OF_FIVE', 'BEST_OF_ONE', 'BEST_OF_SEVEN', 'BEST_OF_THREE') not null,
     max_players            int                                                                    not null,
     semifinals_sets_to_win enum ('BEST_OF_FIVE', 'BEST_OF_ONE', 'BEST_OF_SEVEN', 'BEST_OF_THREE') not null,

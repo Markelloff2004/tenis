@@ -10,6 +10,7 @@ import org.cedacri.pingpong.utils.*;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -74,8 +75,11 @@ public class TournamentService {
         if (tournament.getPlayers().size() < minAmountPlayers ) {
             throw new NotEnoughPlayersException(tournament.getPlayers().size(), minAmountPlayers);
         }
-        MatchGenerator matchGenerator = createMatchGenerator(tournament);
 
+        tournament.setStartedAt(LocalDate.now());
+        tournamentRepository.save(tournament);
+
+        MatchGenerator matchGenerator = createMatchGenerator(tournament);
         matchGenerator.generateMatches(tournament);
     }
 
@@ -83,6 +87,4 @@ public class TournamentService {
         return new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
                 tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this);
     }
-
-
 }
