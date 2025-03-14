@@ -10,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
@@ -32,6 +33,7 @@ import java.util.Set;
 @Slf4j
 @Route(value = "tournament/matches", layout = MainLayout.class)
 @PermitAll
+@AnonymousAllowed
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer> {
 
     private final TournamentService tournamentService;

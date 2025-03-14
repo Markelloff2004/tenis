@@ -58,7 +58,7 @@ public class HomeView extends VerticalLayout {
 
         tournaments.forEach(tournament -> {
             log.debug("Processed tournament {}", tournament);
-            tournamentContainer.add(new TournamentSummaryComponent(tournamentService, tournament));
+            tournamentContainer.add(new TournamentSummaryComponent(tournament));
         });
     }
 
