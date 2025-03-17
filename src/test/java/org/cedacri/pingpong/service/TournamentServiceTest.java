@@ -718,6 +718,8 @@ public class TournamentServiceTest {
 
         @Mock
         private MatchGenerator matchGeneratorMock;
+        @Mock
+        private TournamentRepository tournamentRepository;
 
         @Spy
         @InjectMocks
