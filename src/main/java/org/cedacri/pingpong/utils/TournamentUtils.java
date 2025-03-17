@@ -73,7 +73,7 @@ public class TournamentUtils {
         return rounds;
     }
 
-    public static void updateWinnersAfterRound(int round, Tournament tournament) {
+    public static void movePlayersWithoutOpponent(int round, Tournament tournament) {
 
         List<Match> thisRoundMatches = tournament.getMatches()
                 .stream()
@@ -94,7 +94,7 @@ public class TournamentUtils {
 
     }
 
-    public static void determinateWinner(Match match) {
+    public static void determinateWinnerFromScore(Match match) {
 
         int topPlayerWins = 0;
         int bottomPlayerWins = 0;
@@ -168,16 +168,6 @@ public class TournamentUtils {
             return semifinalSetsToWin;
         } else {
             return setsToWin;
-        }
-    }
-
-    private static void finishTournament(Tournament tournament) {
-        tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
-
-        if (tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC) {
-            updateRatingAndSetTournamentWinnerOlympic(tournament);
-        } else if (tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND) {
-            updateRatingAndSetTournamentWinnerRobinRound(tournament);
         }
     }
 
@@ -305,20 +295,48 @@ public class TournamentUtils {
                 .count();
     }
 
-    public static void checkAndUpdateTournamentWinner(Match match, TournamentService tournamentService) {
-        Tournament tournament = tournamentService.findTournamentById(match.getTournament().getId());
+    public static void checkAndUpdateTournamentWinner(Tournament tournament, TournamentService tournamentService) {
+        boolean isOlympic = tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC;
+        boolean isRobinRound = tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND;
 
-        if (isFinished(tournament)) {
-            finishTournament(tournament);
-            tournamentService.saveTournament(tournament);
+        if (isOlympic) {
+            boolean finalMatchHasWinner = tournament.getMatches().stream()
+                    .anyMatch(m -> m.getPosition() == 1 && m.getWinner() != null);
 
-            UI.getCurrent().navigate("home");
-            NotificationManager.showInfoNotification(Constants.TOURNAMENT_WINNER_HAS_BEEN_DETERMINATED + tournament.getWinner().getName() + " " + tournament.getWinner().getSurname());
+            if (finalMatchHasWinner) {
+                finalizeTournament(tournament, tournamentService, TournamentTypeEnum.OLYMPIC);
+            } else {
+                NotificationManager.showErrorNotification(Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED
+                        + "Please assure that the Final match has a winner.");
+            }
+        } else if (isRobinRound) {
+            boolean allMatchesHaveWinner = tournament.getMatches().stream()
+                    .allMatch(m -> m.getWinner() != null);
+
+            if (allMatchesHaveWinner) {
+                finalizeTournament(tournament, tournamentService, TournamentTypeEnum.ROBIN_ROUND);
+            } else {
+                NotificationManager.showErrorNotification(Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED
+                        + "Please assure that all matches have a winner.");
+            }
         }
     }
 
-    private static boolean isFinished(Tournament tournament) {
-        return tournament.getMatches().stream().allMatch(match -> match.getWinner() != null);
+    private static void finalizeTournament(Tournament tournament, TournamentService tournamentService, TournamentTypeEnum type) {
+        tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
+
+        if (type == TournamentTypeEnum.OLYMPIC) {
+            updateRatingAndSetTournamentWinnerOlympic(tournament);
+        } else {
+            updateRatingAndSetTournamentWinnerRobinRound(tournament);
+        }
+
+        tournamentService.saveTournament(tournament);
+
+        UI.getCurrent().navigate("home");
+        NotificationManager.showInfoNotification(Constants.TOURNAMENT_WINNER_HAS_BEEN_DETERMINATED
+                + tournament.getWinner().getName() + " " + tournament.getWinner().getSurname());
     }
+
 
 }

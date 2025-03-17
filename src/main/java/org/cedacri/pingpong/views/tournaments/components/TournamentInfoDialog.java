@@ -45,7 +45,6 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
 
         prefillFields(tournament);
         setReadOnlyForFields();
-//        refreshGrids();
     }
 
     private void setReadOnlyForFields() {
@@ -71,15 +70,15 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
         if (!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
             Button saveButton = ViewUtils.createSecuredButton(
                     "Matches",
-                    "colored-button",
+                    ViewUtils.COLORED_BUTTON,
                     this::onSave,
                     RoleEnum.ADMIN, RoleEnum.MANAGER
             );
-            Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+            Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
         } else {
-            Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+            Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, cancelButton);
 

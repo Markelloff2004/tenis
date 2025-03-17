@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
@@ -25,10 +26,7 @@ import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
 import org.cedacri.pingpong.views.tournaments.components.RobinRoundDetailsDialog;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Route(value = "tournament/matches", layout = MainLayout.class)
@@ -90,25 +88,37 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private void initialLoadMatchesBasedOnTournamentType() {
         if (tournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC)) {
             refreshMatchesInRound(1);
-        } else if (tournament.getTournamentType().equals(TournamentTypeEnum.ROBIN_ROUND))
-        {
+        } else if (tournament.getTournamentType().equals(TournamentTypeEnum.ROBIN_ROUND)) {
             refreshMatchesInRound("All");
         }
     }
 
     private HorizontalLayout createRoundButtonsLayout() {
-
         log.info("Creating layout for Round buttons.");
+
+        HorizontalLayout buttonsLayout;
 
         TournamentTypeEnum type = tournament.getTournamentType();
 
         if (type == TournamentTypeEnum.OLYMPIC) {
-            return createOlympicRoundButtons();
+            buttonsLayout = createOlympicRoundButtons();
         } else if (type == TournamentTypeEnum.ROBIN_ROUND) {
-            return createRobinRoundPlayerSelection();
+            buttonsLayout = createRobinRoundPlayerSelection();
         } else {
-            return createUnknownTournamentType();
+            buttonsLayout = createUnknownTournamentType();
         }
+
+        if (tournament.getTournamentStatus() == TournamentStatusEnum.ONGOING) {
+            buttonsLayout.add(
+                    ViewUtils.createButton(
+                            "End Tournament",
+                            ViewUtils.BUTTON,
+                            () -> TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService)
+                    )
+            );
+        }
+
+        return buttonsLayout;
     }
 
     private HorizontalLayout createUnknownTournamentType() {
@@ -124,7 +134,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         playerOptionsComboBox.setValue(playerOptions.get(0));
         playerOptionsComboBox.addValueChangeListener(event -> refreshMatchesInRound(event.getValue()));
 
-        Button openRating = ViewUtils.createButton("View Rating","button", () -> {
+        Button openRating = ViewUtils.createButton("View Rating", ViewUtils.BUTTON, () -> {
             RobinRoundDetailsDialog robinRoundDetailsDialog = new RobinRoundDetailsDialog(tournament.getId(), tournamentService);
             robinRoundDetailsDialog.open();
         });
@@ -152,7 +162,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 ViewUtils.highlightSelectedComponentFromComponentsList(buttons, round - 1, "selected");
             });
 
-            roundButton.addClassName("button");
+            roundButton.addClassName(ViewUtils.BUTTON);
             buttons.add(roundButton);
             roundButtons.add(roundButton);
         }
@@ -189,13 +199,15 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         log.info("Displaying {} matches", matches.size());
         matchContainer.removeAll();
 
+        matches = matches.stream().sorted(Comparator.comparing(Match::getPosition).reversed()).toList();
+
         for (Match match : matches) {
             log.debug("Processed match {}", match);
 
-            MatchComponent matchLayout = new MatchComponent(match, matchService, tournamentService, tournament,
+            MatchComponent matchLayout = new MatchComponent(match, matchService, tournament,
                     () -> {
                         if (tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC)
-                            refreshMatchesInRound( match.getRound());
+                            refreshMatchesInRound(match.getRound());
 
                         if (tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND)
                             refreshMatchesInRound(playerOptionsComboBox.getValue());

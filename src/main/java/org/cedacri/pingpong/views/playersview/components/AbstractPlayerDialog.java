@@ -27,7 +27,7 @@ public abstract class AbstractPlayerDialog extends Dialog {
     protected DatePicker birthDatePicker;
     protected ComboBox<String> handComboBox;
 
-    public AbstractPlayerDialog(String headerTitle) {
+    protected AbstractPlayerDialog(String headerTitle) {
         log.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
@@ -74,16 +74,14 @@ public abstract class AbstractPlayerDialog extends Dialog {
                 birthDatePicker,
                 handComboBox
         );
-//        fields.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-//        fields.setSpacing(false);
         fields.setPadding(false);
 
         return fields;
     }
 
     protected HorizontalLayout createButtonsLayout() {
-        Button saveButton = ViewUtils.createButton("Save", "colored-button", this::onSave);
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+        Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
     }

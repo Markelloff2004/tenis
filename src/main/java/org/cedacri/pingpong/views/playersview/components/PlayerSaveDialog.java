@@ -9,9 +9,9 @@ import org.cedacri.pingpong.utils.NotificationManager;
 
 public class PlayerSaveDialog extends AbstractPlayerDialog {
 
-    private PlayerService playerService;
-    private Runnable onSaveCallback;
-    private Player player;
+    private final PlayerService playerService;
+    private final Runnable onSaveCallback;
+    private final Player player;
 
     public PlayerSaveDialog(PlayerService playerService, Runnable onSaveCallback) {
         super("Save Player");
@@ -39,10 +39,10 @@ public class PlayerSaveDialog extends AbstractPlayerDialog {
             playerService.savePlayer(player);
             onSaveCallback.run();
             close();
-            NotificationManager.showInfoNotification("Player saved successfully!");
+            NotificationManager.showInfoNotification(Constants.PLAYER_SAVE_SUCCESS);
         } catch (ConstraintViolationException e) {
-            log.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
-            NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
+            log.error(Constants.PLAYER_SAVE_ERROR + "{}", e.getMessage());
+            NotificationManager.showErrorNotification(Constants.PLAYER_SAVE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }
     }
 }

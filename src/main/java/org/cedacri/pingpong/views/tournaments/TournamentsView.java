@@ -11,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
@@ -63,7 +62,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
         Button addTournamentButton = ViewUtils.createSecuredButton(
                 "Add Tournament",
-                "colored-button",
+                ViewUtils.COLORED_BUTTON,
                 this::showCreateTournament,
                 RoleEnum.ADMIN, RoleEnum.MANAGER
         );
@@ -101,13 +100,13 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     private HorizontalLayout createActionButtons(Tournament tournament) {
         Button viewButton = ViewUtils.createButton(
                 "View",
-                "compact-button",
+                ViewUtils.COMPACT_BUTTON,
                 () -> showInfoTournament(tournament)
         );
 
         Button deleteButton = ViewUtils.createSecuredButton(
                 "Delete",
-                "compact-button",
+                ViewUtils.COMPACT_BUTTON,
                 () -> showDeleteTournament(tournament),
                 RoleEnum.ADMIN
         );
@@ -119,7 +118,7 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
 
             Button editButton = ViewUtils.createSecuredButton(
                     "Edit",
-                    "compact-button",
+                    ViewUtils.COMPACT_BUTTON,
                     () -> showEditTournament(tournament),
                     RoleEnum.ADMIN, RoleEnum.MANAGER
             );
