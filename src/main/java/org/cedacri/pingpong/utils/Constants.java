@@ -44,12 +44,12 @@ public class Constants {
 
     //Exceptions
     public static final String NOT_ENOUGH_PLAYERS_MESSAGE = "Not enough players!";
-    public static final String ROBIN_ROUND_NOT_SUPPORTED = "At moment matches for this type of tournament cannot be generated";
 
     public static final String TOURNAMENT_CANNOT_BE_NULL = "Tournament cannot be null";
     public static final int MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC = 8;
     public static final int MINIMAL_AMOUNT_OF_PLAYER_FOR_ROBIN_ROUND = 4;
-    public static final String TOURNAMENT_WINNER_HAS_BEEN_DETERMINATED = "Tournament winner has benn determinated: ";
+    public static final String TOURNAMENT_WINNER_HAS_BEEN_DETERMINATED = "Tournament winner has been determinated: ";
+    public static final String TOURNAMENT_WINNER_CANT_BE_DETERMINATED = "Tournament winner cant be determinated: ";
 
     // OLYMPIC_POSITIONS maps the number of players to their predefined seeding positions
     // for the first round in an Olympic-style tournament bracket.

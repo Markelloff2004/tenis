@@ -1,6 +1,8 @@
 package org.cedacri.pingpong.views.tournaments.components;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -14,7 +16,6 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
-import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -30,11 +31,9 @@ public class MatchComponent extends HorizontalLayout {
     private final MatchService matchService;
     private final Tournament tournament;
     private final List<List<TextField>> scoreFields = new ArrayList<>();
-    private final TournamentService tournamentService;
 
-    public MatchComponent(Match match, MatchService matchService, TournamentService tournamentService, Tournament tournament, Runnable refreshMatches) {
+    public MatchComponent(Match match, MatchService matchService, Tournament tournament, Runnable refreshMatches) {
         this.matchService = matchService;
-        this.tournamentService = tournamentService;
         this.tournament = tournament;
         log.info("Initializing MatchComponent for match with id {}", match.getId());
 
@@ -91,19 +90,13 @@ public class MatchComponent extends HorizontalLayout {
         scoreDetails.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         List<Score> matchScore = match.getScore();
-
         int setsCount = TournamentUtils.getNumsOfSetsPerMatch(match);
 
         for (int i = 0; i < setsCount; i++) {
-            TextField topScoreField = (matchScore.size() > i)
-                    ? ViewUtils.createScoreField(matchScore.get(i).getTopPlayerScore())
-                    : ViewUtils.createScoreField(null);
+            TextField topScoreField = createScoreField(matchScore, i, true);
+            TextField bottomScoreField = createScoreField(matchScore, i, false);
 
-            TextField bottomScoreField = (matchScore.size() > i)
-                    ? ViewUtils.createScoreField(matchScore.get(i).getBottomPlayerScore())
-                    : ViewUtils.createScoreField(null);
-
-            if (match.getTopPlayer() == null || match.getBottomPlayer() == null) {
+            if (isReadOnly(match)) {
                 topScoreField.setReadOnly(true);
                 bottomScoreField.setReadOnly(true);
             }
@@ -119,37 +112,75 @@ public class MatchComponent extends HorizontalLayout {
             );
         }
 
-        Button editScoreButton;
-        if (tournament.getTournamentStatus().equals(TournamentStatusEnum.ONGOING)) {
-            editScoreButton = ViewUtils.createSecuredButton(
-                    "",
-                    "colored-button",
-                    () -> {
-                        updateMatchScore(match);
-                        onEditScoreCallback.run();
-                    },
-                    RoleEnum.MANAGER, RoleEnum.ADMIN
-            );
-
-        } else {
-            editScoreButton = ViewUtils.createSecuredButton(
-                    "",
-                    "colored-button",
-                    () -> {
-                        NotificationManager.showInfoNotification("Unable to edit the score for a match in a finished tournament");
-                        onEditScoreCallback.run();
-                    },
-                    RoleEnum.MANAGER, RoleEnum.ADMIN
-            );
-
-        }
-        editScoreButton.setIcon(VaadinIcon.PENCIL.create());
-        editScoreButton.setMaxWidth("20px");
+        Button editScoreButton = createEditScoreButton(match, onEditScoreCallback);
         scoreDetails.add(editScoreButton);
-
 
         return scoreDetails;
     }
+
+    private TextField createScoreField(List<Score> matchScore, int index, boolean isTop) {
+        if (matchScore.size() > index) {
+            return isTop
+                    ? ViewUtils.createScoreField(matchScore.get(index).getTopPlayerScore())
+                    : ViewUtils.createScoreField(matchScore.get(index).getBottomPlayerScore());
+        }
+        return ViewUtils.createScoreField(null);
+    }
+
+    private boolean isReadOnly(Match match) {
+        return match.getTopPlayer() == null ||
+                match.getBottomPlayer() == null ||
+                match.getTournament().getTournamentStatus() == TournamentStatusEnum.FINISHED;
+    }
+
+    private Button createEditScoreButton(Match match, Runnable onEditScoreCallback) {
+        Button editScoreButton = ViewUtils.createSecuredButton(
+                "",
+                ViewUtils.COLORED_BUTTON,
+                () -> handleEditScore(match, onEditScoreCallback),
+                RoleEnum.MANAGER, RoleEnum.ADMIN
+        );
+
+        editScoreButton.setIcon(VaadinIcon.PENCIL.create());
+        editScoreButton.setMaxWidth("20px");
+
+        return editScoreButton;
+    }
+
+    private void handleEditScore(Match match, Runnable onEditScoreCallback) {
+        if (match.getTournament().getTournamentStatus().equals(TournamentStatusEnum.ONGOING)) {
+            if (match.getWinner() != null) {
+                showConfirmDialog(match, onEditScoreCallback);
+            } else {
+                updateMatchScore(match);
+                onEditScoreCallback.run();
+            }
+        } else {
+            NotificationManager.showInfoNotification("Unable to edit the score for a match in a finished tournament");
+            onEditScoreCallback.run();
+        }
+    }
+
+    private void showConfirmDialog(Match match, Runnable onEditScoreCallback) {
+        Dialog confirmDialog = new Dialog();
+        confirmDialog.add(new Text("Are you sure about changing the score? This will change the current winner: " + match.getWinner().getName() + "?"));
+
+        Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () -> {
+            matchService.cleanAllFutureMatches(match);
+            updateMatchScore(match);
+            onEditScoreCallback.run();
+            confirmDialog.close();
+        });
+
+
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, confirmDialog::close);
+
+        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, confirmButton, cancelButton);
+        confirmDialog.add(buttonLayout);
+
+        confirmDialog.open();
+    }
+
 
     private VerticalLayout createWinnerDetails(Match winner) {
         VerticalLayout winnerDetails = new VerticalLayout();
@@ -174,28 +205,30 @@ public class MatchComponent extends HorizontalLayout {
                 int bottomScore = Integer.parseInt(scoreRow.get(1).getValue().trim());
                 newMatchScores.add(new Score(topScore, bottomScore));
 
-            } catch (NumberFormatException ignored){
+            } catch (NumberFormatException ignored) {
+                //Ignore, because tak nado.
             }
         }
 
-        String validationMessages = "";
+        if (!newMatchScores.isEmpty()) {
+            String validationMessages = "";
 
-        try {
-            validationMessages = matchService.validateAndUpdateScores(match, newMatchScores);
+            try {
+                validationMessages = matchService.validateAndUpdateScores(match, newMatchScores);
 
-            if (!validationMessages.isEmpty()) {
-                NotificationManager.showErrorNotification(validationMessages);
+                if (!validationMessages.isEmpty()) {
+                    NotificationManager.showErrorNotification(validationMessages);
+                }
+
+                if (!newMatchScores.isEmpty()) {
+                    NotificationManager.showInfoNotification("The Score for this match has been updated.");
+                    log.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
+                }
+            } catch (IllegalArgumentException illegalArgumentException) {
+                NotificationManager.showErrorNotification(illegalArgumentException.getMessage() + validationMessages);
             }
-
-            if (!newMatchScores.isEmpty()) {
-                NotificationManager.showInfoNotification("The Score for this match has been updated.");
-                log.info("Updated scores for match {}: {}", match.getId(), newMatchScores);
-
-                TournamentUtils.checkAndUpdateTournamentWinner(match, tournamentService);
-            }
-        } catch ( IllegalArgumentException illegalArgumentException) {
-            NotificationManager.showErrorNotification(illegalArgumentException.getMessage() + validationMessages);
         }
+
     }
 
     private Span getPlayerLabel(Player player, Match match, boolean isTop) {
@@ -205,7 +238,6 @@ public class MatchComponent extends HorizontalLayout {
     }
 
     private Span getPreviousMatchWinner(Match match, boolean isTop) {
-//
         List<Match> previousMatches = tournament.getMatches().stream()
                 .filter(m -> Objects.nonNull(m.getNextMatch()) && Objects.equals(m.getNextMatch().getId(), match.getId()))
                 .toList();
@@ -214,25 +246,12 @@ public class MatchComponent extends HorizontalLayout {
             return ViewUtils.createPlayerLabel("BYE");
         }
 
-        if (isTop) {
-            if (match.getTopPlayer() == null) {
-                //value top player
-                Optional<Match> topMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 1).findFirst();
+        Optional<Match> selectedMatch = previousMatches.stream()
+                .filter(m -> (isTop && m.getPosition() % 2 == 1) || (!isTop && m.getPosition() % 2 == 0))
+                .findFirst();
 
-                if (topMatch.isPresent())
-                    return ViewUtils.createPlayerLabel("Match " + topMatch.get().getPosition() + " winner");
-
-            }
-        } else {
-            if (match.getBottomPlayer() == null) {
-                Optional<Match> bottomMatch = previousMatches.stream().filter(m -> m.getPosition() % 2 == 0).findFirst();
-
-                if (bottomMatch.isPresent())
-                    return ViewUtils.createPlayerLabel("Match " + bottomMatch.get().getPosition() + " winner");
-
-            }
-        }
-
-        return new Span("Ne dorobotal");
+        return selectedMatch.map(matchObj -> ViewUtils.createPlayerLabel("Match " + matchObj.getPosition() + " winner"))
+                .orElse(ViewUtils.createPlayerLabel("No previous match winner"));
     }
+
 }

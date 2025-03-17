@@ -21,9 +21,6 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     protected IntegerField lostMatchesField;
     protected IntegerField goalsScoredField;
     protected IntegerField goalsLostField;
-//    protected TextField createdAtField;
-
-
 
     public PlayerEditDialog(Player player, PlayerService playerService, Runnable onSaveCallback) {
         super("Edit Player");
@@ -65,13 +62,12 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
         lostMatchesField = new IntegerField("Lost Matches");
         goalsScoredField = new IntegerField("Goals Scored");
         goalsLostField = new IntegerField("Goals Lost");
-//        createdAtField = ViewUtils.createTextField("Created At");
-//        createdAtField.setReadOnly(true);
 
         log.debug("Initialized fields for editing.");
 
     }
 
+    @Override
     protected void populateFields(Player player) {
         super.populateFields(player);
 
@@ -97,12 +93,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
                 lostMatchesField,
                 goalsScoredField,
                 goalsLostField
-//                ,createdAtField
-
         );
 
-//        fields.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-//        fields.setSpacing(false);
         fields.setPadding(false);
 
         return fields;
@@ -129,7 +121,7 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 
             close();
 
-            NotificationManager.showInfoNotification("Player updated successfully!");
+            NotificationManager.showInfoNotification(Constants.PLAYER_UPDATE_SUCCESS);
         } catch (Exception e) {
             log.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
             NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));

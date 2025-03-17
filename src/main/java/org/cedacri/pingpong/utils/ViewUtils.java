@@ -13,13 +13,19 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.enums.RoleEnum;
-import org.cedacri.pingpong.service.SecurityService;
 
 import java.util.List;
 
 @Slf4j
 public class ViewUtils {
 
+    public static final String BUTTON = "button";
+    public static final String COLORED_BUTTON = "colored-button";
+    public static final String COMPACT_BUTTON = "compact-button";
+
+    private ViewUtils() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
 
     public static Button createButton(String text, String className, Runnable clickListener) {
 

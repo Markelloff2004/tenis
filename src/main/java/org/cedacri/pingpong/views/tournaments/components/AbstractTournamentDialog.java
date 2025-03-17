@@ -53,7 +53,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
         typeComboBox = new ComboBox<>("Type");
         typeComboBox.setWidth("35%");
         typeComboBox.setRequired(true);
-        typeComboBox.addValueChangeListener((value) -> manageSetFields(value.getValue()));
+        typeComboBox.addValueChangeListener(value -> manageSetFields(value.getValue()));
 
         setsCountComboBox = new ComboBox<>("Sets Count");
         setsCountComboBox.setWidth("30%");
@@ -124,8 +124,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
     }
 
     protected HorizontalLayout createDialogButtons() {
-        Button saveButton = ViewUtils.createButton("Save", "colored-button", this::onSave);
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+        Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
     }

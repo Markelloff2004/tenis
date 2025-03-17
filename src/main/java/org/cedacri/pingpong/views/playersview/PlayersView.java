@@ -11,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
@@ -24,7 +23,6 @@ import org.cedacri.pingpong.views.playersview.components.PlayerDeleteDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerEditDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerInfoDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerSaveDialog;
-import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -63,7 +61,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
 
         Button addPlayerButton = ViewUtils.createSecuredButton(
                 "New player",
-                "colored-button",
+                ViewUtils.COLORED_BUTTON,
                 this::showCreatePlayer,
                 RoleEnum.ADMIN
         );
@@ -84,18 +82,18 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
         playersGrid.addColumn(
                         new ComponentRenderer<>(player ->
                         {
-                            Button detailsButton = ViewUtils.createButton("Details", "compact-button", () -> showDetailsPlayer(player));
+                            Button detailsButton = ViewUtils.createButton("Details", ViewUtils.COMPACT_BUTTON, () -> showDetailsPlayer(player));
 
                             Button editButton = ViewUtils.createSecuredButton(
                                     "Edit",
-                                    "compact-button",
+                                    ViewUtils.COMPACT_BUTTON,
                                     () -> showEditPlayer(player),
                                     RoleEnum.ADMIN
                             );
 
                             Button deleteButton = ViewUtils.createSecuredButton(
                                     "Delete",
-                                    "compact-button",
+                                    ViewUtils.COMPACT_BUTTON,
                                     () -> showDeletePlayer(player),
                                     RoleEnum.ADMIN
                             );
@@ -109,7 +107,6 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement 
                 .setTextAlign(ColumnTextAlign.CENTER);
 
         showAllPlayers();
-//        refreshGridData();
     }
 
     @Override

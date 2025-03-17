@@ -21,7 +21,7 @@ public class TournamentDeleteDialog extends Dialog {
 
         Button confirmButton = ViewUtils.createButton(
                 "Delete",
-                "colored-button",
+                ViewUtils.COLORED_BUTTON,
                 () -> {
                     log.debug("Delete button clicked. Attempting to delete tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
 
@@ -40,7 +40,7 @@ public class TournamentDeleteDialog extends Dialog {
                 }
         );
 
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () -> {
             log.info("Cancel button clicked. Closing TournamentDeleteDialog.");
             close();
         } );

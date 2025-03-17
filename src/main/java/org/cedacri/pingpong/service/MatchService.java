@@ -193,4 +193,39 @@ public class MatchService {
         return null;
     }
 
+    public void cleanAllFutureMatches(Match match) {
+        if (match == null) {
+            return;
+        }
+
+        List<Match> matchesToUpdate = new ArrayList<>();
+        Match currMatch = match;
+
+        while (currMatch != null && currMatch.getWinner() != null) {
+            currMatch.setWinner(null);
+
+            currMatch.getScore().clear();
+
+            Match nextMatch = currMatch.getNextMatch();
+            if (nextMatch != null) {
+                if (currMatch.getPosition() % 2 == 1) {
+                    nextMatch.setTopPlayer(null);
+                } else {
+                    nextMatch.setBottomPlayer(null);
+                }
+            }
+
+            matchesToUpdate.add(currMatch);
+            currMatch = nextMatch;
+        }
+
+        saveAllMatches(matchesToUpdate);
+    }
+
+    private void saveAllMatches(List<Match> matches) {
+        for (Match match : matches) {
+            this.saveMatch(match);
+        }
+    }
+
 }

@@ -44,8 +44,8 @@ public class TournamentAddDialog extends AbstractTournamentDialog {
 
     @Override
     protected HorizontalLayout createDialogButtons() {
-        Button saveButton = ViewUtils.createButton("Save", "colored-button", this::onSave);
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", this::onCancel);
+        Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, startNowCheckbox, saveButton, cancelButton);
     }

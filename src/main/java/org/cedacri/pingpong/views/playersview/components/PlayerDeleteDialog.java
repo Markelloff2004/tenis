@@ -25,7 +25,7 @@ public class PlayerDeleteDialog extends Dialog {
                 player.getSurname() + " with Id: " + player.getId() + "?");
         confirmationText.getStyle().set("margin", "10px 0");
 
-        Button deleteButton = ViewUtils.createButton("Delete", "colored-button", () ->
+        Button deleteButton = ViewUtils.createButton("Delete", ViewUtils.COLORED_BUTTON, () ->
         {
             log.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
             try {
@@ -45,7 +45,7 @@ public class PlayerDeleteDialog extends Dialog {
             }
         });
 
-        Button cancelButton = ViewUtils.createButton("Cancel", "button", () -> {
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () -> {
             log.info("Cancel button clicked. Closing PlayerDeleteDialog.");
             close();
         });

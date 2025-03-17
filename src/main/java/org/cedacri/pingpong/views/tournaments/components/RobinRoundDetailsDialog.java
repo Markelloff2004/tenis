@@ -19,7 +19,7 @@ public class RobinRoundDetailsDialog extends Dialog {
 
     private final Grid<Player> playerRatingGrid = new Grid<>(Player.class, false);
 
-    private Tournament tournament;
+    private final Tournament tournament;
 
     public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService) {
         log.info("Initializing tournament {} Rating ", tournamentId);
@@ -34,7 +34,7 @@ public class RobinRoundDetailsDialog extends Dialog {
         add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN, playerRatingGrid));
         loadPlayersIntoGrid();
 
-        Button closeDialog = ViewUtils.createButton("Cancel","button", () -> {
+        Button closeDialog = ViewUtils.createButton("Cancel",ViewUtils.BUTTON, () -> {
             log.info("Cancel button clicked. Closing TournamentDeleteDialog.");
             close();
         });
