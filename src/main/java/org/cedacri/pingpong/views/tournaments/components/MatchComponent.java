@@ -16,6 +16,7 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.SecurityUtils;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
@@ -103,7 +104,10 @@ public class MatchComponent extends HorizontalLayout {
                     ? ViewUtils.createScoreField(matchScore.get(i).getBottomPlayerScore())
                     : ViewUtils.createScoreField(null);
 
-            if (match.getTopPlayer() == null || match.getBottomPlayer() == null) {
+            if (match.getTopPlayer() == null
+                    || match.getBottomPlayer() == null
+                    || !SecurityUtils.hasAnyRole(RoleEnum.MANAGER, RoleEnum.ADMIN))
+            {
                 topScoreField.setReadOnly(true);
                 bottomScoreField.setReadOnly(true);
             }
