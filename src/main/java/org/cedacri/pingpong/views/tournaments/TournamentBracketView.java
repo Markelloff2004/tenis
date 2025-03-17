@@ -108,12 +108,17 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             buttonsLayout = createUnknownTournamentType();
         }
 
-        if (tournament.getTournamentStatus() == TournamentStatusEnum.ONGOING) {
+        if (tournament.getTournamentStatus() == TournamentStatusEnum.ONGOING)
+        {
             buttonsLayout.add(
                     ViewUtils.createButton(
                             "End Tournament",
                             ViewUtils.BUTTON,
-                            () -> TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService)
+                            () ->
+                            {
+                                refreshTournament();
+                                TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService);
+                            }
                     )
             );
         }
@@ -215,8 +220,13 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
             matchContainer.add(matchLayout);
         }
-
     }
+
+    private void refreshTournament() {
+        log.info("Refreshing tournament data...");
+        this.tournament = tournamentService.findTournamentById(tournament.getId());
+    }
+
 
 }
 
