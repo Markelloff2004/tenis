@@ -21,14 +21,6 @@ create table if not exists tournament_db.players
     check (`won_matches` >= 0)
 );
 
-create table if not exists tournament_db.roles
-(
-    id   bigint auto_increment
-        primary key,
-    name enum ('ADMIN', 'MANAGER', 'USER') not null,
-    constraint UKofx66keruapi6vyqpv6f2or37
-        unique (name)
-);
 
 create table if not exists tournament_db.tournaments
 (
@@ -91,6 +83,15 @@ create table if not exists tournament_db.tournament_players
         foreign key (player_id) references tournament_db.players (id)
 );
 
+create table if not exists tournament_db.roles
+(
+    id   bigint auto_increment
+        primary key,
+    name enum ('ADMIN', 'MANAGER', 'USER') not null,
+    constraint UKofx66keruapi6vyqpv6f2or37
+        unique (name)
+);
+
 create table if not exists tournament_db.users
 (
     id       bigint auto_increment
@@ -117,13 +118,14 @@ create table if not exists tournament_db.user_roles
 ################################## INSERTING # DATA ####################################################################
 ########################################################################################################################
 
-INSERT INTO tournament_db.roles (id, name) VALUES (3, 'ADMIN');
-INSERT INTO tournament_db.roles (id, name) VALUES (2, 'MANAGER');
-INSERT INTO tournament_db.roles (id, name) VALUES (1, 'USER');
 
-INSERT INTO tournament_db.users (id, password, username) VALUES (1, '$2a$12$Rb1824dn553ed/pik0K7uej7WHEVrCBRg8u.YuesIbtIG5oryIVD2', 'user');
-INSERT INTO tournament_db.users (id, password, username) VALUES (2, '$2a$12$4cvsXLfXFsMXV.2mP7zTeukWVycfo.iFeg3WmNCH5n6S2E534Ote2', 'manager');
-INSERT INTO tournament_db.users (id, password, username) VALUES (3, '$2a$12$53DrOtZ0lM517o9Dh8fZ/edj/qzQ/h1tXPX6tBSPqBY0zeYtSlJ8S', 'admin');
+INSERT INTO tournament_db.roles (id, name) VALUES (1, 'USER');
+INSERT INTO tournament_db.roles (id, name) VALUES (2, 'MANAGER');
+INSERT INTO tournament_db.roles (id, name) VALUES (3, 'ADMIN');
+
+INSERT INTO tournament_db.users (id, password, username) VALUES (1, '$2a$12$mCpUh9qMCUVolCiJVp/Qf.xSZVuJRDFasSatzApexVbatAUVlSW42', 'user');
+INSERT INTO tournament_db.users (id, password, username) VALUES (2, '$2a$12$efdDF3oLeO2Qij4yp.zLc.49QlxDmvBB0cMbJmCKVozWoEmt9IG5i', 'manager');
+INSERT INTO tournament_db.users (id, password, username) VALUES (3, '$2a$12$ETwUOy1Ob6Le9ChaSV9YXOTIs2S2ZVq.kZAzNop77zWYHaQ5N3yK.', 'admin');
 
 INSERT INTO tournament_db.user_roles (user_id, role_id) VALUES (1, 1);
 INSERT INTO tournament_db.user_roles (user_id, role_id) VALUES (2, 2);
@@ -140,11 +142,11 @@ INSERT INTO tournament_db.players (id, address, birth_date, created_at, email, g
 INSERT INTO tournament_db.players (id, address, birth_date, created_at, email, goals_lost, goals_scored, hand, lost_matches, name, rating, surname, won_matches) VALUES (9, '606 Boulevard, NY', '1990-06-15', '2025-02-12', 'grace.white@example.com', 60, 160, 'Right', 2, 'Grace', 1450, 'White', 22);
 INSERT INTO tournament_db.players (id, address, birth_date, created_at, email, goals_lost, goals_scored, hand, lost_matches, name, rating, surname, won_matches) VALUES (10, '707 Street, NY', '1987-04-30', '2025-02-12', 'henry.harris@example.com', 50, 170, 'Left', 1, 'Henry', 1500, 'Harris', 25);
 
-INSERT INTO tournament_db.tournaments (id, created_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (6, '2025-02-12', 'BEST_OF_FIVE', 8, 'BEST_OF_THREE', 'BEST_OF_ONE', 'Chisinau Cup', 'PENDING', 'OLYMPIC', null);
-INSERT INTO tournament_db.tournaments (id, created_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (7, '2025-02-10', 'BEST_OF_FIVE', 8, 'BEST_OF_THREE', 'BEST_OF_THREE', 'MAIB ', 'ONGOING', 'OLYMPIC', null);
-INSERT INTO tournament_db.tournaments (id, created_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (8, '2025-02-07', 'BEST_OF_SEVEN', 16, 'BEST_OF_FIVE', 'BEST_OF_THREE', 'Eximbank', 'FINISHED', 'OLYMPIC', 6);
-INSERT INTO tournament_db.tournaments (id, created_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (9, '2025-02-15', 'BEST_OF_THREE', 8, 'BEST_OF_THREE', 'BEST_OF_THREE', 'Cedacri', 'FINISHED', 'ROBIN_ROUND', 1);
-INSERT INTO tournament_db.tournaments (id, created_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (10, '2025-02-03', 'BEST_OF_ONE', 8, 'BEST_OF_ONE', 'BEST_OF_ONE', 'WebZipper', 'ONGOING', 'ROBIN_ROUND', null);
+INSERT INTO tournament_db.tournaments (id, created_at, started_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (6, '2024-02-12', null, 'BEST_OF_FIVE', 8, 'BEST_OF_THREE', 'BEST_OF_ONE', 'Chisinau Cup', 'PENDING', 'OLYMPIC', null);
+INSERT INTO tournament_db.tournaments (id, created_at, started_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (7, '2024-02-10', '2025-02-13', 'BEST_OF_FIVE', 8, 'BEST_OF_THREE', 'BEST_OF_THREE', 'MAIB ', 'ONGOING', 'OLYMPIC', null);
+INSERT INTO tournament_db.tournaments (id, created_at, started_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (8, '2025-02-07', '2025-02-08', 'BEST_OF_SEVEN', 16, 'BEST_OF_FIVE', 'BEST_OF_THREE', 'Eximbank', 'FINISHED', 'OLYMPIC', 6);
+INSERT INTO tournament_db.tournaments (id, created_at, started_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (9, '2025-02-15', '2025-02-15', 'BEST_OF_THREE', 8, 'BEST_OF_THREE', 'BEST_OF_THREE', 'Cedacri', 'FINISHED', 'ROBIN_ROUND', 1);
+INSERT INTO tournament_db.tournaments (id, created_at, started_at, finals_sets_to_win, max_players, semifinals_sets_to_win, sets_to_win, tournament_name, tournament_status, tournament_type, winner_id) VALUES (10, '2025-02-03', '2025-02-13', 'BEST_OF_ONE', 8, 'BEST_OF_ONE', 'BEST_OF_ONE', 'Webziper', 'ONGOING', 'ROBIN_ROUND', null);
 
 INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (7, 1);
 INSERT INTO tournament_db.tournament_players (tournament_id, player_id) VALUES (8, 1);
