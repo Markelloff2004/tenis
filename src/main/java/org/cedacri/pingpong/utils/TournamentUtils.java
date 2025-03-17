@@ -10,7 +10,9 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.TournamentService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class TournamentUtils {
@@ -295,39 +297,52 @@ public class TournamentUtils {
                 .count();
     }
 
-    public static void checkAndUpdateTournamentWinner(Tournament tournament, TournamentService tournamentService) {
-        boolean isOlympic = tournament.getTournamentType() == TournamentTypeEnum.OLYMPIC;
-        boolean isRobinRound = tournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND;
-
-        if (isOlympic) {
-            boolean finalMatchHasWinner = tournament.getMatches().stream()
-                    .anyMatch(m -> m.getPosition() == 1 && m.getWinner() != null);
-
-            if (finalMatchHasWinner) {
-                finalizeTournament(tournament, tournamentService, TournamentTypeEnum.OLYMPIC);
-            } else {
-                NotificationManager.showErrorNotification(Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED
-                        + "Please assure that the Final match has a winner.");
-            }
-        } else if (isRobinRound) {
-            boolean allMatchesHaveWinner = tournament.getMatches().stream()
-                    .allMatch(m -> m.getWinner() != null);
-
-            if (allMatchesHaveWinner) {
-                finalizeTournament(tournament, tournamentService, TournamentTypeEnum.ROBIN_ROUND);
-            } else {
-                NotificationManager.showErrorNotification(Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED
-                        + "Please assure that all matches have a winner.");
-            }
+    public static void checkAndUpdateTournamentWinner(Tournament tournament, TournamentService tournamentService)
+    {
+        if (isTournamentReadyToFinish(tournament))
+        {
+            finalizeTournament(tournament, tournamentService, tournament.getTournamentType());
+        }
+        else
+        {
+            NotificationManager.showErrorNotification(
+                    Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED + " Please assure that " +
+                            getErrorMessageForTournamentType(tournament)
+            );
         }
     }
 
-    private static void finalizeTournament(Tournament tournament, TournamentService tournamentService, TournamentTypeEnum type) {
+
+    public static boolean isTournamentReadyToFinish(Tournament tournament)
+    {
+        return switch (tournament.getTournamentType())
+        {
+            case OLYMPIC -> tournament.getMatches().stream()
+                    .anyMatch(m -> m.getPosition() == 1 && m.getWinner() != null);
+            case ROBIN_ROUND -> tournament.getMatches().stream()
+                    .allMatch(m -> m.getWinner() != null);
+        };
+    }
+
+    public static String getErrorMessageForTournamentType(Tournament tournament)
+    {
+        return switch (tournament.getTournamentType())
+        {
+            case OLYMPIC -> "the Final match must have a winner.";
+            case ROBIN_ROUND -> "all matches must have a winner.";
+        };
+    }
+
+    private static void finalizeTournament(Tournament tournament, TournamentService tournamentService, TournamentTypeEnum type)
+    {
         tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
 
-        if (type == TournamentTypeEnum.OLYMPIC) {
+        if (type == TournamentTypeEnum.OLYMPIC)
+        {
             updateRatingAndSetTournamentWinnerOlympic(tournament);
-        } else {
+        }
+        else
+        {
             updateRatingAndSetTournamentWinnerRobinRound(tournament);
         }
 
@@ -337,6 +352,4 @@ public class TournamentUtils {
         NotificationManager.showInfoNotification(Constants.TOURNAMENT_WINNER_HAS_BEEN_DETERMINATED
                 + tournament.getWinner().getName() + " " + tournament.getWinner().getSurname());
     }
-
-
 }

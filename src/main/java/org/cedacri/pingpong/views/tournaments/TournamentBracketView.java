@@ -1,7 +1,9 @@
 package org.cedacri.pingpong.views.tournaments;
 
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
@@ -20,13 +22,19 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.utils.Constants;
+import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
 import org.cedacri.pingpong.views.tournaments.components.RobinRoundDetailsDialog;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Route(value = "tournament/matches", layout = MainLayout.class)
@@ -111,19 +119,45 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         if (tournament.getTournamentStatus() == TournamentStatusEnum.ONGOING)
         {
             buttonsLayout.add(
-                    ViewUtils.createButton(
-                            "End Tournament",
-                            ViewUtils.BUTTON,
-                            () ->
-                            {
-                                refreshTournament();
-                                TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService);
-                            }
-                    )
+                    ViewUtils.createButton("End Tournament", ViewUtils.BUTTON, () ->
+                    {
+                        refreshTournament();
+
+                        if (TournamentUtils.isTournamentReadyToFinish(tournament))
+                        {
+                            showEndTournamentDialog();
+                        }
+                        else
+                        {
+                            NotificationManager.showErrorNotification(
+                                    Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED + " Please assure that " +
+                                            TournamentUtils.getErrorMessageForTournamentType(tournament)
+                            );
+                        }
+                    })
             );
         }
 
         return buttonsLayout;
+    }
+
+    private void showEndTournamentDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Confirm end tournament: " + tournament.getTournamentName());
+        dialog.add(new Text("Are you sure you want to end the tournament?"));
+
+
+        Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () -> {
+            TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService);
+            dialog.close();
+        });
+
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, dialog::close);
+
+        HorizontalLayout buttonLayout = ViewUtils.createHorizontalLayout(JustifyContentMode.CENTER, confirmButton, cancelButton);
+        dialog.add(buttonLayout);
+
+        dialog.open();
     }
 
     private HorizontalLayout createUnknownTournamentType() {
