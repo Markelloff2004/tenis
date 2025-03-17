@@ -10,7 +10,8 @@ import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 
-public class PlayerEditDialog extends AbstractPlayerDialog {
+public class PlayerEditDialog extends AbstractPlayerDialog
+{
 
     private final PlayerService playerService;
     private final Runnable onSaveCallback;
@@ -22,7 +23,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     protected IntegerField goalsScoredField;
     protected IntegerField goalsLostField;
 
-    public PlayerEditDialog(Player player, PlayerService playerService, Runnable onSaveCallback) {
+    public PlayerEditDialog(Player player, PlayerService playerService, Runnable onSaveCallback)
+    {
         super("Edit Player");
 
         this.playerService = playerService;
@@ -38,7 +40,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     }
 
     @Override
-    public void initializeFields() {
+    public void initializeFields()
+    {
         nameField = ViewUtils.createTextField("Name");
         nameField.setRequired(true);
 
@@ -68,7 +71,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     }
 
     @Override
-    protected void populateFields(Player player) {
+    protected void populateFields(Player player)
+    {
         super.populateFields(player);
 
         ratingField.setValue(player.getRating() != null ? player.getRating() : 0);
@@ -80,7 +84,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
     }
 
     @Override
-    protected VerticalLayout createFieldsLayout() {
+    protected VerticalLayout createFieldsLayout()
+    {
         VerticalLayout fields = ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.START,
                 ratingField,
                 nameField,
@@ -99,8 +104,10 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
 
         return fields;
     }
+
     @Override
-    protected void onSave() {
+    protected void onSave()
+    {
         log.info("Saving player: {} {}", player.getName(), player.getSurname());
         player.setName(nameField.getValue());
         player.setSurname(surnameField.getValue());
@@ -114,7 +121,8 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
         player.setGoalsScored(goalsScoredField.getValue());
         player.setGoalsLost(goalsLostField.getValue());
 
-        try {
+        try
+        {
             playerService.savePlayer(player);
 
             onSaveCallback.run();
@@ -122,7 +130,9 @@ public class PlayerEditDialog extends AbstractPlayerDialog {
             close();
 
             NotificationManager.showInfoNotification(Constants.PLAYER_UPDATE_SUCCESS);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error(Constants.PLAYER_UPDATE_ERROR + "{}", e.getMessage());
             NotificationManager.showErrorNotification(Constants.PLAYER_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
         }

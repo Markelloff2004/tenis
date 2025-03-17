@@ -8,18 +8,29 @@ import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import java.time.LocalDate;
 import java.util.Set;
 
-public interface ITournament {
+public interface ITournament
+{
 
     Integer getMaxPlayers();
+
     Integer getId();
+
     String getTournamentName();
+
     SetTypesEnum getSetsToWin();
+
     SetTypesEnum getSemifinalsSetsToWin();
+
     SetTypesEnum getFinalsSetsToWin();
+
     TournamentStatusEnum getTournamentStatus();
+
     TournamentTypeEnum getTournamentType();
+
     LocalDate getCreatedAt();
+
     Set<Player> getPlayers();
+
     Player getWinner();
 
 }

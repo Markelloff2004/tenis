@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-public abstract class AbstractTournamentDialog extends Dialog {
-
+public abstract class AbstractTournamentDialog extends Dialog
+{
 
     protected TextField tournamentNameField;
     protected ComboBox<TournamentTypeEnum> typeComboBox;
@@ -37,7 +37,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     private Registration setsCountListenerRegistration;
 
-    protected AbstractTournamentDialog(String headerTitle) {
+    protected AbstractTournamentDialog(String headerTitle)
+    {
         log.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
@@ -45,7 +46,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     }
 
-    protected void initializeFields() {
+    protected void initializeFields()
+    {
         tournamentNameField = new TextField("Tournament Name");
         tournamentNameField.setWidth("60%");
         tournamentNameField.setRequired(true);
@@ -69,7 +71,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     }
 
-    protected void configureComboBoxes() {
+    protected void configureComboBoxes()
+    {
 
         typeComboBox.setItems(TournamentTypeEnum.values());
 
@@ -79,7 +82,8 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     }
 
-    protected void initializePlayerSets(PlayerService playerService) {
+    protected void initializePlayerSets(PlayerService playerService)
+    {
         availablePlayersSet.addAll(
                 playerService.getAllPlayers()
                         .stream()
@@ -88,42 +92,50 @@ public abstract class AbstractTournamentDialog extends Dialog {
         );
     }
 
-    protected void initializeGrids(boolean withButtonActions) {
+    protected void initializeGrids(boolean withButtonActions)
+    {
         selectedPlayersGrid = new Grid<>(Player.class, false);
         availablePlayersGrid = new Grid<>(Player.class, false);
 
         availablePlayersGrid.setItems(availablePlayersSet);
         selectedPlayersGrid.setItems(selectedPlayersSet);
 
-        if (withButtonActions) {
+        if (withButtonActions)
+        {
             GridUtils.configurePlayerGridWithActionButtons(selectedPlayersGrid, selectedPlayersSet, availablePlayersSet, "Remove", this::refreshGrids);
             GridUtils.configurePlayerGridWithActionButtons(availablePlayersGrid, availablePlayersSet, selectedPlayersSet, "Add", this::refreshGrids);
-        } else {
+        }
+        else
+        {
             GridUtils.configurePlayerGrid(selectedPlayersGrid, selectedPlayersSet);
             GridUtils.configurePlayerGrid(availablePlayersGrid, availablePlayersSet);
         }
     }
 
-    protected void refreshGrids() {
+    protected void refreshGrids()
+    {
         selectedPlayersGrid.setItems(selectedPlayersSet);
         availablePlayersGrid.setItems(availablePlayersSet);
     }
 
-    protected VerticalLayout createDialogLayout() {
+    protected VerticalLayout createDialogLayout()
+    {
         return new VerticalLayout(
                 ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN, tournamentNameField, typeComboBox),
                 ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN, setsCountComboBox, semifinalsSetsCountComboBox, finalsSetsCountComboBox)
         );
     }
 
-    protected HorizontalLayout createPlayersLayout() {
+    protected HorizontalLayout createPlayersLayout()
+    {
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN,
                 ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER, new Span("Selected Players"), selectedPlayersGrid),
                 ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER, new Span("Available Players"), availablePlayersGrid)
         );
     }
 
-    protected HorizontalLayout createDialogButtons() {
+    protected HorizontalLayout createDialogButtons()
+    {
         Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
         Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
@@ -132,30 +144,37 @@ public abstract class AbstractTournamentDialog extends Dialog {
 
     protected abstract void onSave();
 
-    protected void onCancel() {
+    protected void onCancel()
+    {
         log.info("Cancel button clicked. Closing dialog.");
         close();
     }
 
-    private void manageSetFields(TournamentTypeEnum tournamentType) {
-        if (setsCountListenerRegistration != null) {
+    private void manageSetFields(TournamentTypeEnum tournamentType)
+    {
+        if (setsCountListenerRegistration != null)
+        {
             setsCountListenerRegistration.remove();
             setsCountListenerRegistration = null;
         }
 
-        if (tournamentType == TournamentTypeEnum.ROBIN_ROUND) {
+        if (tournamentType == TournamentTypeEnum.ROBIN_ROUND)
+        {
             semifinalsSetsCountComboBox.setReadOnly(true);
             semifinalsSetsCountComboBox.setValue(setsCountComboBox.getValue());
 
             finalsSetsCountComboBox.setReadOnly(true);
             finalsSetsCountComboBox.setValue(setsCountComboBox.getValue());
 
-            setsCountListenerRegistration = setsCountComboBox.addValueChangeListener(event -> {
+            setsCountListenerRegistration = setsCountComboBox.addValueChangeListener(event ->
+            {
                 semifinalsSetsCountComboBox.setValue(event.getValue());
                 finalsSetsCountComboBox.setValue(event.getValue());
             });
 
-        } else {
+        }
+        else
+        {
             semifinalsSetsCountComboBox.setReadOnly(false);
             finalsSetsCountComboBox.setReadOnly(false);
         }

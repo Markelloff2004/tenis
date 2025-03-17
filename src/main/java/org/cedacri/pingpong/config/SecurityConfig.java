@@ -12,10 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends VaadinWebSecurity {
+public class SecurityConfig extends VaadinWebSecurity
+{
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(HttpSecurity http) throws Exception
+    {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/home", "/login").permitAll()
@@ -36,7 +38,8 @@ public class SecurityConfig extends VaadinWebSecurity {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder()
+    {
         return new BCryptPasswordEncoder();
     }
 }

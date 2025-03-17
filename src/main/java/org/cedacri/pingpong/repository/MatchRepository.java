@@ -10,12 +10,17 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MatchRepository extends JpaRepository<Match, Integer> {
+public interface MatchRepository extends JpaRepository<Match, Integer>
+{
 
     List<Match> findByTournament(Tournament tournament);
+
     List<Match> findByTournamentAndRound(Tournament tournament, int round);
+
     Optional<Match> findByTournamentAndRoundAndPosition(Tournament tournament, int round, int position);
+
     List<Match> findByTopPlayer(Player topPlayer);
+
     List<Match> findByBottomPlayer(Player bottomPlayer);
 
     List<Match> findByWinner(Player winner);

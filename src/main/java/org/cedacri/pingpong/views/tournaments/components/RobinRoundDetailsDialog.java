@@ -15,13 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class RobinRoundDetailsDialog extends Dialog {
+public class RobinRoundDetailsDialog extends Dialog
+{
 
     private final Grid<Player> playerRatingGrid = new Grid<>(Player.class, false);
 
     private final Tournament tournament;
 
-    public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService) {
+    public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService)
+    {
         log.info("Initializing tournament {} Rating ", tournamentId);
 
         this.tournament = tournamentService.findTournamentById(tournamentId);
@@ -34,7 +36,8 @@ public class RobinRoundDetailsDialog extends Dialog {
         add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN, playerRatingGrid));
         loadPlayersIntoGrid();
 
-        Button closeDialog = ViewUtils.createButton("Cancel",ViewUtils.BUTTON, () -> {
+        Button closeDialog = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () ->
+        {
             log.info("Cancel button clicked. Closing TournamentDeleteDialog.");
             close();
         });
@@ -44,16 +47,17 @@ public class RobinRoundDetailsDialog extends Dialog {
     }
 
 
-    private void configureGrid() {
+    private void configureGrid()
+    {
         playerRatingGrid.addColumn(player ->
-                TournamentUtils.calculateNewRating(
-                        TournamentUtils.calculateNewWonMatches(player, tournament),
-                        TournamentUtils.calculateNewLostMatches(player, tournament),
-                        TournamentUtils.calculateNewGoalsScored(player, tournament),
-                        TournamentUtils.calculateNewGoalsLost(player, tournament))
-        )
-        .setHeader("Rating")
-        .setSortable(true);
+                        TournamentUtils.calculateNewRating(
+                                TournamentUtils.calculateNewWonMatches(player, tournament),
+                                TournamentUtils.calculateNewLostMatches(player, tournament),
+                                TournamentUtils.calculateNewGoalsScored(player, tournament),
+                                TournamentUtils.calculateNewGoalsLost(player, tournament))
+                )
+                .setHeader("Rating")
+                .setSortable(true);
 
         playerRatingGrid.addColumn(Player::getName).setHeader("Name");
         playerRatingGrid.addColumn(Player::getSurname).setHeader("Surname");
@@ -76,7 +80,8 @@ public class RobinRoundDetailsDialog extends Dialog {
     }
 
 
-    private void loadPlayersIntoGrid() {
+    private void loadPlayersIntoGrid()
+    {
         List<Player> players = new ArrayList<>(tournament.getPlayers());
         playerRatingGrid.setItems(players);
     }

@@ -1,6 +1,14 @@
 package org.cedacri.pingpong.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +29,8 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "players")
-public class Player {
+public class Player
+{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,7 +70,7 @@ public class Player {
     @Column(name = "rating", nullable = false, columnDefinition = "int default 0")
     private Integer rating = 0;
 
-//    @Size(max = 5)
+    //    @Size(max = 5)
     @NotNull(message = "Select a hand playing style")
 //    @Column(name = "hand", length = 5)
     @Column(name = "hand")
@@ -87,7 +96,8 @@ public class Player {
     @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Tournament> tournaments = new HashSet<>();
 
-    public Player(String name, String surname, String address, String email, String hand) {
+    public Player(String name, String surname, String address, String email, String hand)
+    {
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -96,7 +106,8 @@ public class Player {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
@@ -104,7 +115,8 @@ public class Player {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return Objects.hash(id);
     }
 }

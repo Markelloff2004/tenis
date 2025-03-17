@@ -11,12 +11,15 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.TournamentService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Getter
 @Setter
-public class MatchGenerator {
+public class MatchGenerator
+{
 
     private SetTypesEnum simpleRoundSets;
     private SetTypesEnum semifinalsRoundSets;
@@ -29,7 +32,8 @@ public class MatchGenerator {
 
     public MatchGenerator(SetTypesEnum simpleRoundSets, SetTypesEnum semifinalsRoundSets,
                           SetTypesEnum finalsRoundSets, TournamentTypeEnum tournamentType,
-                          PlayerDistributer playerDistributer, TournamentService tournamentService) {
+                          PlayerDistributer playerDistributer, TournamentService tournamentService)
+    {
         this.simpleRoundSets = simpleRoundSets;
         this.semifinalsRoundSets = semifinalsRoundSets;
         this.finalsRoundSets = finalsRoundSets;
@@ -38,14 +42,17 @@ public class MatchGenerator {
         this.tournamentService = tournamentService;
     }
 
-    public void generateMatches(Tournament tournamentRef) {
+    public void generateMatches(Tournament tournamentRef)
+    {
         Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
 
-        switch(tournamentType){
+        switch (tournamentType)
+        {
             case OLYMPIC -> generateOlympicTournament(tournament);
 
             case ROBIN_ROUND -> generateRobinRoundTournament(tournament);
-            default -> {
+            default ->
+            {
                 NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
                 log.error("Tournament type {} not supported", tournamentType);
             }
@@ -53,14 +60,17 @@ public class MatchGenerator {
 
     }
 
-    private void generateRobinRoundTournament(Tournament tournament) {
+    private void generateRobinRoundTournament(Tournament tournament)
+    {
         List<Player> players = new ArrayList<>(tournament.getPlayers());
         int numPlayers = players.size();
 
         // Создаём список матчей для каждого игрока против каждого
         List<Match> matches = new ArrayList<>();
-        for (int i = 0; i < numPlayers; i++) {
-            for (int j = i + 1; j < numPlayers; j++) {
+        for (int i = 0; i < numPlayers; i++)
+        {
+            for (int j = i + 1; j < numPlayers; j++)
+            {
                 Match match = createMatch(1, matches.size() + 1, null, tournament);
                 matches.add(match);
             }
@@ -75,7 +85,8 @@ public class MatchGenerator {
         tournamentService.saveTournament(tournament);
     }
 
-    private void generateOlympicTournament(Tournament tournament) {
+    private void generateOlympicTournament(Tournament tournament)
+    {
 
         tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
 
@@ -90,16 +101,20 @@ public class MatchGenerator {
         tournamentService.saveTournament(tournament);
     }
 
-    private void generateOlympicMatches(Tournament tournament, int totalRounds) {
+    private void generateOlympicMatches(Tournament tournament, int totalRounds)
+    {
         int currentMatches = 1;
         int position = 1;
-        for (int round = totalRounds; round > 0; round--) {
-            if (round != totalRounds) {
+        for (int round = totalRounds; round > 0; round--)
+        {
+            if (round != totalRounds)
+            {
                 currentMatches *= 2;
 
                 List<Match> currentRoundMatches = new ArrayList<>();
 
-                for (int i = 0; i < currentMatches; i++) {
+                for (int i = 0; i < currentMatches; i++)
+                {
                     position++;
 
                     int currentRound = round;
@@ -112,24 +127,30 @@ public class MatchGenerator {
 
                     Optional<Match> nextMatch = previousRoundMatches.stream().filter(m -> m.getPosition() == nextMatchIndex).findFirst();
 
-                    if (nextMatch.isPresent()) {
+                    if (nextMatch.isPresent())
+                    {
                         Match match = createMatch(round, position, nextMatch.orElse(null), tournament);
                         currentRoundMatches.add(match);
-                    } else {
+                    }
+                    else
+                    {
                         log.warn("Failed to generate match: No match found for position {} in round {} of tournament {}",
                                 nextMatchIndex, round, tournament.getTournamentName());
 
                     }
                 }
                 tournament.getMatches().addAll(currentRoundMatches);
-            } else {
+            }
+            else
+            {
                 Match finalMatch = createMatch(totalRounds, position, null, tournament);
                 tournament.getMatches().add(finalMatch);
             }
         }
     }
 
-    private Match createMatch(int round, int position, Match nextMatch, Tournament tournament) {
+    private Match createMatch(int round, int position, Match nextMatch, Tournament tournament)
+    {
         return Match.builder()
                 .round(round)
                 .position(position)

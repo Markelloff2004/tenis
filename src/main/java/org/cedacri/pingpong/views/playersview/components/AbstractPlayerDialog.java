@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 
-public abstract class AbstractPlayerDialog extends Dialog {
+public abstract class AbstractPlayerDialog extends Dialog
+{
 
     protected static final Logger log = LoggerFactory.getLogger(AbstractPlayerDialog.class);
 
@@ -27,7 +28,8 @@ public abstract class AbstractPlayerDialog extends Dialog {
     protected DatePicker birthDatePicker;
     protected ComboBox<String> handComboBox;
 
-    protected AbstractPlayerDialog(String headerTitle) {
+    protected AbstractPlayerDialog(String headerTitle)
+    {
         log.info("Initializing {}", headerTitle);
 
         setHeaderTitle(headerTitle);
@@ -35,7 +37,8 @@ public abstract class AbstractPlayerDialog extends Dialog {
     }
 
 
-    protected void initializeFields() {
+    protected void initializeFields()
+    {
         nameField = ViewUtils.createTextField("Name");
         nameField.setRequired(true);
 
@@ -55,7 +58,8 @@ public abstract class AbstractPlayerDialog extends Dialog {
         handComboBox.setRequired(true);
     }
 
-    protected void populateFields(Player player) {
+    protected void populateFields(Player player)
+    {
         log.info("Populating fields with player data: {} {}", player.getName(), player.getSurname());
         nameField.setValue(player.getName() != null ? player.getName() : "");
         surnameField.setValue(player.getSurname() != null ? player.getSurname() : "");
@@ -65,7 +69,8 @@ public abstract class AbstractPlayerDialog extends Dialog {
         handComboBox.setValue(player.getHand() != null ? player.getHand() : "");
     }
 
-    protected VerticalLayout createFieldsLayout() {
+    protected VerticalLayout createFieldsLayout()
+    {
         VerticalLayout fields = ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.START,
                 nameField,
                 surnameField,
@@ -79,7 +84,8 @@ public abstract class AbstractPlayerDialog extends Dialog {
         return fields;
     }
 
-    protected HorizontalLayout createButtonsLayout() {
+    protected HorizontalLayout createButtonsLayout()
+    {
         Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
         Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
@@ -88,7 +94,8 @@ public abstract class AbstractPlayerDialog extends Dialog {
 
     protected abstract void onSave();
 
-    private void onCancel() {
+    private void onCancel()
+    {
         log.info("Cancel button clicked. Closing dialog.");
         close();
     }

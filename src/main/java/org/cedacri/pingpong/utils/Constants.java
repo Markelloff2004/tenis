@@ -5,9 +5,11 @@ import com.vaadin.flow.component.notification.Notification;
 import java.util.List;
 import java.util.Map;
 
-public class Constants {
+public class Constants
+{
 
-    private Constants() {
+    private Constants()
+    {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 

@@ -25,16 +25,19 @@ import java.util.List;
 import java.util.Optional;
 
 @CssImport("./themes/ping-pong-tournament/main-layout.css")
-public class MainLayout extends AppLayout implements AfterNavigationObserver {
+public class MainLayout extends AppLayout implements AfterNavigationObserver
+{
 
     private final List<String> routes = Arrays.asList("home", "tournaments", "players");
     private List<Button> menuButtons;
 
-    public MainLayout() {
+    public MainLayout()
+    {
         configureView();
     }
 
-    private void configureView() {
+    private void configureView()
+    {
         setPrimarySection(Section.DRAWER);
 
         VerticalLayout logoLayout = createLogoSection();
@@ -56,7 +59,8 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         addToDrawer(drawerLayout);
     }
 
-    private VerticalLayout createLogoSection() {
+    private VerticalLayout createLogoSection()
+    {
         H4 appName = new H4("TOURNAMENT");
         Image logo = new Image("images/logo.png", "Tournament Logo");
         logo.setWidth("160px");
@@ -68,7 +72,8 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         return logoLayout;
     }
 
-    private VerticalLayout createMenuItems() {
+    private VerticalLayout createMenuItems()
+    {
         menuButtons = Arrays.asList(
                 ViewUtils.createButton("Home", "transparent-button", () -> navigateTo("home")),
                 ViewUtils.createSecuredButton(
@@ -92,14 +97,16 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         return menuItemsLayout;
     }
 
-    private HorizontalLayout createUserSection() {
+    private HorizontalLayout createUserSection()
+    {
         HorizontalLayout userLayout = new HorizontalLayout();
         userLayout.setWidthFull();
         userLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         userLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal()))
+        {
             String username = auth.getName();
             MenuBar userMenu = new MenuBar();
 
@@ -109,7 +116,9 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
             subMenu.addItem("Logout", e -> logout());
 
             userLayout.add(userMenu);
-        } else {
+        }
+        else
+        {
             Button loginButton = new Button("Login", e -> navigateTo("login"));
             userLayout.add(loginButton);
         }
@@ -117,26 +126,31 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         return userLayout;
     }
 
-    private void logout() {
+    private void logout()
+    {
         VaadinSession.getCurrent().getSession().invalidate();
         UI.getCurrent().getPage().setLocation("/login");
     }
 
-    private void navigateTo(String route) {
+    private void navigateTo(String route)
+    {
         UI.getCurrent().navigate(route);
     }
 
-    private void highlightActiveMenuItem(String route) {
+    private void highlightActiveMenuItem(String route)
+    {
         int selectedIndex = routes.indexOf(route);
         ViewUtils.highlightSelectedComponentFromComponentsList(menuButtons, selectedIndex, "selected");
     }
 
     @Override
-    public void afterNavigation(AfterNavigationEvent event) {
+    public void afterNavigation(AfterNavigationEvent event)
+    {
         highlightActiveMenuItem(getCurrentRoute());
     }
 
-    private String getCurrentRoute() {
+    private String getCurrentRoute()
+    {
         return Optional.ofNullable(
                         UI.getCurrent()
                                 .getInternals()

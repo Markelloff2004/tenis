@@ -24,13 +24,15 @@ import java.util.List;
 @RouteAlias(value = "home", layout = MainLayout.class)
 @AnonymousAllowed
 @PermitAll
-public class HomeView extends VerticalLayout {
+public class HomeView extends VerticalLayout
+{
 
     private final TournamentService tournamentService;
     private final VerticalLayout tournamentContainer = new VerticalLayout();
 
     @Autowired
-    public HomeView(TournamentService tournamentService) {
+    public HomeView(TournamentService tournamentService)
+    {
         this.tournamentService = tournamentService;
         log.info("HomeView initialized.");
 
@@ -46,7 +48,8 @@ public class HomeView extends VerticalLayout {
         displayTournaments();
     }
 
-    private void displayTournaments() {
+    private void displayTournaments()
+    {
         List<Tournament> tournaments = tournamentService.findAllTournaments()
                 .sorted(
                         Comparator.comparing(
@@ -64,18 +67,21 @@ public class HomeView extends VerticalLayout {
 
         tournamentContainer.removeAll();
 
-        if (tournaments.isEmpty()) {
+        if (tournaments.isEmpty())
+        {
             showNoTournamentFound();
             return;
         }
 
-        tournaments.forEach(tournament -> {
+        tournaments.forEach(tournament ->
+        {
             log.debug("Processed tournament {}", tournament);
             tournamentContainer.add(new TournamentSummaryComponent(tournament));
         });
     }
 
-    private void showNoTournamentFound() {
+    private void showNoTournamentFound()
+    {
         H1 noTournamentsMessage = new H1("There are currently no tournaments");
         noTournamentsMessage.getStyle().set("text-align", "center").set("width", "100%").set("color", "gray");
         tournamentContainer.setAlignItems(Alignment.CENTER);

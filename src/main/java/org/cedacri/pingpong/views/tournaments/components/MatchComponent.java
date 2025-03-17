@@ -17,7 +17,6 @@ import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.SecurityUtils;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
@@ -171,7 +170,8 @@ public class MatchComponent extends HorizontalLayout {
         Dialog confirmDialog = new Dialog();
         confirmDialog.add(new Text("Are you sure about changing the score? This will change the current winner: " + match.getWinner().getName() + "?"));
 
-        Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () -> {
+        Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () ->
+        {
             matchService.cleanAllFutureMatches(match);
             updateMatchScore(match);
             onEditScoreCallback.run();

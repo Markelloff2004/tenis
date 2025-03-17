@@ -16,13 +16,15 @@ import org.cedacri.pingpong.utils.ViewUtils;
 import java.util.HashSet;
 
 @Slf4j
-public class TournamentInfoDialog extends AbstractTournamentDialog {
+public class TournamentInfoDialog extends AbstractTournamentDialog
+{
 
     private final Tournament tournament;
 
     private final ComboBox<String> statusComboBox;
 
-    public TournamentInfoDialog(PlayerService playerService, Tournament tournament) {
+    public TournamentInfoDialog(PlayerService playerService, Tournament tournament)
+    {
         super("Tournament Details:");
 
         this.tournament = tournament;
@@ -47,7 +49,8 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
         setReadOnlyForFields();
     }
 
-    private void setReadOnlyForFields() {
+    private void setReadOnlyForFields()
+    {
         log.debug("Set readOnly for fields");
         tournamentNameField.setReadOnly(true);
         typeComboBox.setReadOnly(true);
@@ -58,16 +61,19 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     }
 
     @Override
-    protected HorizontalLayout createPlayersLayout() {
+    protected HorizontalLayout createPlayersLayout()
+    {
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.BETWEEN,
                 ViewUtils.createVerticalLayout(FlexComponent.JustifyContentMode.CENTER, new Span("Selected Players"), selectedPlayersGrid)
         );
     }
 
     @Override
-    protected HorizontalLayout createDialogButtons() {
+    protected HorizontalLayout createDialogButtons()
+    {
 
-        if (!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING)) {
+        if (!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
+        {
             Button saveButton = ViewUtils.createSecuredButton(
                     "Matches",
                     ViewUtils.COLORED_BUTTON,
@@ -77,7 +83,9 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
             Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
-        } else {
+        }
+        else
+        {
             Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
             return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, cancelButton);
@@ -86,7 +94,8 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
 
     }
 
-    private VerticalLayout createDialogLayoutWithStatus() {
+    private VerticalLayout createDialogLayoutWithStatus()
+    {
         VerticalLayout dialogLayout = createDialogLayout();
 
         HorizontalLayout firstRow = (HorizontalLayout) dialogLayout.getComponentAt(0);
@@ -97,7 +106,8 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
         return dialogLayout;
     }
 
-    private ComboBox<String> createStatusComboBox() {
+    private ComboBox<String> createStatusComboBox()
+    {
         ComboBox<String> comboBox = new ComboBox<>("Status");
         comboBox.setItems(String.valueOf(TournamentStatusEnum.PENDING));
         comboBox.setValue(String.valueOf(tournament.getTournamentStatus()));
@@ -107,7 +117,8 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
         return comboBox;
     }
 
-    private void prefillFields(Tournament tournament) {
+    private void prefillFields(Tournament tournament)
+    {
         log.debug("Pre-fill fields with existing tournament data");
         tournamentNameField.setValue(tournament.getTournamentName());
         typeComboBox.setValue(tournament.getTournamentType());
@@ -117,7 +128,8 @@ public class TournamentInfoDialog extends AbstractTournamentDialog {
     }
 
     @Override
-    protected void onSave() {
+    protected void onSave()
+    {
         getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()));
         log.info("Navigating to tournament details page, id: {}", tournament.getId());
         close();

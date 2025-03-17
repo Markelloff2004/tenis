@@ -11,9 +11,11 @@ import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 @Slf4j
-public class TournamentDeleteDialog extends Dialog {
+public class TournamentDeleteDialog extends Dialog
+{
 
-    public TournamentDeleteDialog(TournamentService tournamentService, Tournament tournamentDelete, Runnable onDeleteCallback) {
+    public TournamentDeleteDialog(TournamentService tournamentService, Tournament tournamentDelete, Runnable onDeleteCallback)
+    {
         log.info("Initializing TournamentDeleteDialog for tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
 
         setHeaderTitle("Delete Tournament");
@@ -22,28 +24,33 @@ public class TournamentDeleteDialog extends Dialog {
         Button confirmButton = ViewUtils.createButton(
                 "Delete",
                 ViewUtils.COLORED_BUTTON,
-                () -> {
+                () ->
+                {
                     log.debug("Delete button clicked. Attempting to delete tournament: {} with Id: {}", tournamentDelete.getTournamentName(), tournamentDelete.getId());
 
                     int id = tournamentDelete.getId();
-                    try {
+                    try
+                    {
                         tournamentService.deleteTournamentById(id);
                         log.info("Tournament deleted successfully! id: {}", id);
 
                         NotificationManager.showInfoNotification("Tournament deleted successfully! id: " + id);
                         onDeleteCallback.run();
                         close();
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         NotificationManager.showErrorNotification("Error deleting tournament: " + ExceptionUtils.getExceptionMessage(e));
                         log.error("Error deleting tournament: {}, {}", id, e.getMessage());
                     }
                 }
         );
 
-        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () -> {
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () ->
+        {
             log.info("Cancel button clicked. Closing TournamentDeleteDialog.");
             close();
-        } );
+        });
 
         add(ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, confirmButton, cancelButton));
     }

@@ -11,23 +11,27 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class SecurityUtils {
+public final class SecurityUtils
+{
 
-    private SecurityUtils() {
+    private SecurityUtils()
+    {
         // Private constructor to prevent instantiation
     }
 
     /**
      * Returns the current Authentication object.
      */
-    public static Authentication getAuthentication() {
+    public static Authentication getAuthentication()
+    {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
     /**
      * Checks if a user is logged in.
      */
-    public static boolean isUserLoggedIn() {
+    public static boolean isUserLoggedIn()
+    {
         Authentication auth = getAuthentication();
         return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
@@ -35,9 +39,11 @@ public final class SecurityUtils {
     /**
      * Returns the current UserDetails if available.
      */
-    public static UserDetails getCurrentUser() {
+    public static UserDetails getCurrentUser()
+    {
         Authentication auth = getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof UserDetails) {
+        if (auth != null && auth.getPrincipal() instanceof UserDetails)
+        {
             return (UserDetails) auth.getPrincipal();
         }
         return null;
@@ -46,7 +52,8 @@ public final class SecurityUtils {
     /**
      * Returns the username of the current user, or "anonymous" if not logged in.
      */
-    public static String getUsername() {
+    public static String getUsername()
+    {
         UserDetails user = getCurrentUser();
         return (user != null) ? user.getUsername() : "anonymous";
     }
@@ -55,9 +62,11 @@ public final class SecurityUtils {
      * Returns a set of RoleEnum for the current user.
      * Converts the authorities (which might be "ROLE_ADMIN", etc.) into RoleEnum values.
      */
-    public static Set<RoleEnum> getUserRoles() {
+    public static Set<RoleEnum> getUserRoles()
+    {
         UserDetails user = getCurrentUser();
-        if (user != null) {
+        if (user != null)
+        {
             return user.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
@@ -73,10 +82,13 @@ public final class SecurityUtils {
     /**
      * Checks if the current user has at least one of the specified RoleEnum values.
      */
-    public static boolean hasAnyRole(RoleEnum... allowedRoles) {
+    public static boolean hasAnyRole(RoleEnum... allowedRoles)
+    {
         Set<RoleEnum> userRoles = getUserRoles();
-        for (RoleEnum role : allowedRoles) {
-            if (userRoles.contains(role)) {
+        for (RoleEnum role : allowedRoles)
+        {
+            if (userRoles.contains(role))
+            {
                 return true;
             }
         }

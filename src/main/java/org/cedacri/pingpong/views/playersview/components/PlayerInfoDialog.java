@@ -7,16 +7,19 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 
-public class PlayerInfoDialog extends PlayerEditDialog {
+public class PlayerInfoDialog extends PlayerEditDialog
+{
 
 
-    public PlayerInfoDialog(Player player, PlayerService playerService, Runnable onSaveCallback) {
+    public PlayerInfoDialog(Player player, PlayerService playerService, Runnable onSaveCallback)
+    {
         super(player, playerService, onSaveCallback);
 
         setReadOnlyForFields();
     }
 
-    protected void setReadOnlyForFields() {
+    protected void setReadOnlyForFields()
+    {
         nameField.setReadOnly(true);
         surnameField.setReadOnly(true);
         emailField.setReadOnly(true);
@@ -31,7 +34,8 @@ public class PlayerInfoDialog extends PlayerEditDialog {
     }
 
     @Override
-    protected HorizontalLayout createButtonsLayout() {
+    protected HorizontalLayout createButtonsLayout()
+    {
         Button cancelButton = ViewUtils.createButton(
                 "Cancel",
                 ViewUtils.BUTTON,
@@ -40,7 +44,6 @@ public class PlayerInfoDialog extends PlayerEditDialog {
 
         return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, cancelButton);
     }
-
 
 
 }

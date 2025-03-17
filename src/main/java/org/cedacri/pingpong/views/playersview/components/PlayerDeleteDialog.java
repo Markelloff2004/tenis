@@ -13,9 +13,11 @@ import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 @Slf4j
-public class PlayerDeleteDialog extends Dialog {
+public class PlayerDeleteDialog extends Dialog
+{
 
-    public PlayerDeleteDialog(Player player, PlayerService playerService, Runnable onDeleteCallback) {
+    public PlayerDeleteDialog(Player player, PlayerService playerService, Runnable onDeleteCallback)
+    {
         log.info("Initializing PlayerDeleteDialog for player: {} with Id: {}", player.getName() + " " + player.getSurname(), player.getId());
 
         setWidth("500px");
@@ -28,7 +30,8 @@ public class PlayerDeleteDialog extends Dialog {
         Button deleteButton = ViewUtils.createButton("Delete", ViewUtils.COLORED_BUTTON, () ->
         {
             log.debug("Delete button clicked. Attempting to delete player: {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
-            try {
+            try
+            {
                 playerService.deletePlayerById(player.getId());
 
                 log.info("Player deleted successfully: {} {} , Id: {} ", player.getName(), player.getSurname(), player.getId());
@@ -39,13 +42,16 @@ public class PlayerDeleteDialog extends Dialog {
                         ": " + player.getId() + " deleted!");
 
                 onDeleteCallback.run();
-            } catch (Exception  e) {
+            }
+            catch (Exception e)
+            {
                 log.warn("Cannot delete player {} {} with Id: {}", player.getName(), player.getSurname(), player.getId());
                 NotificationManager.showErrorNotification("Player cannot be deleted : " + ExceptionUtils.getExceptionMessage(e));
             }
         });
 
-        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () -> {
+        Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, () ->
+        {
             log.info("Cancel button clicked. Closing PlayerDeleteDialog.");
             close();
         });

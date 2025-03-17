@@ -6,31 +6,38 @@ import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
-import org.cedacri.pingpong.utils.*;
+import org.cedacri.pingpong.utils.MatchGenerator;
+import org.cedacri.pingpong.utils.PlayerDistributer;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
-public class TournamentService {
+public class TournamentService
+{
     private final TournamentRepository tournamentRepository;
 
-    public TournamentService(TournamentRepository tournamentRepository) {
+    public TournamentService(TournamentRepository tournamentRepository)
+    {
         this.tournamentRepository = tournamentRepository;
     }
 
     @Transactional
-    public Stream<Tournament> findAllTournaments() {
+    public Stream<Tournament> findAllTournaments()
+    {
         List<Tournament> tournaments = tournamentRepository.findAll();
         tournaments.forEach(tournament -> Hibernate.initialize(tournament.getPlayers()));
         return tournaments.stream().sorted(Comparator.comparing(Tournament::getCreatedAt).reversed());
     }
 
-    public Tournament findTournamentById(Integer id) {
+    public Tournament findTournamentById(Integer id)
+    {
         validateTournamentId(id);
 
         Tournament tournament = tournamentRepository.findById(id).
@@ -41,8 +48,10 @@ public class TournamentService {
     }
 
     @Transactional
-    public Tournament saveTournament(Tournament tournament) {
-        if (tournament == null) {
+    public Tournament saveTournament(Tournament tournament)
+    {
+        if (tournament == null)
+        {
             throw new IllegalArgumentException("Tournament cannot be null");
         }
 
@@ -50,7 +59,8 @@ public class TournamentService {
     }
 
     @Transactional
-    public void deleteTournamentById(Integer id) {
+    public void deleteTournamentById(Integer id)
+    {
         validateTournamentId(id);
         Tournament tournamentToDelete = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
@@ -59,20 +69,26 @@ public class TournamentService {
         tournamentRepository.deleteById(id);
     }
 
-    private static void validateTournamentId(Integer id) {
-        if (id == null) {
+    private static void validateTournamentId(Integer id)
+    {
+        if (id == null)
+        {
             throw new IllegalArgumentException("Tournament ID cannot be null");
-        } else if (id <= 0) {
+        }
+        else if (id <= 0)
+        {
             throw new IllegalArgumentException("Tournament ID cannot be 0 (zero) or bellow");
         }
     }
 
     @Transactional
-    public void startTournament(Tournament tournament) throws NotEnoughPlayersException {
+    public void startTournament(Tournament tournament) throws NotEnoughPlayersException
+    {
 
         int minAmountPlayers = TournamentUtils.getMinimalPlayersRequired(tournament.getTournamentType());
 
-        if (tournament.getPlayers().size() < minAmountPlayers ) {
+        if (tournament.getPlayers().size() < minAmountPlayers)
+        {
             throw new NotEnoughPlayersException(tournament.getPlayers().size(), minAmountPlayers);
         }
 
@@ -83,7 +99,8 @@ public class TournamentService {
         matchGenerator.generateMatches(tournament);
     }
 
-    MatchGenerator createMatchGenerator(Tournament tournament) {
+    MatchGenerator createMatchGenerator(Tournament tournament)
+    {
         return new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
                 tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this);
     }

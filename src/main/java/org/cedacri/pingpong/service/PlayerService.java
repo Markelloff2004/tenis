@@ -16,43 +16,51 @@ import java.util.List;
 @Slf4j
 @Validated
 @Service
-public class PlayerService {
+public class PlayerService
+{
 
     private final PlayerRepository playerRepository;
 
-    public PlayerService(PlayerRepository playerRepository) {
+    public PlayerService(PlayerRepository playerRepository)
+    {
         this.playerRepository = playerRepository;
     }
 
-    public Player findPlayerById(Long id) {
+    public Player findPlayerById(Long id)
+    {
         return playerRepository.findById(id)
-                .orElseThrow(() -> {
+                .orElseThrow(() ->
+                {
                     log.error("Player with id {} not found", id);
                     return new IllegalArgumentException("Player not found");
                 });
     }
 
-    public List<Player> getAllPlayers() {
+    public List<Player> getAllPlayers()
+    {
         log.info("Fetching list of players");
 
         List<Player> players = playerRepository.findAll();
 
         return players == null ?
-                    new ArrayList<>() :
-                    players;
+                new ArrayList<>() :
+                players;
     }
 
     @Transactional
-    public Player savePlayer(Player player) {
+    public Player savePlayer(Player player)
+    {
         log.debug("Attempting to save player {}", player);
 
-        if (player == null) {
+        if (player == null)
+        {
             throw new IllegalArgumentException("Player cannot be null");
         }
 
-        if (player.getId() != null && playerRepository.findById(player.getId()).isEmpty()) {
-                throw new IllegalArgumentException("Cannot update non-existing player with ID: " + player.getId());
-            }
+        if (player.getId() != null && playerRepository.findById(player.getId()).isEmpty())
+        {
+            throw new IllegalArgumentException("Cannot update non-existing player with ID: " + player.getId());
+        }
 
 
         Player savedPlayer = playerRepository.save(player);
@@ -62,27 +70,35 @@ public class PlayerService {
     }
 
     @Transactional
-    public void deletePlayerById(Long id) {
-        if (id == null) {
+    public void deletePlayerById(Long id)
+    {
+        if (id == null)
+        {
             log.error("Attempting to delete a player with null ID");
             throw new IllegalArgumentException("Player ID cannot be null.");
         }
 
         log.debug("Attempting to delete player with ID {}", id);
 
-        if (!playerRepository.existsById(id)) {
+        if (!playerRepository.existsById(id))
+        {
             log.warn("Player with ID {} does not exist in the database.", id);
             throw new EntityNotFoundException("Player with ID " + id + " does not exist and cannot be deleted.");
         }
 
-        try {
+        try
+        {
             playerRepository.deleteById(id);
             playerRepository.flush();
             log.info("Successfully deleted player with ID {}", id);
-        } catch (DataIntegrityViolationException ex) {
+        }
+        catch (DataIntegrityViolationException ex)
+        {
             log.info("Cannot delete player with ID {} due to foreign key constraints, as it affects tournament statistics", id);
             throw new EntityDeletionException("Player with ID " + id + " cannot be deleted because they are associated with one or more tournaments.", ex);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             log.error("Unexpected error while deleting player with ID {}", id, ex);
             throw new IllegalStateException("An unexpected error occurred while deleting the player with ID " + id, ex);
         }

@@ -1,6 +1,7 @@
 package org.cedacri.pingpong.enums;
 
-public enum RoleEnum {
+public enum RoleEnum
+{
     ADMIN,
     MANAGER,
     USER

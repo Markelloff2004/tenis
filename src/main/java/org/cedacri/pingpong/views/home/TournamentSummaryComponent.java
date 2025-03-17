@@ -7,7 +7,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.time.LocalDate;

@@ -13,12 +13,17 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.*;
+import org.cedacri.pingpong.utils.Constants;
+import org.cedacri.pingpong.utils.ExceptionUtils;
+import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.TournamentUtils;
+import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.HashSet;
 
 @Slf4j
-public class TournamentEditDialog extends AbstractTournamentDialog {
+public class TournamentEditDialog extends AbstractTournamentDialog
+{
 
     private final TournamentService tournamentService;
     private final Runnable onSaveCallback;
@@ -27,7 +32,8 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
     private final ComboBox<String> statusComboBox;
     private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
-    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, Tournament tournament, Runnable onSaveCallback) {
+    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, Tournament tournament, Runnable onSaveCallback)
+    {
         super("Edit Tournament");
 
         this.tournamentService = tournamentService;
@@ -48,7 +54,8 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         refreshGrids();
     }
 
-    protected VerticalLayout createDialogLayoutWithStatus() {
+    protected VerticalLayout createDialogLayoutWithStatus()
+    {
         VerticalLayout dialogLayout = createDialogLayout();
         HorizontalLayout firstRow = (HorizontalLayout) dialogLayout.getComponentAt(0);
         int typeComboBoxIndex = firstRow.indexOf(typeComboBox);
@@ -57,7 +64,8 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         return dialogLayout;
     }
 
-    private ComboBox<String> createStatusComboBox() {
+    private ComboBox<String> createStatusComboBox()
+    {
         ComboBox<String> comboBox = new ComboBox<>("Status");
         comboBox.setItems(String.valueOf(TournamentStatusEnum.PENDING));
         comboBox.setValue(String.valueOf(tournament.getTournamentStatus()));
@@ -67,7 +75,8 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         return comboBox;
     }
 
-    private void prefillFields(Tournament tournament) {
+    private void prefillFields(Tournament tournament)
+    {
         log.debug("Pre-fill fields with existing tournament data");
         tournamentNameField.setValue(tournament.getTournamentName());
         typeComboBox.setValue(tournament.getTournamentType());
@@ -77,7 +86,8 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
     }
 
     @Override
-    protected HorizontalLayout createDialogButtons() {
+    protected HorizontalLayout createDialogButtons()
+    {
         Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
         Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::onCancel);
 
@@ -85,11 +95,13 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
     }
 
     @Override
-    protected void onSave() {
+    protected void onSave()
+    {
         log.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
 
         boolean startNow;
-        try {
+        try
+        {
             startNow = startNowCheckbox.getValue();
 
             tournament.setTournamentName(tournamentNameField.getValue());
@@ -101,32 +113,41 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
             tournament.setPlayers(selectedPlayersSet);
             tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournament));
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error("Error fetching data from Vaadin Components for saving tournament: {}", e.getMessage(), e);
             NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + ExceptionUtils.getExceptionMessage(e));
 
             return;
         }
 
-        try {
+        try
+        {
             tournament = tournamentService.saveTournament(tournament);
 
             log.info("Tournament saved successfully: {}", tournament.getId());
             NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
-        } catch (IllegalArgumentException illegalArgumentException) {
+        }
+        catch (IllegalArgumentException illegalArgumentException)
+        {
             NotificationManager.showErrorNotification(Constants.TOURNAMENT_UPDATE_ERROR + illegalArgumentException.getMessage());
 
             return;
         }
 
-        if (startNow) {
-            try {
+        if (startNow)
+        {
+            try
+            {
                 tournamentService.startTournament(tournament);
 
                 UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
 
                 NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
-            } catch (NotEnoughPlayersException notEnoughPlayersException) {
+            }
+            catch (NotEnoughPlayersException notEnoughPlayersException)
+            {
                 NotificationManager.showErrorNotification(Constants.TOURNAMENT_START_ERROR + " " + notEnoughPlayersException.getMessage());
             }
         }
