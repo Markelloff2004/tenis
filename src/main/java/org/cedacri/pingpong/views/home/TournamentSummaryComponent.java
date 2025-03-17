@@ -60,7 +60,7 @@ public class TournamentSummaryComponent extends HorizontalLayout
         LocalDate startedAt = tournament.getStartedAt();
         if (startedAt == null)
         {
-            startedAtInfo = "Tournament has not started yet";
+            startedAtInfo = "Pending";
         }
         else
         {
