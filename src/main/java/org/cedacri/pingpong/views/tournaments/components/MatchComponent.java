@@ -146,6 +146,10 @@ public class MatchComponent extends HorizontalLayout {
         editScoreButton.setIcon(VaadinIcon.PENCIL.create());
         editScoreButton.setMaxWidth("20px");
 
+        if (match.getTournament().getTournamentStatus() == TournamentStatusEnum.FINISHED) {
+             editScoreButton.setVisible(false);
+        }
+
         return editScoreButton;
     }
 
