@@ -10,6 +10,7 @@ It contains all the necessary configuration and some placeholder files to get yo
 3. Open the project in your IDE (e.g., IntelliJ IDEA).
 4. Locate the `Application` class (in `src/main/java`).
 5. Run the `main` method in that class.
+6. The application will be available at: http://localhost:8080
 
 
 ## Deploying using Docker
