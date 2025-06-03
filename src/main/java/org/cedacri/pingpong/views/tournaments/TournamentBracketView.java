@@ -21,6 +21,7 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
+import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.NotificationManager;
@@ -45,6 +46,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private final TournamentService tournamentService;
     private final MatchService matchService;
+    private final PlayerService playerService;
 
     private Tournament tournament;
 
@@ -52,11 +54,12 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private ComboBox<String> playerOptionsComboBox;
 
 
-    public TournamentBracketView(TournamentService tournamentService, MatchService matchService)
+    public TournamentBracketView(TournamentService tournamentService, MatchService matchService, PlayerService playerService)
     {
         this.tournamentService = tournamentService;
         this.matchService = matchService;
         log.info("TournamentBracketView initialized.");
+        this.playerService = playerService;
     }
 
     @Override
@@ -165,7 +168,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () ->
         {
-            TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService);
+            TournamentUtils.checkAndUpdateTournamentWinner(tournament, tournamentService, playerService);
             dialog.close();
         });
 

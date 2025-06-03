@@ -8,11 +8,10 @@ import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
+import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class TournamentUtils
@@ -217,7 +216,7 @@ public class TournamentUtils
         }
     }
 
-    private static void updateRatingAndSetTournamentWinnerRobinRound(Tournament tournament)
+    private static void updateRatingAndSetTournamentWinnerRobinRound(Tournament tournament, PlayerService playerService)
     {
         Map<Player, Integer> wonMatchesMap = new HashMap<>();
         Map<Player, Integer> goalsScoredMap = new HashMap<>();
@@ -248,6 +247,8 @@ public class TournamentUtils
             player.setGoalsLost(player.getGoalsLost() + newGoalsLost);
             player.setWonMatches(player.getWonMatches() + newWonMatches);
             player.setLostMatches(player.getLostMatches() + newLostMatches);
+
+            playerService.savePlayer(player);
         }
 
         determineRobinRoundWinner(tournament, wonMatchesMap, goalsScoredMap, goalsLostMap);
@@ -283,8 +284,9 @@ public class TournamentUtils
     }
 
 
-    private static void updateRatingAndSetTournamentWinnerOlympic(Tournament tournament)
+    private static void updateRatingAndSetTournamentWinnerOlympic(Tournament tournament, PlayerService playerService)
     {
+
         for (Player player : tournament.getPlayers())
         {
             int oldRating = player.getRating();
@@ -300,10 +302,12 @@ public class TournamentUtils
             player.setGoalsLost(player.getGoalsLost() + newGoalsLost);
             player.setWonMatches(player.getWonMatches() + newWonMatches);
             player.setLostMatches(player.getLostMatches() + newLostMatches);
+
+            playerService.savePlayer(player);
         }
 
         tournament.getMatches()
-                .stream().filter(match -> match.getRound() == 1).findFirst()
+                .stream().filter(match -> match.getPosition() == 1 ).findFirst()
                 .ifPresent(finalMatch -> tournament.setWinner(finalMatch.getWinner()));
     }
 
@@ -355,11 +359,11 @@ public class TournamentUtils
                 .count();
     }
 
-    public static void checkAndUpdateTournamentWinner(Tournament tournament, TournamentService tournamentService)
+    public static void checkAndUpdateTournamentWinner(Tournament tournament, TournamentService tournamentService, PlayerService playerService)
     {
         if (isTournamentReadyToFinish(tournament))
         {
-            finalizeTournament(tournament, tournamentService, tournament.getTournamentType());
+            finalizeTournament(tournament, tournamentService, playerService, tournament.getTournamentType());
         }
         else
         {
@@ -369,6 +373,7 @@ public class TournamentUtils
             );
         }
     }
+
 
 
     public static boolean isTournamentReadyToFinish(Tournament tournament)
@@ -391,17 +396,17 @@ public class TournamentUtils
         };
     }
 
-    private static void finalizeTournament(Tournament tournament, TournamentService tournamentService, TournamentTypeEnum type)
+    private static void finalizeTournament(Tournament tournament, TournamentService tournamentService, PlayerService playerService, TournamentTypeEnum type)
     {
         tournament.setTournamentStatus(TournamentStatusEnum.FINISHED);
 
         if (type == TournamentTypeEnum.OLYMPIC)
         {
-            updateRatingAndSetTournamentWinnerOlympic(tournament);
+            updateRatingAndSetTournamentWinnerOlympic(tournament, playerService);
         }
         else
         {
-            updateRatingAndSetTournamentWinnerRobinRound(tournament);
+            updateRatingAndSetTournamentWinnerRobinRound(tournament, playerService);
         }
 
         tournamentService.saveTournament(tournament);
