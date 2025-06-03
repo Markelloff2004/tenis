@@ -3,30 +3,31 @@
 This project can be used as a starting point to create your own Vaadin application with Spring Boot.
 It contains all the necessary configuration and some placeholder files to get you started.
 
-## Running the application
+### Run from IDE
 
-Open the project in an IDE. You can download the [IntelliJ community edition](https://www.jetbrains.com/idea/download) if you do not have a suitable IDE already.
-Once opened in the IDE, locate the `Application` class and run the main method using "Debug".
+1. Make sure the **MySQL** (or other) database container is running correctly.
+2. Verify that the database connection URL is correct in the `application.properties` file:
+3. Open the project in your IDE (e.g., IntelliJ IDEA).
+4. Locate the `Application` class (in `src/main/java`).
+5. Run the `main` method in that class.
 
-For more information on installing in various IDEs, see [how to import Vaadin projects to different IDEs](https://vaadin.com/docs/latest/getting-started/import).
 
-If you install the Vaadin plugin for IntelliJ, you should instead launch the `Application` class using "Debug using HotswapAgent" to see updates in the Java code immediately reflected in the browser.
+## Deploying using Docker
 
-## Deploying to Production
+To build the Dockerized version of the project, you will need:
+1. Make sure the database connection URL in `application.properties` is correctly set to connect to the containerized database.
+2. Build the application and start the containers using:
+    ```bash
+      mvn clean package -Pproduction
+      docker-compose up --build -d
+     ```
+3. The application will be available at: [http://localhost:8090](http://localhost:8090)
+4. To stop and remove all containers, volumes, and networks created by Docker Compose:
 
-The project is a standard Maven project. To create a production build, call 
+   ```bash
+   docker-compose down -v
+   ```
 
-```
-./mvnw clean package -Pproduction
-```
-
-If you have Maven globally installed, you can replace `./mvnw` with `mvn`.
-
-This will build a JAR file with all the dependencies and front-end resources,ready to be run. The file can be found in the `target` folder after the build completes.
-You then launch the application using 
-```
-java -jar target/ping-pong-tournament-1.0-SNAPSHOT.jar
-```
 
 ## Project structure
 
@@ -49,19 +50,3 @@ java -jar target/ping-pong-tournament-1.0-SNAPSHOT.jar
 - Find add-ons at [vaadin.com/directory](https://vaadin.com/directory).
 - Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/vaadin) or join our [Forum](https://vaadin.com/forum).
 - Report issues, create pull requests in [GitHub](https://github.com/vaadin).
-
-
-## Deploying using Docker
-
-To build the Dockerized version of the project, run
-
-```
-mvn clean package -Pproduction
-docker build . -t ping-pong-tournament:latest
-```
-
-Once the Docker image is correctly built, you can test it locally using
-
-```
-docker run -p 8080:8080 ping-pong-tournament:latest
-```
