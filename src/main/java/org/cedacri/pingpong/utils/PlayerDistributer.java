@@ -105,21 +105,47 @@ public class PlayerDistributer
 
     public void distributePlayersInRobinRound(List<Match> matches, List<Player> players)
     {
-        int matchIndex = 0;
         int numPlayers = players.size();
 
-        for (int i = 0; i < numPlayers; i++)
+        // in caz de numar de jucatori impar - suplinim cu unul null pentru a avea posibilitatea de a forma perechile
+        //  fara de careva erori
+
+        if (numPlayers % 2 != 0)
         {
-            for (int j = i + 1; j < numPlayers; j++)
+            players.add(null);
+            numPlayers++;
+        }
+
+        int numRounds = numPlayers - 1;
+        int matchIndex = 0;
+
+        List<Player> rotatingPlayers = new ArrayList<>(players);
+
+        for (int round = 1; round <= numRounds; round++)
+        {
+            int halfSize = numPlayers / 2;
+
+            for (int i = 0; i < halfSize; i++)
             {
-                if (matchIndex < matches.size())
+                Player player1 = rotatingPlayers.get(i);
+                Player player2 = rotatingPlayers.get(numPlayers - 1 -i);
+
+                if(player1 != null && player2 != null)
                 {
-                    Match match = matches.get(matchIndex);
-                    match.setTopPlayer(players.get(i));
-                    match.setBottomPlayer(players.get(j));
-                    matchIndex++;
+                    Match match = matches.get(matchIndex++);
+                    match.setTopPlayer(player1);
+                    match.setBottomPlayer(player2);
+                    match.setRound(round);
                 }
             }
+
+            List<Player> newRotatingPlayers = new ArrayList<>();
+
+            newRotatingPlayers.add(rotatingPlayers.get(0));
+            newRotatingPlayers.add(rotatingPlayers.get(numPlayers - 1));
+
+            newRotatingPlayers.addAll(rotatingPlayers.subList(1, numPlayers - 1));
+            rotatingPlayers = newRotatingPlayers;
         }
     }
 }

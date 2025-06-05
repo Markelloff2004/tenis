@@ -65,23 +65,24 @@ public class MatchGenerator
         List<Player> players = new ArrayList<>(tournament.getPlayers());
         int numPlayers = players.size();
 
+        int numRounds = (numPlayers % 2 == 0) ? numPlayers - 1 : numPlayers;
+        int matchesPerRound = numPlayers / 2;
+        int totalMatches = numRounds * matchesPerRound;
+
         // Создаём список матчей для каждого игрока против каждого
         List<Match> matches = new ArrayList<>();
-        for (int i = 0; i < numPlayers; i++)
+        for (int i = 0; i < totalMatches; i++)
         {
-            for (int j = i + 1; j < numPlayers; j++)
-            {
-                Match match = createMatch(1, matches.size() + 1, null, tournament);
-                matches.add(match);
-            }
+            Match match = createMatch(0, i+1, null, tournament);
+            matches.add(match);
         }
 
         tournament.getMatches().addAll(matches);
         tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
 
-
         // Распределение игроков в отдельном методе PlayerDistributer
         playerDistributer.distributePlayersInRobinRound(matches, players);
+
         tournamentService.saveTournament(tournament);
     }
 
