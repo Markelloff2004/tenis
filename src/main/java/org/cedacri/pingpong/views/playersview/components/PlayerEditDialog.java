@@ -4,7 +4,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.service.primary.PlayerService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;

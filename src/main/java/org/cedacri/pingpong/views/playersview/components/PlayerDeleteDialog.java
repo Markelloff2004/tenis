@@ -7,7 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.service.primary.PlayerService;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;

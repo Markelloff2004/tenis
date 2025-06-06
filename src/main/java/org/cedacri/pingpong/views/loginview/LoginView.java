@@ -8,7 +8,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.cedacri.pingpong.service.UserDetailsServiceImpl;
+import org.cedacri.pingpong.config.security.service.UserDetailsServiceImpl;
 
 @Route("login")
 @PageTitle("Login | Ping Pong")

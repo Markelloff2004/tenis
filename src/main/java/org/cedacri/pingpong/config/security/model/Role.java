@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.entity;
+package org.cedacri.pingpong.config.security.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.enums.RoleEnum;
 
 @Getter
 @Setter

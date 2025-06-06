@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.service;
+package org.cedacri.pingpong.service.primary;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -21,121 +21,11 @@ import java.util.Optional;
 @Service
 public class MatchService
 {
-
     private final MatchRepository matchRepository;
 
     public MatchService(MatchRepository matchRepository)
     {
         this.matchRepository = matchRepository;
-    }
-
-    public List<Match> findMatchesByTournamentAndRound(Tournament tournament, int round)
-    {
-        log.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
-
-        if (tournament == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        if (round <= 0 || round == Integer.MAX_VALUE)
-        {
-            throw new IllegalArgumentException("Invalid round number");
-        }
-
-        List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round);
-
-        if (matches != null)
-        {
-            matches = matches
-                    .stream()
-                    .distinct()
-                    .sorted(Comparator.comparing(Match::getPosition)).toList();
-        }
-        else
-        {
-            matches = Collections.emptyList();
-        }
-
-        log.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournament, round);
-        return matches;
-    }
-
-    public List<Match> findMatchesByTournament(Tournament tournament)
-    {
-
-        if (tournament == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        log.debug("Fetching matches for tournament: {} ", tournament.getId());
-        List<Match> matches = matchRepository.findByTournament(tournament);
-
-        if (matches != null)
-        {
-            matches = matches
-                    .stream()
-                    .distinct()
-                    .sorted(Comparator.comparing(Match::getPosition)
-                            .thenComparing(Match::getRound))
-                    .toList();
-        }
-        else
-        {
-            matches = Collections.emptyList();
-        }
-
-
-        log.info("Found {} matches for tournament: {}", matches.size(), tournament.getId());
-        return matches;
-    }
-
-    public List<Match> findMatchesByPlayerNameAndSurname(Tournament tournament, String playerName, String playerSurname)
-    {
-        log.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
-
-        if (tournament == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        if (playerName == null)
-        {
-            throw new IllegalArgumentException("Player Name cannot be null");
-        }
-
-        if (playerSurname == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        List<Match> tournamentMatches  = matchRepository.findByTournament(tournament);
-
-        if (tournamentMatches  == null || tournamentMatches .isEmpty())
-        {
-            return Collections.emptyList();
-        }
-
-        List<Match> matchesWhereIsTopPlayer = tournamentMatches .stream()
-                .filter(m -> (Objects.nonNull(m.getTopPlayer())
-                                && (m.getTopPlayer().getName().equals(playerName)
-                                && m.getTopPlayer().getSurname().equals(playerSurname))
-                        )
-                ).toList();
-
-        List<Match> matchesWhereIsBottomPlayer = tournamentMatches .stream()
-                .filter(m -> (Objects.nonNull(m.getTopPlayer())
-                                && (m.getBottomPlayer().getName().equals(playerName)
-                                && m.getBottomPlayer().getSurname().equals(playerSurname))
-                        )
-                ).toList();
-
-        List<Match> allMatches = new ArrayList<>();
-        allMatches.addAll(matchesWhereIsTopPlayer);
-        allMatches.addAll(matchesWhereIsBottomPlayer);
-
-        return allMatches;
     }
 
     @Transactional

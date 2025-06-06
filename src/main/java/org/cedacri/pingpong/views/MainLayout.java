@@ -15,7 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.server.VaadinSession;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.enums.RoleEnum;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.service;
+package org.cedacri.pingpong.service.primary;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;

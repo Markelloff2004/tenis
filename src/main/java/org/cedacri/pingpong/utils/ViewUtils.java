@@ -12,7 +12,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.utils.SecurityUtils;
 
 import java.util.List;
 

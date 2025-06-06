@@ -20,15 +20,15 @@ services:
       MYSQL_PASSWORD: 4384466
       MYSQL_ROOT_PASSWORD: root4384466
     ports:
-      - "3306:3306"
+      - "3333:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./src/main/resources/db/migration/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - my-network
-    depends_on:
-      db-init:
-        condition: service_completed_successfully
+#    depends_on:
+#      db-init:
+#        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
 

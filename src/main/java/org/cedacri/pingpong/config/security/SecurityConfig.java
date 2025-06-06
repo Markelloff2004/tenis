@@ -1,7 +1,7 @@
-package org.cedacri.pingpong.config;
+package org.cedacri.pingpong.config.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.enums.RoleEnum;
 import org.cedacri.pingpong.views.loginview.LoginView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

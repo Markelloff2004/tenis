@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
@@ -16,9 +15,11 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@MappedSuperclass
 @Getter
 @Setter
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "tournament_type")
 public abstract class Tournament implements ITournament
 {
 

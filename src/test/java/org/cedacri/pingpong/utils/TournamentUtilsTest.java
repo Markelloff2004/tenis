@@ -5,7 +5,7 @@ import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.service.primary.TournamentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

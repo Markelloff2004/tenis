@@ -9,6 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long>
 {
+    Page<Player> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
-    Page<Player> findAll(Pageable pageable);
+    Page<Player> findBySurnameContainingIgnoreCase(String surname, Pageable pageable);
+
+    Page<Player> findByNameContainingIgnoreCaseOrSurnameContainingIgnoreCase(String name, String surname, Pageable pageable);
+
 }

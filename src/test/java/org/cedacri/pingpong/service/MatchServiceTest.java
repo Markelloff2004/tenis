@@ -7,6 +7,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.repository.MatchRepository;
+import org.cedacri.pingpong.service.primary.MatchService;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
 import org.springframework.dao.DataIntegrityViolationException;

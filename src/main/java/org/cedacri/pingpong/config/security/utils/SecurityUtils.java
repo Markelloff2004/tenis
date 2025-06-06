@@ -1,6 +1,6 @@
-package org.cedacri.pingpong.utils;
+package org.cedacri.pingpong.config.security.utils;
 
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.enums.RoleEnum;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

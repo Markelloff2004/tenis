@@ -11,7 +11,7 @@ import java.util.Set;
 public interface ITournament
 {
 
-    Integer getId();
+    Long getId();
 
     String getTournamentName();
 

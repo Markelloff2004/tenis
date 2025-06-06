@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.enums;
+package org.cedacri.pingpong.config.security.enums;
 
 public enum RoleEnum
 {

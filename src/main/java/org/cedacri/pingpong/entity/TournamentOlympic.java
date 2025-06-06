@@ -9,10 +9,10 @@ import org.cedacri.pingpong.interfaces.ITournamentOlympic;
 
 import java.io.Serializable;
 
-@Entity
-@Table(name = "tournaments_olympic")
 @Getter
 @Setter
+@Entity
+@Table(name = "tournaments_olympic")
 public class TournamentOlympic extends Tournament implements ITournamentOlympic, Serializable {
 
     @Column

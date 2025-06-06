@@ -12,23 +12,27 @@ It contains all the necessary configuration and some placeholder files to get yo
 5. Run the `main` method in that class.
 6. The application will be available at: http://localhost:8080
 
-
 ## Deploying using Docker
 
 To build the Dockerized version of the project, you will need:
-1. Make sure the database connection URL in `application.properties` is correctly set to connect to the containerized database.
+
+1. Make sure the database connection URL in `application.properties` is correctly set to connect to the containerized
+   database.
 2. Build the application and start the containers using:
-    ```bash
+   ```bash
       mvn clean package -Pproduction
+   ```
+3. Start the Docker containers using Docker Compose:
+
+   ```bash
       docker-compose up --build -d
-     ```
+   ```
 3. The application will be available at: [http://localhost:8090](http://localhost:8090)
 4. To stop and remove all containers, volumes, and networks created by Docker Compose:
 
    ```bash
    docker-compose down -v
    ```
-
 
 ## Project structure
 
@@ -44,10 +48,14 @@ To build the Dockerized version of the project, you will need:
 - Read the documentation at [vaadin.com/docs](https://vaadin.com/docs).
 - Follow the tutorial at [vaadin.com/docs/latest/tutorial/overview](https://vaadin.com/docs/latest/tutorial/overview).
 - Create new projects at [start.vaadin.com](https://start.vaadin.com/).
-- Search UI components and their usage examples at [vaadin.com/docs/latest/components](https://vaadin.com/docs/latest/components).
-- View use case applications that demonstrate Vaadin capabilities at [vaadin.com/examples-and-demos](https://vaadin.com/examples-and-demos).
-- Build any UI without custom CSS by discovering Vaadin's set of [CSS utility classes](https://vaadin.com/docs/styling/lumo/utility-classes). 
+- Search UI components and their usage examples
+  at [vaadin.com/docs/latest/components](https://vaadin.com/docs/latest/components).
+- View use case applications that demonstrate Vaadin capabilities
+  at [vaadin.com/examples-and-demos](https://vaadin.com/examples-and-demos).
+- Build any UI without custom CSS by discovering Vaadin's set
+  of [CSS utility classes](https://vaadin.com/docs/styling/lumo/utility-classes).
 - Find a collection of solutions to common use cases at [cookbook.vaadin.com](https://cookbook.vaadin.com/).
 - Find add-ons at [vaadin.com/directory](https://vaadin.com/directory).
-- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/vaadin) or join our [Forum](https://vaadin.com/forum).
+- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/vaadin) or join
+  our [Forum](https://vaadin.com/forum).
 - Report issues, create pull requests in [GitHub](https://github.com/vaadin).

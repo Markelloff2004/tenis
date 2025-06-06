@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.service.primary.PlayerService;
 import org.cedacri.pingpong.utils.GridUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 

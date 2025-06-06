@@ -6,6 +6,8 @@ import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
+import org.cedacri.pingpong.service.primary.PlayerService;
+import org.cedacri.pingpong.service.primary.TournamentService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.MatchGenerator;
 import org.hibernate.Hibernate;

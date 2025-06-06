@@ -4,10 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.*;
-import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.service.primary.TournamentService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,24 +17,13 @@ import java.util.Optional;
 @Setter
 public class MatchGenerator
 {
-
-    private SetTypesEnum simpleRoundSets;
-    private SetTypesEnum semifinalsRoundSets;
-    private SetTypesEnum finalsRoundSets;
-    private TournamentTypeEnum tournamentType;
-
     private final PlayerDistributer playerDistributer;
-
     private final TournamentService tournamentService;
 
-    public MatchGenerator(SetTypesEnum simpleRoundSets, SetTypesEnum semifinalsRoundSets,
-                          SetTypesEnum finalsRoundSets, TournamentTypeEnum tournamentType,
-                          PlayerDistributer playerDistributer, TournamentService tournamentService)
+    private TournamentTypeEnum tournamentType;
+
+    public MatchGenerator(PlayerDistributer playerDistributer, TournamentService tournamentService)
     {
-        this.simpleRoundSets = simpleRoundSets;
-        this.semifinalsRoundSets = semifinalsRoundSets;
-        this.finalsRoundSets = finalsRoundSets;
-        this.tournamentType = tournamentType;
         this.playerDistributer = playerDistributer;
         this.tournamentService = tournamentService;
     }

@@ -8,8 +8,8 @@ import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.entity.Tournament;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.service.PlayerService;
-import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.service.primary.PlayerService;
+import org.cedacri.pingpong.service.primary.TournamentService;
 
 import java.util.*;
 
@@ -186,6 +186,7 @@ public class TournamentUtils
 
     public static int getNumsOfSetsPerMatch(Match match)
     {
+
 
         int setsToWin = match.getTournament().getSetsToWin().getValue();
         int semifinalSetsToWin = match.getTournament().getSemifinalsSetsToWin().getValue();

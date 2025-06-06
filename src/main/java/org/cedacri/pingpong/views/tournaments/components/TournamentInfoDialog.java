@@ -8,9 +8,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
-import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.service.primary.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.HashSet;

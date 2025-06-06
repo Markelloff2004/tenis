@@ -10,7 +10,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
-import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.service.primary.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;

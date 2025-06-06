@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.exception.tournament.EntityDeletionException;
 import org.cedacri.pingpong.repository.PlayerRepository;
+import org.cedacri.pingpong.service.primary.PlayerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

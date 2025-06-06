@@ -2,7 +2,7 @@ package org.cedacri.pingpong.views.playersview.components;
 
 import jakarta.validation.ConstraintViolationException;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.service.PlayerService;
+import org.cedacri.pingpong.service.primary.PlayerService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;

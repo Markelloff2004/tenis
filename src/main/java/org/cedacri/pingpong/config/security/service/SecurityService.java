@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.service;
+package org.cedacri.pingpong.config.security.service;
 
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import org.springframework.security.core.GrantedAuthority;
