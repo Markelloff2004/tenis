@@ -4,7 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
+import org.cedacri.pingpong.interfaces.ITournament;
 import org.cedacri.pingpong.repository.TournamentRepository;
 import org.cedacri.pingpong.utils.MatchGenerator;
 import org.cedacri.pingpong.utils.PlayerDistributer;
@@ -101,7 +103,8 @@ public class TournamentService
 
     MatchGenerator createMatchGenerator(Tournament tournament)
     {
-        return new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
-                tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this);
+        return null;
+//        return new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
+//                tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this);
     }
 }

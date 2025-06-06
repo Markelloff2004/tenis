@@ -244,20 +244,20 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         if (round instanceof Integer roundInt)
         {
-            displayMatches(matchService.getMatchesByTournamentAndRound(tournament, roundInt));
+            displayMatches(matchService.findMatchesByTournamentAndRound(tournament, roundInt));
         }
         else if (round instanceof String roundStr)
         {
             if ("All".equals(roundStr) || roundStr.isEmpty() || roundStr.isBlank())
             {
-                displayMatches(matchService.getMatchesByTournament(tournament));
+                displayMatches(matchService.findMatchesByTournament(tournament));
             }
             else
             {
                 String[] playerNameSurname = roundStr.split(" ");
                 if (playerNameSurname.length == 2)
                 {
-                    displayMatches(matchService.getMatchesByPlayerNameSurname(tournament, playerNameSurname[0], playerNameSurname[1]));
+                    displayMatches(matchService.findMatchesByPlayerNameAndSurname(tournament, playerNameSurname[0], playerNameSurname[1]));
                 }
                 else
                 {

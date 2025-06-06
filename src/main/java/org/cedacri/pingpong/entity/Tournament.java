@@ -1,20 +1,6 @@
 package org.cedacri.pingpong.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -30,12 +16,10 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@MappedSuperclass
 @Getter
 @Setter
-@RequiredArgsConstructor
-@Table(name = "tournaments")
-public class Tournament implements ITournament
+public abstract class Tournament implements ITournament
 {
 
     @Id
@@ -67,21 +51,13 @@ public class Tournament implements ITournament
     @Column(name = "sets_to_win", nullable = false)
     private SetTypesEnum setsToWin;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Tournament semifinals sets cannot be null")
-    private SetTypesEnum semifinalsSetsToWin;
-
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Tournament final sets cannot be null")
-    private SetTypesEnum finalsSetsToWin;
-
     @Column(name = "created_at", updatable = false)
-    private LocalDate createdAt = LocalDate.now();
+    private LocalDate createdAt;
 
     @Column(name = "started_at")
     private LocalDate startedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "tournament_id"),
@@ -95,4 +71,9 @@ public class Tournament implements ITournament
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "winner_id")
     private Player winner;
+
+    @PrePersist
+    private void setCreatedAt() {
+        createdAt = LocalDate.now();
+    }
 }

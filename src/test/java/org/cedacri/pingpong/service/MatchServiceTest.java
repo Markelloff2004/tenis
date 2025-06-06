@@ -59,7 +59,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament, 1))
                     .thenReturn(Arrays.asList(match1, match2, match3));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournament, 1);
 
             assertTrue(result.containsAll(Arrays.asList(match2, match3, match1)));
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
@@ -70,7 +70,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament, 1))
                     .thenReturn(Collections.emptyList());
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournament, 1);
 
             assertTrue(result.isEmpty());
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
@@ -79,7 +79,7 @@ class MatchServiceTest {
         @Test
         void testThrowsExceptionWhenTournamentIsNull() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByTournamentAndRound(null, 1);
+                matchService.findMatchesByTournamentAndRound(null, 1);
             });
             assertEquals("Tournament cannot be null", exception.getMessage());
             verify(matchRepository, times(0)).findByTournamentAndRound(any(), anyInt());
@@ -95,7 +95,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament, 1))
                     .thenReturn(Collections.singletonList(singleMatch));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournament, 1);
 
             assertEquals(Collections.singletonList(singleMatch), result);
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
@@ -122,7 +122,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament, 1))
                     .thenReturn(Arrays.asList(duplicateMatch1, duplicateMatch2, matchWithDifferentPosition));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournament, 1);
 
             assertEquals(Arrays.asList(duplicateMatch1, duplicateMatch2, matchWithDifferentPosition), result);
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
@@ -133,7 +133,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament, 1))
                     .thenReturn(Arrays.asList(match1, match1));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournament, 1);
 
             assertEquals(Collections.singletonList(match1), result);
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
@@ -144,7 +144,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament, 1))
                     .thenReturn(null);
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournament, 1);
 
             assertEquals(Collections.emptyList(), result);
             verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
@@ -176,8 +176,8 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournament2, 1))
                     .thenReturn(Collections.singletonList(match1ForTourney2));
 
-            List<Match> result1 = matchService.getMatchesByTournamentAndRound(tournament1, 1);
-            List<Match> result2 = matchService.getMatchesByTournamentAndRound(tournament2, 1);
+            List<Match> result1 = matchService.findMatchesByTournamentAndRound(tournament1, 1);
+            List<Match> result2 = matchService.findMatchesByTournamentAndRound(tournament2, 1);
 
             assertEquals(Collections.singletonList(match1ForTourney1), result1);
             assertEquals(Collections.singletonList(match1ForTourney2), result2);
@@ -197,7 +197,7 @@ class MatchServiceTest {
             when(matchRepository.findByTournamentAndRound(tournamentLowerCase, 1))
                     .thenReturn(Collections.singletonList(match));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentLowerCase, 1);
+            List<Match> result = matchService.findMatchesByTournamentAndRound(tournamentLowerCase, 1);
 
             assertEquals(Collections.singletonList(match), result);
             verify(matchRepository, times(1)).findByTournamentAndRound(tournamentLowerCase, 1);
@@ -206,12 +206,12 @@ class MatchServiceTest {
         @Test
         void testInvalidRoundNumber() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByTournamentAndRound(tournament, -1);
+                matchService.findMatchesByTournamentAndRound(tournament, -1);
             });
             assertEquals("Invalid round number", exception.getMessage());
 
             exception = assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByTournamentAndRound(tournament, Integer.MAX_VALUE);
+                matchService.findMatchesByTournamentAndRound(tournament, Integer.MAX_VALUE);
             });
             assertEquals("Invalid round number", exception.getMessage());
             verify(matchRepository, times(0)).findByTournamentAndRound(any(), anyInt());
@@ -226,7 +226,7 @@ class MatchServiceTest {
         void testGetMatchesByTournamentSortedByPositionAndRound() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.findMatchesByTournament(tournament);
 
             assertEquals(3, matches.size());
             assertEquals(match1, matches.get(0));
@@ -239,7 +239,7 @@ class MatchServiceTest {
         void testGetMatchesByTournamentEmptyListIfNoMatches() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of());
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.findMatchesByTournament(tournament);
 
             assertTrue(matches.isEmpty());
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -248,7 +248,7 @@ class MatchServiceTest {
         @Test
         void testGetMatchesByTournamentThrowsExceptionIfTournamentIsNull() {
             assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByTournament(null);
+                matchService.findMatchesByTournament(null);
             });
             verify(matchRepository, times(0)).findByTournament(any());
         }
@@ -257,7 +257,7 @@ class MatchServiceTest {
         void testGetMatchesByTournamentNullFromRepository() {
             when(matchRepository.findByTournament(tournament)).thenReturn(null);
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.findMatchesByTournament(tournament);
 
             assertEquals(Collections.emptyList(), matches);
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -277,8 +277,8 @@ class MatchServiceTest {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
             when(matchRepository.findByTournament(anotherTournament)).thenReturn(List.of(match4));
 
-            List<Match> matchesFromTournament1 = matchService.getMatchesByTournament(tournament);
-            List<Match> matchesFromAnotherTournament = matchService.getMatchesByTournament(anotherTournament);
+            List<Match> matchesFromTournament1 = matchService.findMatchesByTournament(tournament);
+            List<Match> matchesFromAnotherTournament = matchService.findMatchesByTournament(anotherTournament);
 
 
             assertTrue(matchesFromTournament1.contains(match1));
@@ -292,7 +292,7 @@ class MatchServiceTest {
         void testGetMatchesByTournamentNoDuplicateMatches() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match1, match2));
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.findMatchesByTournament(tournament);
 
             assertEquals(2, matches.size());
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -305,7 +305,7 @@ class MatchServiceTest {
 
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.findMatchesByTournament(tournament);
 
             assertEquals(3, matches.size());
             assertEquals(match1, matches.get(0));
@@ -354,7 +354,7 @@ class MatchServiceTest {
         void testGetMatchesByPlayerNameSurnameReturnsMatchesForJaneDoe() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "Jane", "Doe");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "Jane", "Doe");
 
             assertEquals(2, matches.size());
             assertTrue(matches.contains(match1));
@@ -366,7 +366,7 @@ class MatchServiceTest {
         void testGetMatchesByPlayerNameSurnameReturnsEmptyListIfNoMatches() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "Michael", "Johnson");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "Michael", "Johnson");
 
             assertTrue(matches.isEmpty());
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -375,7 +375,7 @@ class MatchServiceTest {
         @Test
         void testGetMatchesByPlayerNameSurnameThrowsExceptionIfTournamentIsNull() {
             assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByPlayerNameSurname(null, "Doe", "John");
+                matchService.findMatchesByPlayerNameAndSurname(null, "Doe", "John");
             });
             verifyNoInteractions(matchRepository);
         }
@@ -383,7 +383,7 @@ class MatchServiceTest {
         @Test
         void testGetMatchesByPlayerNameSurnameThrowsExceptionIfPlayerNameIsNull() {
             assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByPlayerNameSurname(tournament, null, "Doe");
+                matchService.findMatchesByPlayerNameAndSurname(tournament, null, "Doe");
             });
             verifyNoInteractions(matchRepository);
         }
@@ -391,7 +391,7 @@ class MatchServiceTest {
         @Test
         void testGetMatchesByPlayerNameSurnameThrowsExceptionIfPlayerSurnameIsNull() {
             assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByPlayerNameSurname(tournament, "John", null);
+                matchService.findMatchesByPlayerNameAndSurname(tournament, "John", null);
             });
             verifyNoInteractions(matchRepository);
         }
@@ -404,7 +404,7 @@ class MatchServiceTest {
 
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doer");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "John", "Doer");
 
             assertTrue(matches.isEmpty());
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -414,7 +414,7 @@ class MatchServiceTest {
         void testGetMatchesByPlayerNameSurnameHandlesPlayerInMultipleRounds() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "John", "Doe");
 
             assertEquals(3, matches.size());
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -424,7 +424,7 @@ class MatchServiceTest {
         void testGetMatchesByPlayerNameSurnameHandlesNullFromRepository() {
             when(matchRepository.findByTournament(tournament)).thenReturn(null);
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "John", "Doe");
 
             assertEquals(Collections.emptyList(), matches);
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -442,8 +442,8 @@ class MatchServiceTest {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
             when(matchRepository.findByTournament(anotherTournament)).thenReturn(List.of(matchInAnotherTournament));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
-            List<Match> matchesFromAnotherT = matchService.getMatchesByPlayerNameSurname(anotherTournament, "John", "Doe");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "John", "Doe");
+            List<Match> matchesFromAnotherT = matchService.findMatchesByPlayerNameAndSurname(anotherTournament, "John", "Doe");
 
             assertEquals(2, matches.size());
             assertTrue(matches.contains(match1));
@@ -461,7 +461,7 @@ class MatchServiceTest {
         void testGetMatchesByPlayerNameSurnameHandlesEmptyPlayerName() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, " ", "Doe");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, " ", "Doe");
 
             assertTrue(matches.isEmpty());  // No player should match empty name
             verify(matchRepository, times(1)).findByTournament(tournament);
@@ -471,7 +471,7 @@ class MatchServiceTest {
         void testGetMatchesByPlayerNameSurnameHandlesEmptyPlayerSurname() {
             when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", " ");
+            List<Match> matches = matchService.findMatchesByPlayerNameAndSurname(tournament, "John", " ");
 
             assertTrue(matches.isEmpty());  // No player should match empty surname
             verify(matchRepository, times(1)).findByTournament(tournament);

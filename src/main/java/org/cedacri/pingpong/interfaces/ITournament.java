@@ -11,27 +11,23 @@ import java.util.Set;
 public interface ITournament
 {
 
-    Integer getMaxPlayers();
-
     Integer getId();
 
     String getTournamentName();
-
-    SetTypesEnum getSetsToWin();
-
-    SetTypesEnum getSemifinalsSetsToWin();
-
-    SetTypesEnum getFinalsSetsToWin();
 
     TournamentStatusEnum getTournamentStatus();
 
     TournamentTypeEnum getTournamentType();
 
-    LocalDate getCreatedAt();
+    Integer getMaxPlayers();
 
     Set<Player> getPlayers();
 
+    SetTypesEnum getSetsToWin();
+
     Player getWinner();
+
+    LocalDate getCreatedAt();
 
 }
 

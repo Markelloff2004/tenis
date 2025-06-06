@@ -61,7 +61,7 @@ public class MatchComponent extends HorizontalLayout {
         matchIdDetails.setAlignItems(Alignment.START);
         matchIdDetails.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        Span spanDetails = new Span("Match: " + match.getPosition());
+        Span spanDetails = new Span("Match: " + match.getPosition() + " Round: " + match.getRound());
         matchIdDetails.add(spanDetails);
         return matchIdDetails;
     }

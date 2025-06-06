@@ -29,7 +29,7 @@ public class MatchService
         this.matchRepository = matchRepository;
     }
 
-    public List<Match> getMatchesByTournamentAndRound(Tournament tournament, int round)
+    public List<Match> findMatchesByTournamentAndRound(Tournament tournament, int round)
     {
         log.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
 
@@ -61,7 +61,7 @@ public class MatchService
         return matches;
     }
 
-    public List<Match> getMatchesByTournament(Tournament tournament)
+    public List<Match> findMatchesByTournament(Tournament tournament)
     {
 
         if (tournament == null)
@@ -91,7 +91,7 @@ public class MatchService
         return matches;
     }
 
-    public List<Match> getMatchesByPlayerNameSurname(Tournament tournament, String playerName, String playerSurname)
+    public List<Match> findMatchesByPlayerNameAndSurname(Tournament tournament, String playerName, String playerSurname)
     {
         log.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
 
@@ -110,21 +110,21 @@ public class MatchService
             throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
-        List<Match> matchesFromTournament = matchRepository.findByTournament(tournament);
+        List<Match> tournamentMatches  = matchRepository.findByTournament(tournament);
 
-        if (matchesFromTournament == null || matchesFromTournament.isEmpty())
+        if (tournamentMatches  == null || tournamentMatches .isEmpty())
         {
             return Collections.emptyList();
         }
 
-        List<Match> matchesWhereIsTopPlayer = matchesFromTournament.stream()
+        List<Match> matchesWhereIsTopPlayer = tournamentMatches .stream()
                 .filter(m -> (Objects.nonNull(m.getTopPlayer())
                                 && (m.getTopPlayer().getName().equals(playerName)
                                 && m.getTopPlayer().getSurname().equals(playerSurname))
                         )
                 ).toList();
 
-        List<Match> matchesWhereIsBottomPlayer = matchesFromTournament.stream()
+        List<Match> matchesWhereIsBottomPlayer = tournamentMatches .stream()
                 .filter(m -> (Objects.nonNull(m.getTopPlayer())
                                 && (m.getBottomPlayer().getName().equals(playerName)
                                 && m.getBottomPlayer().getSurname().equals(playerSurname))
@@ -176,16 +176,9 @@ public class MatchService
     public String validateAndUpdateScores(Match match, List<Score> newMatchScores)
     {
 
-        if (match == null)
-        {
-            throw new IllegalArgumentException("Match cannot be null.");
-        }
-        if (newMatchScores == null || newMatchScores.isEmpty())
-        {
-            throw new IllegalArgumentException("Invalid score list: must not be null or empty.");
-        }
+        validateMatchAndScoreList(match, newMatchScores);
 
-        StringBuilder infoMessage = new StringBuilder();
+        List<String> infoMessages = new ArrayList<>();
         List<Score> validScores = new ArrayList<>();
 
         for (Score score : newMatchScores)
@@ -193,7 +186,7 @@ public class MatchService
             String validationMessage = validateScore(score.getTopPlayerScore(), score.getBottomPlayerScore());
             if (validationMessage != null)
             {
-                infoMessage.append(validationMessage).append("\n");
+                infoMessages.add(validationMessage);
             }
             else
             {
@@ -206,12 +199,29 @@ public class MatchService
             throw new IllegalArgumentException("No valid scores provided to update.");
         }
 
+        if(Objects.equals(match.getScore(), validScores))
+        {
+            log.debug("No new scores provided to update. Score is the same.");
+            return String.join("\n", infoMessages);
+        }
+
         match.setScore(validScores);
         TournamentUtils.determinateWinnerFromScore(match);
 
         matchRepository.saveAndFlush(match); //throws IllegalArgumentException
 
-        return infoMessage.toString();
+        return String.join("\n", infoMessages);
+    }
+
+    private static void validateMatchAndScoreList(Match match, List<Score> newMatchScores) {
+        if (match == null)
+        {
+            throw new IllegalArgumentException("Match cannot be null.");
+        }
+        if (newMatchScores == null || newMatchScores.isEmpty())
+        {
+            throw new IllegalArgumentException("Invalid score list: must not be null or empty.");
+        }
     }
 
     private String validateScore(int topScore, int bottomScore)
@@ -268,15 +278,7 @@ public class MatchService
             currMatch = nextMatch;
         }
 
-        saveAllMatches(matchesToUpdate);
-    }
+        matchRepository.saveAllAndFlush(matchesToUpdate);
 
-    private void saveAllMatches(List<Match> matches)
-    {
-        for (Match match : matches)
-        {
-            this.saveMatch(match);
-        }
     }
-
 }
