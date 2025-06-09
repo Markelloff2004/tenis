@@ -1,6 +1,6 @@
-package org.cedacri.pingpong.service;
+package org.cedacri.pingpong.config.security.service;
 
-import org.cedacri.pingpong.repository.UserRepository;
+import org.cedacri.pingpong.config.security.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

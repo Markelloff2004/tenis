@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.config;
+package org.cedacri.pingpong.config.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.cedacri.pingpong.enums.RoleEnum;

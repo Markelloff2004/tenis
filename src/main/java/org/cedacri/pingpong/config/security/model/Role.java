@@ -1,4 +1,4 @@
-package org.cedacri.pingpong.entity;
+package org.cedacri.pingpong.config.security.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

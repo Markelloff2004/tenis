@@ -1,6 +1,6 @@
-package org.cedacri.pingpong.repository;
+package org.cedacri.pingpong.config.security.repository;
 
-import org.cedacri.pingpong.entity.User;
+import org.cedacri.pingpong.config.security.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
