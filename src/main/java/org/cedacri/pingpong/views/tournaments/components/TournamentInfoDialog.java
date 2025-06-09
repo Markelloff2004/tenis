@@ -7,7 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
@@ -19,18 +19,18 @@ import java.util.HashSet;
 public class TournamentInfoDialog extends AbstractTournamentDialog
 {
 
-    private final Tournament tournament;
+    private final TournamentOlympic tournamentOlympic;
 
     private final ComboBox<String> statusComboBox;
 
-    public TournamentInfoDialog(PlayerService playerService, Tournament tournament)
+    public TournamentInfoDialog(PlayerService playerService, TournamentOlympic tournamentOlympic)
     {
         super("Tournament Details:");
 
-        this.tournament = tournament;
+        this.tournamentOlympic = tournamentOlympic;
 
 
-        this.selectedPlayersSet = tournament.getPlayers();
+        this.selectedPlayersSet = tournamentOlympic.getPlayers();
         this.availablePlayersSet = new HashSet<>();
         initializePlayerSets(playerService);
         initializeFields();
@@ -45,7 +45,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
 
         log.debug("Initializing fields for editing...");
 
-        prefillFields(tournament);
+        prefillFields(tournamentOlympic);
         setReadOnlyForFields();
     }
 
@@ -72,7 +72,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
     protected HorizontalLayout createDialogButtons()
     {
 
-        if (!tournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
+        if (!tournamentOlympic.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
         {
             Button saveButton = ViewUtils.createSecuredButton(
                     "Matches",
@@ -110,28 +110,28 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
     {
         ComboBox<String> comboBox = new ComboBox<>("Status");
         comboBox.setItems(String.valueOf(TournamentStatusEnum.PENDING));
-        comboBox.setValue(String.valueOf(tournament.getTournamentStatus()));
+        comboBox.setValue(String.valueOf(tournamentOlympic.getTournamentStatus()));
         comboBox.setWidth("20%");
         comboBox.setRequired(true);
         comboBox.setReadOnly(true);
         return comboBox;
     }
 
-    private void prefillFields(Tournament tournament)
+    private void prefillFields(TournamentOlympic tournamentOlympic)
     {
         log.debug("Pre-fill fields with existing tournament data");
-        tournamentNameField.setValue(tournament.getTournamentName());
-        typeComboBox.setValue(tournament.getTournamentType());
-        setsCountComboBox.setValue(tournament.getSetsToWin());
-        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin());
-        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin());
+        tournamentNameField.setValue(tournamentOlympic.getTournamentName());
+        typeComboBox.setValue(tournamentOlympic.getTournamentType());
+        setsCountComboBox.setValue(tournamentOlympic.getSetsToWin());
+        semifinalsSetsCountComboBox.setValue(tournamentOlympic.getSemifinalsSetsToWin());
+        finalsSetsCountComboBox.setValue(tournamentOlympic.getFinalsSetsToWin());
     }
 
     @Override
     protected void onSave()
     {
-        getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournament.getId()));
-        log.info("Navigating to tournament details page, id: {}", tournament.getId());
+        getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournamentOlympic.getId()));
+        log.info("Navigating to tournament details page, id: {}", tournamentOlympic.getId());
         close();
     }
 }

@@ -3,7 +3,7 @@ package org.cedacri.pingpong.utils;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.TournamentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +22,10 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class TournamentUtilsTest
+class TournamentOlympicUtilsTest
 {
 
-    private Tournament tournament;
+    private TournamentOlympic tournamentOlympic;
     private Match match;
 
     @InjectMocks
@@ -42,24 +42,24 @@ class TournamentUtilsTest
     @BeforeEach
     void setUp()
     {
-        tournament = new Tournament();
-        tournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
-        tournament.setMaxPlayers(16);
+        tournamentOlympic = new TournamentOlympic();
+        tournamentOlympic.setTournamentType(TournamentTypeEnum.OLYMPIC);
+        tournamentOlympic.setMaxPlayers(16);
 
         match = new Match();
         match.setRound(1);
-        match.setTournament(tournament);
+        match.setTournament(tournamentOlympic);
 
         topPlayer = createPlayer("A");
         bottomPlayer = createPlayer("B");
 
-        tournament = new Tournament();
-        tournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
+        tournamentOlympic = new TournamentOlympic();
+        tournamentOlympic.setTournamentType(TournamentTypeEnum.OLYMPIC);
 
         match = new Match();
         match.setTopPlayer(topPlayer);
         match.setBottomPlayer(bottomPlayer);
-        match.setTournament(tournament);
+        match.setTournament(tournamentOlympic);
 
         scores = new ArrayList<>();
         match.setScore(scores);
@@ -84,17 +84,17 @@ class TournamentUtilsTest
         @Test
         void testCalculateMaxPlayersValid()
         {
-            tournament.setPlayers(getPlayers(10));
+            tournamentOlympic.setPlayers(getPlayers(10));
 
-            assertEquals(16, TournamentUtils.calculateMaxPlayers(tournament));
+            assertEquals(16, TournamentUtils.calculateMaxPlayers(tournamentOlympic));
         }
 
         @Test
         void testCalculateMaxPlayersPowerOfTwo()
         {
-            tournament.setPlayers(getPlayers(16));
+            tournamentOlympic.setPlayers(getPlayers(16));
 
-            assertEquals(16, TournamentUtils.calculateMaxPlayers(tournament));
+            assertEquals(16, TournamentUtils.calculateMaxPlayers(tournamentOlympic));
         }
 
     }

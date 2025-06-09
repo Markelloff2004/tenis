@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.SetTypesEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
@@ -42,15 +42,15 @@ public class MatchGenerator
         this.tournamentService = tournamentService;
     }
 
-    public void generateMatches(Tournament tournamentRef)
+    public void generateMatches(TournamentOlympic tournamentOlympicRef)
     {
-        Tournament tournament = tournamentService.findTournamentById(tournamentRef.getId());
+        TournamentOlympic tournamentOlympic = tournamentService.findTournamentById(tournamentOlympicRef.getId());
 
         switch (tournamentType)
         {
-            case OLYMPIC -> generateOlympicTournament(tournament);
+            case OLYMPIC -> generateOlympicTournament(tournamentOlympic);
 
-            case ROBIN_ROUND -> generateRobinRoundTournament(tournament);
+            case ROBIN_ROUND -> generateRobinRoundTournament(tournamentOlympic);
             default ->
             {
                 NotificationManager.showErrorNotification("Tournament type " + tournamentType + " not supported!");
@@ -60,9 +60,9 @@ public class MatchGenerator
 
     }
 
-    private void generateRobinRoundTournament(Tournament tournament)
+    private void generateRobinRoundTournament(TournamentOlympic tournamentOlympic)
     {
-        List<Player> players = new ArrayList<>(tournament.getPlayers());
+        List<Player> players = new ArrayList<>(tournamentOlympic.getPlayers());
         int numPlayers = players.size();
 
         int numRounds = (numPlayers % 2 == 0) ? numPlayers - 1 : numPlayers;
@@ -73,36 +73,36 @@ public class MatchGenerator
         List<Match> matches = new ArrayList<>();
         for (int i = 0; i < totalMatches; i++)
         {
-            Match match = createMatch(0, i+1, null, tournament);
+            Match match = createMatch(0, i+1, null, tournamentOlympic);
             matches.add(match);
         }
 
-        tournament.getMatches().addAll(matches);
-        tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
+        tournamentOlympic.getMatches().addAll(matches);
+        tournamentOlympic.setTournamentStatus(TournamentStatusEnum.ONGOING);
 
         // Распределение игроков в отдельном методе PlayerDistributer
         playerDistributer.distributePlayersInRobinRound(matches, players);
 
-        tournamentService.saveTournament(tournament);
+        tournamentService.saveTournament(tournamentOlympic);
     }
 
-    private void generateOlympicTournament(Tournament tournament)
+    private void generateOlympicTournament(TournamentOlympic tournamentOlympic)
     {
 
-        tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
+        tournamentOlympic.setTournamentStatus(TournamentStatusEnum.ONGOING);
 
-        int maxPlayers = tournament.getMaxPlayers();
+        int maxPlayers = tournamentOlympic.getMaxPlayers();
         int totalRounds = TournamentUtils.calculateNumberOfRounds(maxPlayers);
 
 
-        generateOlympicMatches(tournament, totalRounds);
-        playerDistributer.distributePlayersInFirstRound(maxPlayers, tournament);
-        TournamentUtils.movePlayersWithoutOpponent(1, tournament);
+        generateOlympicMatches(tournamentOlympic, totalRounds);
+        playerDistributer.distributePlayersInFirstRound(maxPlayers, tournamentOlympic);
+        TournamentUtils.movePlayersWithoutOpponent(1, tournamentOlympic);
 
-        tournamentService.saveTournament(tournament);
+        tournamentService.saveTournament(tournamentOlympic);
     }
 
-    private void generateOlympicMatches(Tournament tournament, int totalRounds)
+    private void generateOlympicMatches(TournamentOlympic tournamentOlympic, int totalRounds)
     {
         int currentMatches = 1;
         int position = 1;
@@ -120,7 +120,7 @@ public class MatchGenerator
 
                     int currentRound = round;
 
-                    List<Match> previousRoundMatches = tournament.getMatches().stream()
+                    List<Match> previousRoundMatches = tournamentOlympic.getMatches().stream()
                             .filter(m -> m.getRound() == (currentRound + 1))
                             .toList();
 
@@ -130,33 +130,33 @@ public class MatchGenerator
 
                     if (nextMatch.isPresent())
                     {
-                        Match match = createMatch(round, position, nextMatch.orElse(null), tournament);
+                        Match match = createMatch(round, position, nextMatch.orElse(null), tournamentOlympic);
                         currentRoundMatches.add(match);
                     }
                     else
                     {
                         log.warn("Failed to generate match: No match found for position {} in round {} of tournament {}",
-                                nextMatchIndex, round, tournament.getTournamentName());
+                                nextMatchIndex, round, tournamentOlympic.getTournamentName());
 
                     }
                 }
-                tournament.getMatches().addAll(currentRoundMatches);
+                tournamentOlympic.getMatches().addAll(currentRoundMatches);
             }
             else
             {
-                Match finalMatch = createMatch(totalRounds, position, null, tournament);
-                tournament.getMatches().add(finalMatch);
+                Match finalMatch = createMatch(totalRounds, position, null, tournamentOlympic);
+                tournamentOlympic.getMatches().add(finalMatch);
             }
         }
     }
 
-    private Match createMatch(int round, int position, Match nextMatch, Tournament tournament)
+    private Match createMatch(int round, int position, Match nextMatch, TournamentOlympic tournamentOlympic)
     {
         return Match.builder()
                 .round(round)
                 .position(position)
                 .nextMatch(nextMatch)
-                .tournament(tournament)
+                .tournament(tournamentOlympic)
                 .build();
 
     }

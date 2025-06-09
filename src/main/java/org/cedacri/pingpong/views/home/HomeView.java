@@ -9,7 +9,7 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
@@ -50,30 +50,30 @@ public class HomeView extends VerticalLayout
 
     private void displayTournaments()
     {
-        List<Tournament> tournaments = tournamentService.findAllTournaments()
+        List<TournamentOlympic> tournamentOlympics = tournamentService.findAllTournaments()
                 .sorted(
                         Comparator.comparing(
-                                        Tournament::getStartedAt,
+                                        TournamentOlympic::getStartedAt,
                                         Comparator.nullsFirst(Comparator.naturalOrder())
                                 )
                                 .thenComparing(
-                                        Tournament::getCreatedAt,
+                                        TournamentOlympic::getCreatedAt,
                                         Comparator.nullsFirst(Comparator.naturalOrder())
                                 )
                                 .reversed()
                 )
                 .toList();
-        log.info("Displaying {} tournaments", tournaments.size());
+        log.info("Displaying {} tournaments", tournamentOlympics.size());
 
         tournamentContainer.removeAll();
 
-        if (tournaments.isEmpty())
+        if (tournamentOlympics.isEmpty())
         {
             showNoTournamentFound();
             return;
         }
 
-        tournaments.forEach(tournament ->
+        tournamentOlympics.forEach(tournament ->
         {
             log.debug("Processed tournament {}", tournament);
             tournamentContainer.add(new TournamentSummaryComponent(tournament));

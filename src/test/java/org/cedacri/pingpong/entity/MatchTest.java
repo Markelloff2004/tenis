@@ -20,7 +20,7 @@ public class MatchTest {
     private static Validator validator;
     private Match match;
 
-    private final Tournament mockTournament = Mockito.mock(Tournament.class);
+    private final TournamentOlympic mockTournamentOlympic = Mockito.mock(TournamentOlympic.class);
 
     @BeforeAll
     static void setUp() {
@@ -32,7 +32,7 @@ public class MatchTest {
     void setUpValidMatch() {
 
         match = new Match();
-        match.setTournament(mockTournament);
+        match.setTournament(mockTournamentOlympic);
         match.setRound(1);
     }
 
@@ -68,7 +68,7 @@ public class MatchTest {
 
     @Nested
     @DisplayName("Tests for tournament field")
-    class TournamentTests {
+    class TournamentOlympicTests {
         @Test
         void testNullTournament() {
             match.setTournament(null);

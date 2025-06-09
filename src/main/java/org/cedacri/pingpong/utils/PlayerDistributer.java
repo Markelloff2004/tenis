@@ -3,7 +3,7 @@ package org.cedacri.pingpong.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,16 +17,16 @@ public class PlayerDistributer
     /***
      * Distributes players into pairs based on seeding logic.
      *
-     * @param tournament - represents tournament
+     * @param tournamentOlympic - represents tournament
      * @param maxPlayers - maximum number of players (nearest power of 2)
      * @return list of player pairs for matches
      */
-    public List<Player[]> distributePlayersIntoOlympicPairs(Tournament tournament, int maxPlayers)
+    public List<Player[]> distributePlayersIntoOlympicPairs(TournamentOlympic tournamentOlympic, int maxPlayers)
     {
-        log.info("Ordering players by rating in {} tournament", tournament);
+        log.info("Ordering players by rating in {} tournament", tournamentOlympic);
         List<Player[]> pairs = new ArrayList<>();
         List<Player> paddedPlayers =
-                new ArrayList<>(tournament.getPlayers().stream().sorted(Comparator.comparingInt(Player::getRating).reversed()).toList());
+                new ArrayList<>(tournamentOlympic.getPlayers().stream().sorted(Comparator.comparingInt(Player::getRating).reversed()).toList());
 
         while (paddedPlayers.size() < maxPlayers)
         {
@@ -58,13 +58,13 @@ public class PlayerDistributer
      * Creates the first round of matches based on player pairs.
      *
      * @param maxPlayers - maximum number of players (nearest power of 2)
-     * @param tournament - tournament
+     * @param tournamentOlympic - tournament
      */
-    public void distributePlayersInFirstRound(int maxPlayers, Tournament tournament)
+    public void distributePlayersInFirstRound(int maxPlayers, TournamentOlympic tournamentOlympic)
     {
-        List<Player[]> pairs = distributePlayersIntoOlympicPairs(tournament, maxPlayers);
+        List<Player[]> pairs = distributePlayersIntoOlympicPairs(tournamentOlympic, maxPlayers);
 
-        List<Match> firstRoundMatches = tournament.getMatches().stream()
+        List<Match> firstRoundMatches = tournamentOlympic.getMatches().stream()
                 .filter(m -> m.getRound() == 1)
                 .sorted(Comparator.comparingInt(Match::getPosition).reversed())
                 .toList();

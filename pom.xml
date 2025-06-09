@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Project from https://start.vaadin.com/project/92c85160-dc5b-4d6b-b374-65fb22e46b9c -->
     <groupId>org.cedacri.pingpong</groupId>
-    <artifactId>ping-pong-tournament</artifactId>
-    <name>ping-pong-tournament</name>
+    <artifactId>ping-pong-tournamentOlympic</artifactId>
+    <name>ping-pong-tournamentOlympic</name>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

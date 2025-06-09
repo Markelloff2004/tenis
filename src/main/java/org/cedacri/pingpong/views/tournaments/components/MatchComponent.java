@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.entity.Score;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
@@ -29,12 +29,12 @@ import java.util.Optional;
 public class MatchComponent extends HorizontalLayout {
 
     private final MatchService matchService;
-    private final Tournament tournament;
+    private final TournamentOlympic tournamentOlympic;
     private final List<List<TextField>> scoreFields = new ArrayList<>();
 
-    public MatchComponent(Match match, MatchService matchService, Tournament tournament, Runnable refreshMatches) {
+    public MatchComponent(Match match, MatchService matchService, TournamentOlympic tournamentOlympic, Runnable refreshMatches) {
         this.matchService = matchService;
-        this.tournament = tournament;
+        this.tournamentOlympic = tournamentOlympic;
         log.info("Initializing MatchComponent for match with id {}", match.getId());
 
         configureLayout();
@@ -91,7 +91,7 @@ public class MatchComponent extends HorizontalLayout {
 
         List<Score> matchScore = match.getScore();
 
-        int setsCount = TournamentUtils.getNumsOfSetsPerMatch(match);
+        int setsCount = TournamentUtils.getNumsOfSetsPerMatch((TournamentOlympic) match.getTournament(), match.getRound());
 
         for (int i = 0; i < setsCount; i++) {
             TextField topScoreField = createScoreField(matchScore, i, true);
@@ -244,7 +244,7 @@ public class MatchComponent extends HorizontalLayout {
     }
 
     private Span getPreviousMatchWinner(Match match, boolean isTop) {
-        List<Match> previousMatches = tournament.getMatches().stream()
+        List<Match> previousMatches = tournamentOlympic.getMatches().stream()
                 .filter(m -> Objects.nonNull(m.getNextMatch()) && Objects.equals(m.getNextMatch().getId(), match.getId()))
                 .toList();
 

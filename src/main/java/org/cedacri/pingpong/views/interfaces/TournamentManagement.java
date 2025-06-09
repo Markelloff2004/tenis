@@ -1,15 +1,15 @@
 package org.cedacri.pingpong.views.interfaces;
 
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 
 public interface TournamentManagement
 {
     void showCreateTournament();
 
-    void showInfoTournament(Tournament tournament);
+    void showInfoTournament(TournamentOlympic tournamentOlympic);
 
-    void showEditTournament(Tournament tournament);
+    void showEditTournament(TournamentOlympic tournamentOlympic);
 
-    void showDeleteTournament(Tournament tournament);
+    void showDeleteTournament(TournamentOlympic tournamentOlympic);
 }
 

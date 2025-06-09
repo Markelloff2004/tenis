@@ -14,10 +14,10 @@ import java.util.HashSet;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TournamentTest {
+class TournamentOlympicTest {
 
     private static Validator validator;
-    private Tournament tournament;
+    private TournamentOlympic tournamentOlympic;
 
     @BeforeAll
     static void setUp() {
@@ -27,37 +27,37 @@ class TournamentTest {
 
     @BeforeEach
     void setUpValidTournament() {
-        tournament = new Tournament();
-        tournament.setTournamentName("Grand Championship");
-        tournament.setMaxPlayers(16);
-        tournament.setTournamentStatus(TournamentStatusEnum.ONGOING);
-        tournament.setTournamentType(TournamentTypeEnum.OLYMPIC);
-        tournament.setSetsToWin(SetTypesEnum.BEST_OF_THREE);
-        tournament.setSemifinalsSetsToWin(SetTypesEnum.BEST_OF_FIVE);
-        tournament.setFinalsSetsToWin(SetTypesEnum.BEST_OF_FIVE);
-        tournament.setCreatedAt(LocalDate.now());
-        tournament.setPlayers(new HashSet<>());
-        tournament.setMatches(new HashSet<>());
+        tournamentOlympic = new TournamentOlympic();
+        tournamentOlympic.setTournamentName("Grand Championship");
+        tournamentOlympic.setMaxPlayers(16);
+        tournamentOlympic.setTournamentStatus(TournamentStatusEnum.ONGOING);
+        tournamentOlympic.setTournamentType(TournamentTypeEnum.OLYMPIC);
+        tournamentOlympic.setSetsToWin(SetTypesEnum.BEST_OF_THREE);
+        tournamentOlympic.setSemifinalsSetsToWin(SetTypesEnum.BEST_OF_FIVE);
+        tournamentOlympic.setFinalsSetsToWin(SetTypesEnum.BEST_OF_FIVE);
+        tournamentOlympic.setCreatedAt(LocalDate.now());
+        tournamentOlympic.setPlayers(new HashSet<>());
+        tournamentOlympic.setMatches(new HashSet<>());
     }
 
 
 
     @Nested
     @DisplayName("Tests for tournament name")
-    class TournamentNameTests {
+    class TournamentOlympicNameTests {
 
         @Test
         void testTournamentNameNull() {
-            tournament.setTournamentName(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setTournamentName(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament name cannot be null or blank", violations.iterator().next().getMessage());
         }
 
         @Test
         void testTournamentNameBlank() {
-            tournament.setTournamentName("   ");
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setTournamentName("   ");
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament name cannot be null or blank", violations.iterator().next().getMessage());
         }
@@ -69,8 +69,8 @@ class TournamentTest {
 
         @Test
         void testMaxPlayersNull() {
-            tournament.setMaxPlayers(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setMaxPlayers(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Max amount of players should be calculated", violations.iterator().next().getMessage());
         }
@@ -78,12 +78,12 @@ class TournamentTest {
 
     @Nested
     @DisplayName("Tests for tournament status")
-    class TournamentStatusTests {
+    class TournamentOlympicStatusTests {
 
         @Test
         void testTournamentStatusNull() {
-            tournament.setTournamentStatus(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setTournamentStatus(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament status cannot be null", violations.iterator().next().getMessage());
         }
@@ -91,12 +91,12 @@ class TournamentTest {
 
     @Nested
     @DisplayName("Tests for tournament type")
-    class TournamentTypeTests {
+    class TournamentOlympicTypeTests {
 
         @Test
         void testTournamentTypeNull() {
-            tournament.setTournamentType(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setTournamentType(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament type cannot be null", violations.iterator().next().getMessage());
         }
@@ -104,28 +104,28 @@ class TournamentTest {
 
     @Nested
     @DisplayName("Tests for tournament sets")
-    class TournamentSetsTests {
+    class TournamentOlympicSetsTests {
 
         @Test
         void testSetsToWinNull() {
-            tournament.setSetsToWin(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setSetsToWin(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament sets cannot be null", violations.iterator().next().getMessage());
         }
 
         @Test
         void testSemifinalsSetsToWinNull() {
-            tournament.setSemifinalsSetsToWin(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setSemifinalsSetsToWin(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament semifinals sets cannot be null", violations.iterator().next().getMessage());
         }
 
         @Test
         void testFinalsSetsToWinNull() {
-            tournament.setFinalsSetsToWin(null);
-            Set<ConstraintViolation<Tournament>> violations = validator.validate(tournament);
+            tournamentOlympic.setFinalsSetsToWin(null);
+            Set<ConstraintViolation<TournamentOlympic>> violations = validator.validate(tournamentOlympic);
             assertFalse(violations.isEmpty());
             assertEquals("Tournament final sets cannot be null", violations.iterator().next().getMessage());
         }

@@ -53,10 +53,10 @@ public class Match
     @Column(name = "score")
     private List<Score> score;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_id", nullable = false)
     @NotNull(message = "TournamentId cannot be null")
-    private Tournament tournament;
+    private BaseTournament tournament;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "top_player_id")

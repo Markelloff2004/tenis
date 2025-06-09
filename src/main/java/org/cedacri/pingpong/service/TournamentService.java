@@ -3,7 +3,7 @@ package org.cedacri.pingpong.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.TournamentRepository;
 import org.cedacri.pingpong.utils.MatchGenerator;
@@ -29,43 +29,43 @@ public class TournamentService
     }
 
     @Transactional
-    public Stream<Tournament> findAllTournaments()
+    public Stream<TournamentOlympic> findAllTournaments()
     {
-        List<Tournament> tournaments = tournamentRepository.findAll();
-        tournaments.forEach(tournament -> Hibernate.initialize(tournament.getPlayers()));
-        return tournaments.stream().sorted(Comparator.comparing(Tournament::getCreatedAt).reversed());
+        List<TournamentOlympic> tournamentOlympics = tournamentRepository.findAll();
+        tournamentOlympics.forEach(tournament -> Hibernate.initialize(tournament.getPlayers()));
+        return tournamentOlympics.stream().sorted(Comparator.comparing(TournamentOlympic::getCreatedAt).reversed());
     }
 
-    public Tournament findTournamentById(Integer id)
+    public TournamentOlympic findTournamentById(Integer id)
     {
         validateTournamentId(id);
 
-        Tournament tournament = tournamentRepository.findById(id).
+        TournamentOlympic tournamentOlympic = tournamentRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Tournament with ID " + id + " not found"));
 
-        Hibernate.initialize(tournament.getPlayers());
-        return tournament;
+        Hibernate.initialize(tournamentOlympic.getPlayers());
+        return tournamentOlympic;
     }
 
     @Transactional
-    public Tournament saveTournament(Tournament tournament)
+    public TournamentOlympic saveTournament(TournamentOlympic tournamentOlympic)
     {
-        if (tournament == null)
+        if (tournamentOlympic == null)
         {
             throw new IllegalArgumentException("Tournament cannot be null");
         }
 
-        return tournamentRepository.save(tournament);
+        return tournamentRepository.save(tournamentOlympic);
     }
 
     @Transactional
     public void deleteTournamentById(Integer id)
     {
         validateTournamentId(id);
-        Tournament tournamentToDelete = tournamentRepository.findById(id)
+        TournamentOlympic tournamentOlympicToDelete = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
 
-        tournamentToDelete.getPlayers().forEach(player -> player.getTournaments().remove(tournamentToDelete));
+        tournamentOlympicToDelete.getPlayers().forEach(player -> player.getTournamentOlympics().remove(tournamentOlympicToDelete));
         tournamentRepository.deleteById(id);
     }
 
@@ -82,26 +82,26 @@ public class TournamentService
     }
 
     @Transactional
-    public void startTournament(Tournament tournament) throws NotEnoughPlayersException
+    public void startTournament(TournamentOlympic tournamentOlympic) throws NotEnoughPlayersException
     {
 
-        int minAmountPlayers = TournamentUtils.getMinimalPlayersRequired(tournament.getTournamentType());
+        int minAmountPlayers = TournamentUtils.getMinimalPlayersRequired(tournamentOlympic.getTournamentType());
 
-        if (tournament.getPlayers().size() < minAmountPlayers)
+        if (tournamentOlympic.getPlayers().size() < minAmountPlayers)
         {
-            throw new NotEnoughPlayersException(tournament.getPlayers().size(), minAmountPlayers);
+            throw new NotEnoughPlayersException(tournamentOlympic.getPlayers().size(), minAmountPlayers);
         }
 
-        tournament.setStartedAt(LocalDate.now());
-        tournamentRepository.save(tournament);
+        tournamentOlympic.setStartedAt(LocalDate.now());
+        tournamentRepository.save(tournamentOlympic);
 
-        MatchGenerator matchGenerator = createMatchGenerator(tournament);
-        matchGenerator.generateMatches(tournament);
+        MatchGenerator matchGenerator = createMatchGenerator(tournamentOlympic);
+        matchGenerator.generateMatches(tournamentOlympic);
     }
 
-    MatchGenerator createMatchGenerator(Tournament tournament)
+    MatchGenerator createMatchGenerator(TournamentOlympic tournamentOlympic)
     {
-        return new MatchGenerator(tournament.getSetsToWin(), tournament.getSemifinalsSetsToWin(),
-                tournament.getFinalsSetsToWin(), tournament.getTournamentType(), new PlayerDistributer(), this);
+        return new MatchGenerator(tournamentOlympic.getSetsToWin(), tournamentOlympic.getSemifinalsSetsToWin(),
+                tournamentOlympic.getFinalsSetsToWin(), tournamentOlympic.getTournamentType(), new PlayerDistributer(), this);
     }
 }

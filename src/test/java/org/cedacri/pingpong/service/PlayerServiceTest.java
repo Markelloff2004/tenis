@@ -163,7 +163,7 @@ public class PlayerServiceTest {
         @Test
         void testGetAll_emptyCollectionFieldInPlayer() {
             Player playerWithEmptyCollection = new Player();
-            playerWithEmptyCollection.setTournaments(new HashSet<>());
+            playerWithEmptyCollection.setTournamentOlympics(new HashSet<>());
 
             List<Player> players = List.of(playerWithEmptyCollection);
             when(playerRepository.findAll()).thenReturn(players);
@@ -171,7 +171,7 @@ public class PlayerServiceTest {
             List<Player> result = playerService.getAllPlayers();
             assertNotNull(result);
             assertEquals(1, result.size());
-            assertTrue(result.get(0).getTournaments().isEmpty());
+            assertTrue(result.get(0).getTournamentOlympics().isEmpty());
         }
 
         @Test

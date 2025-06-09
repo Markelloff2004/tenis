@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.repository.MatchRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.*;
@@ -20,7 +20,7 @@ class MatchServiceTest {
 
     private MatchService matchService;
 
-    private Tournament tournament;
+    private TournamentOlympic tournamentOlympic;
     private Match match1;
     private Match match2;
     private Match match3;
@@ -30,50 +30,50 @@ class MatchServiceTest {
         MockitoAnnotations.openMocks(this);
         matchService = new MatchService(matchRepository);
 
-        tournament = new Tournament();
-        tournament.setId(1);
-        tournament.setTournamentName("Tournament1");
+        tournamentOlympic = new TournamentOlympic();
+        tournamentOlympic.setId(1);
+        tournamentOlympic.setTournamentName("Tournament1");
 
         match1 = new Match();
-        match1.setTournament(tournament);
+        match1.setTournament(tournamentOlympic);
         match1.setRound(1);
         match1.setPosition(1);
 
         match2 = new Match();
-        match2.setTournament(tournament);
+        match2.setTournament(tournamentOlympic);
         match2.setRound(1);
         match2.setPosition(2);
 
         match3 = new Match();
-        match3.setTournament(tournament);
+        match3.setTournament(tournamentOlympic);
         match3.setRound(1);
         match3.setPosition(3);
     }
 
     @Nested
     @DisplayName("Tests for the getMatchesByTournamentAndRound method")
-    class GetMatchesByTournamentAndRoundTests {
+    class GetMatchesByTournamentAndRoundTestsOlympic {
 
         @Test
         void testReturnMatchesOrderedByPosition() {
-            when(matchRepository.findByTournamentAndRound(tournament, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic, 1))
                     .thenReturn(Arrays.asList(match1, match2, match3));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympic, 1);
 
             assertTrue(result.containsAll(Arrays.asList(match2, match3, match1)));
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympic, 1);
         }
 
         @Test
         void testReturnEmptyListWhenNoMatchesExist() {
-            when(matchRepository.findByTournamentAndRound(tournament, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic, 1))
                     .thenReturn(Collections.emptyList());
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympic, 1);
 
             assertTrue(result.isEmpty());
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympic, 1);
         }
 
         @Test
@@ -88,17 +88,17 @@ class MatchServiceTest {
         @Test
         void testReturnSingleMatchWhenOneMatchExists() {
             Match singleMatch = new Match();
-            singleMatch.setTournament(tournament);
+            singleMatch.setTournament(tournamentOlympic);
             singleMatch.setRound(1);
             singleMatch.setPosition(1);
 
-            when(matchRepository.findByTournamentAndRound(tournament, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic, 1))
                     .thenReturn(Collections.singletonList(singleMatch));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympic, 1);
 
             assertEquals(Collections.singletonList(singleMatch), result);
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympic, 1);
         }
 
         @Test
@@ -107,77 +107,77 @@ class MatchServiceTest {
             Match duplicateMatch2 = new Match();
             Match matchWithDifferentPosition = new Match();
 
-            duplicateMatch1.setTournament(tournament);
+            duplicateMatch1.setTournament(tournamentOlympic);
             duplicateMatch1.setRound(1);
             duplicateMatch1.setPosition(1);
 
-            duplicateMatch2.setTournament(tournament);
+            duplicateMatch2.setTournament(tournamentOlympic);
             duplicateMatch2.setRound(1);
             duplicateMatch2.setPosition(1);
 
-            matchWithDifferentPosition.setTournament(tournament);
+            matchWithDifferentPosition.setTournament(tournamentOlympic);
             matchWithDifferentPosition.setRound(1);
             matchWithDifferentPosition.setPosition(2);
 
-            when(matchRepository.findByTournamentAndRound(tournament, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic, 1))
                     .thenReturn(Arrays.asList(duplicateMatch1, duplicateMatch2, matchWithDifferentPosition));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympic, 1);
 
             assertEquals(Arrays.asList(duplicateMatch1, duplicateMatch2, matchWithDifferentPosition), result);
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympic, 1);
         }
 
         @Test
         void testReturnNoDuplicateMatches() {
-            when(matchRepository.findByTournamentAndRound(tournament, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic, 1))
                     .thenReturn(Arrays.asList(match1, match1));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympic, 1);
 
             assertEquals(Collections.singletonList(match1), result);
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympic, 1);
         }
 
         @Test
         void testHandleNullRepositoryReturn() {
-            when(matchRepository.findByTournamentAndRound(tournament, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic, 1))
                     .thenReturn(null);
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournament, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympic, 1);
 
             assertEquals(Collections.emptyList(), result);
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournament, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympic, 1);
         }
 
         @Test
         void testHandleMultipleTournamentsWithSameRound() {
-            Tournament tournament1 = new Tournament();
-            tournament1.setId(1);
-            tournament1.setTournamentName("Tournament1");
+            TournamentOlympic tournamentOlympic1 = new TournamentOlympic();
+            tournamentOlympic1.setId(1);
+            tournamentOlympic1.setTournamentName("Tournament1");
 
-            Tournament tournament2 = new Tournament();
-            tournament2.setId(2);
-            tournament2.setTournamentName("Tournament2");
+            TournamentOlympic tournamentOlympic2 = new TournamentOlympic();
+            tournamentOlympic2.setId(2);
+            tournamentOlympic2.setTournamentName("Tournament2");
 
             Match match1ForTourney1 = new Match();
             Match match1ForTourney2 = new Match();
 
-            match1ForTourney1.setTournament(tournament);
+            match1ForTourney1.setTournament(tournamentOlympic);
             match1ForTourney1.setRound(1);
             match1ForTourney1.setPosition(1);
 
-            match1ForTourney2.setTournament(tournament);
+            match1ForTourney2.setTournament(tournamentOlympic);
             match1ForTourney2.setRound(1);
             match1ForTourney2.setPosition(2);
 
-            when(matchRepository.findByTournamentAndRound(tournament1, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic1, 1))
                     .thenReturn(Collections.singletonList(match1ForTourney1));
-            when(matchRepository.findByTournamentAndRound(tournament2, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympic2, 1))
                     .thenReturn(Collections.singletonList(match1ForTourney2));
 
-            List<Match> result1 = matchService.getMatchesByTournamentAndRound(tournament1, 1);
-            List<Match> result2 = matchService.getMatchesByTournamentAndRound(tournament2, 1);
+            List<Match> result1 = matchService.getMatchesByTournamentAndRound(tournamentOlympic1, 1);
+            List<Match> result2 = matchService.getMatchesByTournamentAndRound(tournamentOlympic2, 1);
 
             assertEquals(Collections.singletonList(match1ForTourney1), result1);
             assertEquals(Collections.singletonList(match1ForTourney2), result2);
@@ -186,32 +186,32 @@ class MatchServiceTest {
 
         @Test
         void testTournamentNameCaseInsensitive() {
-            Tournament tournamentLowerCase = new Tournament();
-            tournamentLowerCase.setTournamentName("tournament1");
+            TournamentOlympic tournamentOlympicLowerCase = new TournamentOlympic();
+            tournamentOlympicLowerCase.setTournamentName("tournament1");
 
             Match match = new Match();
-            match.setTournament(tournamentLowerCase);
+            match.setTournament(tournamentOlympicLowerCase);
             match.setRound(1);
             match.setPosition(1);
 
-            when(matchRepository.findByTournamentAndRound(tournamentLowerCase, 1))
+            when(matchRepository.findByTournamentAndRound(tournamentOlympicLowerCase, 1))
                     .thenReturn(Collections.singletonList(match));
 
-            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentLowerCase, 1);
+            List<Match> result = matchService.getMatchesByTournamentAndRound(tournamentOlympicLowerCase, 1);
 
             assertEquals(Collections.singletonList(match), result);
-            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentLowerCase, 1);
+            verify(matchRepository, times(1)).findByTournamentAndRound(tournamentOlympicLowerCase, 1);
         }
 
         @Test
         void testInvalidRoundNumber() {
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByTournamentAndRound(tournament, -1);
+                matchService.getMatchesByTournamentAndRound(tournamentOlympic, -1);
             });
             assertEquals("Invalid round number", exception.getMessage());
 
             exception = assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByTournamentAndRound(tournament, Integer.MAX_VALUE);
+                matchService.getMatchesByTournamentAndRound(tournamentOlympic, Integer.MAX_VALUE);
             });
             assertEquals("Invalid round number", exception.getMessage());
             verify(matchRepository, times(0)).findByTournamentAndRound(any(), anyInt());
@@ -220,29 +220,29 @@ class MatchServiceTest {
 
     @Nested
     @DisplayName("Tests for the getMatchesByTournament method")
-    class GetMatchesByTournamentTests {
+    class GetMatchesByTournamentTestsOlympic {
 
         @Test
         void testGetMatchesByTournamentSortedByPositionAndRound() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.getMatchesByTournament(tournamentOlympic);
 
             assertEquals(3, matches.size());
             assertEquals(match1, matches.get(0));
             assertEquals(match2, matches.get(1));
             assertEquals(match3, matches.get(2));
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByTournamentEmptyListIfNoMatches() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of());
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of());
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.getMatchesByTournament(tournamentOlympic);
 
             assertTrue(matches.isEmpty());
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
@@ -255,30 +255,30 @@ class MatchServiceTest {
 
         @Test
         void testGetMatchesByTournamentNullFromRepository() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(null);
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(null);
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.getMatchesByTournament(tournamentOlympic);
 
             assertEquals(Collections.emptyList(), matches);
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByTournamentOnlyMatchesFromTheCorrectTournament() {
-            Tournament anotherTournament = new Tournament();
-            anotherTournament.setId(2);
-            anotherTournament.setTournamentName("Tournament2");
+            TournamentOlympic anotherTournamentOlympic = new TournamentOlympic();
+            anotherTournamentOlympic.setId(2);
+            anotherTournamentOlympic.setTournamentName("Tournament2");
 
             Match match4 = new Match();
-            match4.setTournament(anotherTournament);
+            match4.setTournament(anotherTournamentOlympic);
             match4.setRound(1);
             match4.setPosition(1);
 
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
-            when(matchRepository.findByTournament(anotherTournament)).thenReturn(List.of(match4));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2));
+            when(matchRepository.findByTournament(anotherTournamentOlympic)).thenReturn(List.of(match4));
 
-            List<Match> matchesFromTournament1 = matchService.getMatchesByTournament(tournament);
-            List<Match> matchesFromAnotherTournament = matchService.getMatchesByTournament(anotherTournament);
+            List<Match> matchesFromTournament1 = matchService.getMatchesByTournament(tournamentOlympic);
+            List<Match> matchesFromAnotherTournament = matchService.getMatchesByTournament(anotherTournamentOlympic);
 
 
             assertTrue(matchesFromTournament1.contains(match1));
@@ -290,12 +290,12 @@ class MatchServiceTest {
 
         @Test
         void testGetMatchesByTournamentNoDuplicateMatches() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match1, match2));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match1, match2));
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.getMatchesByTournament(tournamentOlympic);
 
             assertEquals(2, matches.size());
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
@@ -303,15 +303,15 @@ class MatchServiceTest {
             match2.setRound(3);
             match3.setRound(5);
 
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByTournament(tournament);
+            List<Match> matches = matchService.getMatchesByTournament(tournamentOlympic);
 
             assertEquals(3, matches.size());
             assertEquals(match1, matches.get(0));
             assertEquals(match2, matches.get(1));
             assertEquals(match3, matches.get(2));
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
     }
 
@@ -352,24 +352,24 @@ class MatchServiceTest {
 
         @Test
         void testGetMatchesByPlayerNameSurnameReturnsMatchesForJaneDoe() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "Jane", "Doe");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "Jane", "Doe");
 
             assertEquals(2, matches.size());
             assertTrue(matches.contains(match1));
             assertTrue(matches.contains(match3));
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByPlayerNameSurnameReturnsEmptyListIfNoMatches() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "Michael", "Johnson");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "Michael", "Johnson");
 
             assertTrue(matches.isEmpty());
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
@@ -383,7 +383,7 @@ class MatchServiceTest {
         @Test
         void testGetMatchesByPlayerNameSurnameThrowsExceptionIfPlayerNameIsNull() {
             assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByPlayerNameSurname(tournament, null, "Doe");
+                matchService.getMatchesByPlayerNameSurname(tournamentOlympic, null, "Doe");
             });
             verifyNoInteractions(matchRepository);
         }
@@ -391,7 +391,7 @@ class MatchServiceTest {
         @Test
         void testGetMatchesByPlayerNameSurnameThrowsExceptionIfPlayerSurnameIsNull() {
             assertThrows(IllegalArgumentException.class, () -> {
-                matchService.getMatchesByPlayerNameSurname(tournament, "John", null);
+                matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "John", null);
             });
             verifyNoInteractions(matchRepository);
         }
@@ -402,48 +402,48 @@ class MatchServiceTest {
             similarPlayer.setName("John");
             similarPlayer.setSurname("Doer");
 
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doer");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "John", "Doer");
 
             assertTrue(matches.isEmpty());
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByPlayerNameSurnameHandlesPlayerInMultipleRounds() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2, match3));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2, match3));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "John", "Doe");
 
             assertEquals(3, matches.size());
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByPlayerNameSurnameHandlesNullFromRepository() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(null);
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(null);
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "John", "Doe");
 
             assertEquals(Collections.emptyList(), matches);
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByPlayerNameSurnameHandlesPlayerInMultipleTournaments() {
-            Tournament anotherTournament = new Tournament();
-            anotherTournament.setId(2);
+            TournamentOlympic anotherTournamentOlympic = new TournamentOlympic();
+            anotherTournamentOlympic.setId(2);
             Match matchInAnotherTournament = new Match();
-            matchInAnotherTournament.setTournament(anotherTournament);
+            matchInAnotherTournament.setTournament(anotherTournamentOlympic);
             matchInAnotherTournament.setTopPlayer(topPlayer);
             matchInAnotherTournament.setBottomPlayer(bottomPlayer);
 
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
-            when(matchRepository.findByTournament(anotherTournament)).thenReturn(List.of(matchInAnotherTournament));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2));
+            when(matchRepository.findByTournament(anotherTournamentOlympic)).thenReturn(List.of(matchInAnotherTournament));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", "Doe");
-            List<Match> matchesFromAnotherT = matchService.getMatchesByPlayerNameSurname(anotherTournament, "John", "Doe");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "John", "Doe");
+            List<Match> matchesFromAnotherT = matchService.getMatchesByPlayerNameSurname(anotherTournamentOlympic, "John", "Doe");
 
             assertEquals(2, matches.size());
             assertTrue(matches.contains(match1));
@@ -452,29 +452,29 @@ class MatchServiceTest {
             assertEquals(1, matchesFromAnotherT.size());
             assertTrue(matchesFromAnotherT.contains(matchInAnotherTournament));
 
-            verify(matchRepository, times(1)).findByTournament(tournament);
-            verify(matchRepository, times(1)).findByTournament(anotherTournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
+            verify(matchRepository, times(1)).findByTournament(anotherTournamentOlympic);
         }
 
 
         @Test
         void testGetMatchesByPlayerNameSurnameHandlesEmptyPlayerName() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, " ", "Doe");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, " ", "Doe");
 
             assertTrue(matches.isEmpty());  // No player should match empty name
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
 
         @Test
         void testGetMatchesByPlayerNameSurnameHandlesEmptyPlayerSurname() {
-            when(matchRepository.findByTournament(tournament)).thenReturn(List.of(match1, match2));
+            when(matchRepository.findByTournament(tournamentOlympic)).thenReturn(List.of(match1, match2));
 
-            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournament, "John", " ");
+            List<Match> matches = matchService.getMatchesByPlayerNameSurname(tournamentOlympic, "John", " ");
 
             assertTrue(matches.isEmpty());  // No player should match empty surname
-            verify(matchRepository, times(1)).findByTournament(tournament);
+            verify(matchRepository, times(1)).findByTournament(tournamentOlympic);
         }
     }
 
@@ -563,7 +563,7 @@ class MatchServiceTest {
         @Test
         void shouldThrowExceptionWhenMatchHasNoId() {
             Match matchWithoutId = new Match();
-            matchWithoutId.setTournament(tournament);
+            matchWithoutId.setTournament(tournamentOlympic);
             matchWithoutId.setRound(1);
             matchWithoutId.setPosition(1);
 

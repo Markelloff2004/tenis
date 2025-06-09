@@ -6,7 +6,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
@@ -61,20 +61,20 @@ public class TournamentAddDialog extends AbstractTournamentDialog
     protected void onSave()
     {
 
-        Tournament tournament = new Tournament();
+        TournamentOlympic tournamentOlympic = new TournamentOlympic();
         boolean startNow;
         try
         {
             startNow = startNowCheckbox.getValue();
 
-            tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(typeComboBox.getValue());
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setSetsToWin(setsCountComboBox.getValue());
-            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
-            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
-            tournament.setPlayers(selectedPlayersSet);
-            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournament));
+            tournamentOlympic.setTournamentName(tournamentNameField.getValue());
+            tournamentOlympic.setTournamentType(typeComboBox.getValue());
+            tournamentOlympic.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournamentOlympic.setSetsToWin(setsCountComboBox.getValue());
+            tournamentOlympic.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+            tournamentOlympic.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
+            tournamentOlympic.setPlayers(selectedPlayersSet);
+            tournamentOlympic.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournamentOlympic));
 
         }
         catch (Exception e)
@@ -87,9 +87,9 @@ public class TournamentAddDialog extends AbstractTournamentDialog
 
         try
         {
-            tournament = tournamentService.saveTournament(tournament);
+            tournamentOlympic = tournamentService.saveTournament(tournamentOlympic);
 
-            log.info("Tournament saved successfully: {}", tournament.getId());
+            log.info("Tournament saved successfully: {}", tournamentOlympic.getId());
             NotificationManager.showInfoNotification(Constants.TOURNAMENT_SAVE_SUCCESS_MESSAGE);
         }
         catch (IllegalArgumentException illegalArgumentException)
@@ -103,9 +103,9 @@ public class TournamentAddDialog extends AbstractTournamentDialog
         {
             try
             {
-                tournamentService.startTournament(tournament);
+                tournamentService.startTournament(tournamentOlympic);
 
-                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
+                UI.getCurrent().navigate("tournament/matches/" + tournamentOlympic.getId());
 
                 NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
             }

@@ -2,12 +2,11 @@ package org.cedacri.pingpong.utils;
 
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,13 +28,13 @@ class PlayerDistributerTest
 {
 
     private PlayerDistributer playerDistributer;
-    private Tournament tournament;
+    private TournamentOlympic tournamentOlympic;
 
     @BeforeEach
     void setUp()
     {
         playerDistributer = new PlayerDistributer();
-        tournament = mock(Tournament.class);
+        tournamentOlympic = mock(TournamentOlympic.class);
     }
 
     private Player createPlayer(String name, int rating)
@@ -68,10 +67,10 @@ class PlayerDistributerTest
                     createPlayer("C", 1000),
                     createPlayer("D", 800)
             ));
-            tournament.setPlayers(players);
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            tournamentOlympic.setPlayers(players);
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(2, pairs.size());
             assertEquals("A", pairs.get(0)[0].getName());
@@ -88,10 +87,10 @@ class PlayerDistributerTest
                     createPlayer("B", 900),
                     createPlayer("C", 1000)
             ));
-            tournament.setPlayers(players);
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            tournamentOlympic.setPlayers(players);
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(2, pairs.size());
             assertEquals("A", pairs.get(0)[0].getName());
@@ -102,9 +101,9 @@ class PlayerDistributerTest
         @Test
         void handleZeroPlayers()
         {
-            tournament.setPlayers(new HashSet<>());
+            tournamentOlympic.setPlayers(new HashSet<>());
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 2);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 2);
 
             assertTrue(pairs.isEmpty());
         }
@@ -123,10 +122,10 @@ class PlayerDistributerTest
                     createPlayer("B", 900),
                     createPlayer("C", 1000)
             ));
-            tournament.setPlayers(players);
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            tournamentOlympic.setPlayers(players);
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(2, pairs.size());
             assertNotNull(pairs.get(0)[0]);
@@ -139,10 +138,10 @@ class PlayerDistributerTest
         void handleSinglePlayerWithPadding()
         {
             HashSet<Player> players = new HashSet<>(List.of(createPlayer("A", 1100)));
-            tournament.setPlayers(players);
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            tournamentOlympic.setPlayers(players);
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 2);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 2);
 
             assertEquals(1, pairs.size());
             assertEquals("A", pairs.get(0)[0].getName());
@@ -158,9 +157,9 @@ class PlayerDistributerTest
                     createPlayer("Charlie", 1100),
                     createPlayer("Dave", 950)
             );
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(2, pairs.size());
             assertEquals("Charlie", pairs.get(0)[0].getName());
@@ -177,9 +176,9 @@ class PlayerDistributerTest
                     createPlayer("Bob", 900),
                     createPlayer("Charlie", 1100)
             );
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(2, pairs.size());
             assertEquals("Charlie", pairs.get(0)[0].getName());
@@ -191,9 +190,9 @@ class PlayerDistributerTest
         @Test
         void testDistributePlayersEmptyTournament()
         {
-            when(tournament.getPlayers()).thenReturn(new HashSet<>());
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>());
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(0, pairs.size());
         }
@@ -202,9 +201,9 @@ class PlayerDistributerTest
         void testDistributePlayersSinglePlayer()
         {
             List<Player> players = List.of(createPlayer("Alice", 1000));
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 2);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 2);
 
             assertEquals(1, pairs.size());
             assertEquals("Alice", pairs.get(0)[0].getName());
@@ -221,9 +220,9 @@ class PlayerDistributerTest
                     createPlayer("Charlie", 1100),
                     createPlayer("Eve", 1200)
                     );
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
 
-            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournament, 4);
+            List<Player[]> pairs = playerDistributer.distributePlayersIntoOlympicPairs(tournamentOlympic, 4);
 
             assertEquals(2, pairs.size());
             assertEquals("Eve", pairs.get(0)[0].getName());
@@ -253,11 +252,11 @@ class PlayerDistributerTest
                     createMatch(1, 2)
             );
 
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
-            when(tournament.getMatches()).thenReturn(new HashSet<>(matches));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>(matches));
 
             assertThrows( IllegalArgumentException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(4, tournament));
+                    playerDistributer.distributePlayersInFirstRound(4, tournamentOlympic));
         }
 
         @Test
@@ -271,11 +270,11 @@ class PlayerDistributerTest
             );
             List<Match> matches = List.of(createMatch(1, 1));
 
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
-            when(tournament.getMatches()).thenReturn(new HashSet<>(matches));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>(matches));
 
             assertThrows(IllegalStateException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(4, tournament));
+                    playerDistributer.distributePlayersInFirstRound(4, tournamentOlympic));
         }
 
         @Test
@@ -291,11 +290,11 @@ class PlayerDistributerTest
                     createMatch(1, 1),
                     createMatch(1, 2));
 
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
-            when(tournament.getMatches()).thenReturn(new HashSet<>(matches));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>(matches));
 
             assertThrows( IllegalArgumentException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(4, tournament));
+                    playerDistributer.distributePlayersInFirstRound(4, tournamentOlympic));
         }
 
 
@@ -309,11 +308,11 @@ class PlayerDistributerTest
                     createPlayer("Dave", 1100));
             List<Match> matches = List.of(createMatch(1, 1));
 
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
-            when(tournament.getMatches()).thenReturn(new HashSet<>(matches));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>(matches));
 
             assertThrows(IllegalStateException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(4, tournament)
+                    playerDistributer.distributePlayersInFirstRound(4, tournamentOlympic)
             );
         }
 
@@ -323,11 +322,11 @@ class PlayerDistributerTest
             List<Player> players = List.of(createPlayer("Alice", 1000));
             List<Match> matches = List.of(createMatch(1, 1));
 
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
-            when(tournament.getMatches()).thenReturn(new HashSet<>(matches));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>(matches));
 
             assertThrows( IllegalArgumentException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(2, tournament));
+                    playerDistributer.distributePlayersInFirstRound(2, tournamentOlympic));
         }
 
         @Test
@@ -342,11 +341,11 @@ class PlayerDistributerTest
         void testNoFirstRoundMatches()
         {
             List<Player> players = List.of(createPlayer("Alice", 1000), createPlayer("Bob", 1100));
-            when(tournament.getPlayers()).thenReturn(new HashSet<>(players));
-            when(tournament.getMatches()).thenReturn(new HashSet<>());
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(players));
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>());
 
             assertThrows(IllegalStateException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(4, tournament)
+                    playerDistributer.distributePlayersInFirstRound(4, tournamentOlympic)
             );
         }
 
@@ -356,11 +355,11 @@ class PlayerDistributerTest
             List<Match> matches = List.of(
                     createMatch(1, 1),
                     createMatch(1, 2));
-            when(tournament.getPlayers()).thenReturn(new HashSet<>());
-            when(tournament.getMatches()).thenReturn(new HashSet<>(matches));
+            when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>());
+            when(tournamentOlympic.getMatches()).thenReturn(new HashSet<>(matches));
 
             assertThrows(IllegalStateException.class, () ->
-                    playerDistributer.distributePlayersInFirstRound(4, tournament)
+                    playerDistributer.distributePlayersInFirstRound(4, tournamentOlympic)
             );
 
             for (Match match : matches)

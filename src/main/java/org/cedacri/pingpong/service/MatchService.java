@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Score;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.repository.MatchRepository;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.TournamentUtils;
@@ -29,11 +29,11 @@ public class MatchService
         this.matchRepository = matchRepository;
     }
 
-    public List<Match> getMatchesByTournamentAndRound(Tournament tournament, int round)
+    public List<Match> getMatchesByTournamentAndRound(TournamentOlympic tournamentOlympic, int round)
     {
-        log.debug("Fetching matches for tournament: {} and round: {}", tournament, round);
+        log.debug("Fetching matches for tournament: {} and round: {}", tournamentOlympic, round);
 
-        if (tournament == null)
+        if (tournamentOlympic == null)
         {
             throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
@@ -43,7 +43,7 @@ public class MatchService
             throw new IllegalArgumentException("Invalid round number");
         }
 
-        List<Match> matches = matchRepository.findByTournamentAndRound(tournament, round);
+        List<Match> matches = matchRepository.findByTournamentAndRound(tournamentOlympic, round);
 
         if (matches != null)
         {
@@ -57,20 +57,20 @@ public class MatchService
             matches = Collections.emptyList();
         }
 
-        log.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournament, round);
+        log.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournamentOlympic, round);
         return matches;
     }
 
-    public List<Match> getMatchesByTournament(Tournament tournament)
+    public List<Match> getMatchesByTournament(TournamentOlympic tournamentOlympic)
     {
 
-        if (tournament == null)
+        if (tournamentOlympic == null)
         {
             throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
-        log.debug("Fetching matches for tournament: {} ", tournament.getId());
-        List<Match> matches = matchRepository.findByTournament(tournament);
+        log.debug("Fetching matches for tournament: {} ", tournamentOlympic.getId());
+        List<Match> matches = matchRepository.findByTournament(tournamentOlympic);
 
         if (matches != null)
         {
@@ -87,15 +87,15 @@ public class MatchService
         }
 
 
-        log.info("Found {} matches for tournament: {}", matches.size(), tournament.getId());
+        log.info("Found {} matches for tournament: {}", matches.size(), tournamentOlympic.getId());
         return matches;
     }
 
-    public List<Match> getMatchesByPlayerNameSurname(Tournament tournament, String playerName, String playerSurname)
+    public List<Match> getMatchesByPlayerNameSurname(TournamentOlympic tournamentOlympic, String playerName, String playerSurname)
     {
         log.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
 
-        if (tournament == null)
+        if (tournamentOlympic == null)
         {
             throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
@@ -110,7 +110,7 @@ public class MatchService
             throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
         }
 
-        List<Match> matchesFromTournament = matchRepository.findByTournament(tournament);
+        List<Match> matchesFromTournament = matchRepository.findByTournament(tournamentOlympic);
 
         if (matchesFromTournament == null || matchesFromTournament.isEmpty())
         {

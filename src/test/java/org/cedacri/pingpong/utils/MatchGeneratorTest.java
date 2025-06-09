@@ -2,20 +2,16 @@ package org.cedacri.pingpong.utils;
 
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.SetTypesEnum;
-import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.TournamentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -25,7 +21,7 @@ class MatchGeneratorTest {
     private MatchGenerator matchGenerator;
     private TournamentService tournamentService;
     private PlayerDistributer playerDistributer;
-    private Tournament tournament;
+    private TournamentOlympic tournamentOlympic;
 
     @BeforeEach
     void setUp() {
@@ -41,11 +37,11 @@ class MatchGeneratorTest {
                 tournamentService
         );
 
-        tournament = mock(Tournament.class);
+        tournamentOlympic = mock(TournamentOlympic.class);
 
-        when(tournament.getTournamentType()).thenReturn(TournamentTypeEnum.OLYMPIC);
+        when(tournamentOlympic.getTournamentType()).thenReturn(TournamentTypeEnum.OLYMPIC);
 
-        when(tournament.getPlayers()).thenReturn(new HashSet<>(List.of(
+        when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(List.of(
                 createRealPlayer(1L,"Alice", 1000),
                 createRealPlayer(2L,"Bob", 950),
                 createRealPlayer(3L, "Charlie", 1100),
@@ -56,7 +52,7 @@ class MatchGeneratorTest {
                 createRealPlayer(8L, "Hank", 970)
         )));
 
-        when(tournamentService.findTournamentById(anyInt())).thenReturn(tournament);
+        when(tournamentService.findTournamentById(anyInt())).thenReturn(tournamentOlympic);
     }
 
 //    @Test
@@ -103,21 +99,21 @@ class MatchGeneratorTest {
     @Test
     void testGenerateMatches_RobinRound() {
         matchGenerator.setTournamentType(TournamentTypeEnum.ROBIN_ROUND);
-        matchGenerator.generateMatches(tournament);
+        matchGenerator.generateMatches(tournamentOlympic);
         verify(playerDistributer).distributePlayersInRobinRound(anyList(), anyList());
     }
 
     @Test
     void testGenerateMatches_UnsupportedType() {
         matchGenerator.setTournamentType(null);
-        assertThrows(RuntimeException.class, () -> matchGenerator.generateMatches(tournament));
+        assertThrows(RuntimeException.class, () -> matchGenerator.generateMatches(tournamentOlympic));
     }
 
     @Test
     void testMinimumPlayers_OlympicTournament() {
-        when(tournament.getPlayers()).thenReturn(new HashSet<>(List.of(createRealPlayer(1L, "Alice", 1000))));
+        when(tournamentOlympic.getPlayers()).thenReturn(new HashSet<>(List.of(createRealPlayer(1L, "Alice", 1000))));
         RuntimeException thrown = assertThrows(RuntimeException.class,
-                () -> matchGenerator.generateMatches(tournament));
+                () -> matchGenerator.generateMatches(tournamentOlympic));
         assertEquals("Number of players must be at least 8.", thrown.getMessage());
     }
 
@@ -133,11 +129,11 @@ class MatchGeneratorTest {
     @Test
     void testCreateMatch_UsingReflection() throws Exception {
         // Access the private method
-        Method method = MatchGenerator.class.getDeclaredMethod("createMatch", int.class, int.class, Match.class, Tournament.class);
+        Method method = MatchGenerator.class.getDeclaredMethod("createMatch", int.class, int.class, Match.class, TournamentOlympic.class);
         method.setAccessible(true); // Make it accessible for testing
 
         // Invoke the method and capture the result
-        Match match = (Match) method.invoke(matchGenerator, 2, 3, null, tournament);
+        Match match = (Match) method.invoke(matchGenerator, 2, 3, null, tournamentOlympic);
 
         // Assertions
         assertNotNull(match, "Match should not be null");

@@ -8,7 +8,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
@@ -27,19 +27,19 @@ public class TournamentEditDialog extends AbstractTournamentDialog
 
     private final TournamentService tournamentService;
     private final Runnable onSaveCallback;
-    private Tournament tournament;
+    private TournamentOlympic tournamentOlympic;
 
     private final ComboBox<String> statusComboBox;
     private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
-    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, Tournament tournament, Runnable onSaveCallback)
+    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, TournamentOlympic tournamentOlympic, Runnable onSaveCallback)
     {
         super("Edit Tournament");
 
         this.tournamentService = tournamentService;
-        this.tournament = tournament;
+        this.tournamentOlympic = tournamentOlympic;
         this.onSaveCallback = onSaveCallback;
-        this.selectedPlayersSet = tournament.getPlayers();
+        this.selectedPlayersSet = tournamentOlympic.getPlayers();
         this.availablePlayersSet = new HashSet<>();
 
         statusComboBox = createStatusComboBox();
@@ -50,7 +50,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog
         add(createDialogLayoutWithStatus(), createPlayersLayout(), createDialogButtons());
         log.debug("Initializing fields for editing...");
 
-        prefillFields(tournament);
+        prefillFields(tournamentOlympic);
         refreshGrids();
     }
 
@@ -68,21 +68,21 @@ public class TournamentEditDialog extends AbstractTournamentDialog
     {
         ComboBox<String> comboBox = new ComboBox<>("Status");
         comboBox.setItems(String.valueOf(TournamentStatusEnum.PENDING));
-        comboBox.setValue(String.valueOf(tournament.getTournamentStatus()));
+        comboBox.setValue(String.valueOf(tournamentOlympic.getTournamentStatus()));
         comboBox.setWidth("20%");
         comboBox.setRequired(true);
 
         return comboBox;
     }
 
-    private void prefillFields(Tournament tournament)
+    private void prefillFields(TournamentOlympic tournamentOlympic)
     {
         log.debug("Pre-fill fields with existing tournament data");
-        tournamentNameField.setValue(tournament.getTournamentName());
-        typeComboBox.setValue(tournament.getTournamentType());
-        setsCountComboBox.setValue(tournament.getSetsToWin());
-        semifinalsSetsCountComboBox.setValue(tournament.getSemifinalsSetsToWin());
-        finalsSetsCountComboBox.setValue(tournament.getFinalsSetsToWin());
+        tournamentNameField.setValue(tournamentOlympic.getTournamentName());
+        typeComboBox.setValue(tournamentOlympic.getTournamentType());
+        setsCountComboBox.setValue(tournamentOlympic.getSetsToWin());
+        semifinalsSetsCountComboBox.setValue(tournamentOlympic.getSemifinalsSetsToWin());
+        finalsSetsCountComboBox.setValue(tournamentOlympic.getFinalsSetsToWin());
     }
 
     @Override
@@ -97,21 +97,21 @@ public class TournamentEditDialog extends AbstractTournamentDialog
     @Override
     protected void onSave()
     {
-        log.info("Save button clicked. Attempting to update tournament {}", tournament.getTournamentName());
+        log.info("Save button clicked. Attempting to update tournament {}", tournamentOlympic.getTournamentName());
 
         boolean startNow;
         try
         {
             startNow = startNowCheckbox.getValue();
 
-            tournament.setTournamentName(tournamentNameField.getValue());
-            tournament.setTournamentType(typeComboBox.getValue());
-            tournament.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournament.setSetsToWin(setsCountComboBox.getValue());
-            tournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
-            tournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
-            tournament.setPlayers(selectedPlayersSet);
-            tournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournament));
+            tournamentOlympic.setTournamentName(tournamentNameField.getValue());
+            tournamentOlympic.setTournamentType(typeComboBox.getValue());
+            tournamentOlympic.setTournamentStatus(TournamentStatusEnum.PENDING);
+            tournamentOlympic.setSetsToWin(setsCountComboBox.getValue());
+            tournamentOlympic.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+            tournamentOlympic.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
+            tournamentOlympic.setPlayers(selectedPlayersSet);
+            tournamentOlympic.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournamentOlympic));
 
         }
         catch (Exception e)
@@ -124,9 +124,9 @@ public class TournamentEditDialog extends AbstractTournamentDialog
 
         try
         {
-            tournament = tournamentService.saveTournament(tournament);
+            tournamentOlympic = tournamentService.saveTournament(tournamentOlympic);
 
-            log.info("Tournament saved successfully: {}", tournament.getId());
+            log.info("Tournament saved successfully: {}", tournamentOlympic.getId());
             NotificationManager.showInfoNotification(Constants.TOURNAMENT_UPDATE_SUCCESS_MESSAGE);
         }
         catch (IllegalArgumentException illegalArgumentException)
@@ -140,9 +140,9 @@ public class TournamentEditDialog extends AbstractTournamentDialog
         {
             try
             {
-                tournamentService.startTournament(tournament);
+                tournamentService.startTournament(tournamentOlympic);
 
-                UI.getCurrent().navigate("tournament/matches/" + tournament.getId());
+                UI.getCurrent().navigate("tournament/matches/" + tournamentOlympic.getId());
 
                 NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
             }

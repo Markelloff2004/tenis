@@ -6,7 +6,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Tournament;
+import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -20,15 +20,15 @@ public class RobinRoundDetailsDialog extends Dialog
 
     private final Grid<Player> playerRatingGrid = new Grid<>(Player.class, false);
 
-    private final Tournament tournament;
+    private final TournamentOlympic tournamentOlympic;
 
     public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService)
     {
         log.info("Initializing tournament {} Rating ", tournamentId);
 
-        this.tournament = tournamentService.findTournamentById(tournamentId);
+        this.tournamentOlympic = tournamentService.findTournamentById(tournamentId);
 
-        setHeaderTitle(tournament.getTournamentName() + " Rating");
+        setHeaderTitle(tournamentOlympic.getTournamentName() + " Rating");
         setWidth("80%");
 
         configureGrid();
@@ -51,10 +51,10 @@ public class RobinRoundDetailsDialog extends Dialog
     {
         playerRatingGrid.addColumn(player ->
                         TournamentUtils.calculateNewRating(
-                                TournamentUtils.calculateNewWonMatches(player, tournament),
-                                TournamentUtils.calculateNewLostMatches(player, tournament),
-                                TournamentUtils.calculateNewGoalsScored(player, tournament),
-                                TournamentUtils.calculateNewGoalsLost(player, tournament))
+                                TournamentUtils.calculateNewWonMatches(player, tournamentOlympic),
+                                TournamentUtils.calculateNewLostMatches(player, tournamentOlympic),
+                                TournamentUtils.calculateNewGoalsScored(player, tournamentOlympic),
+                                TournamentUtils.calculateNewGoalsLost(player, tournamentOlympic))
                 )
                 .setHeader("Rating")
                 .setSortable(true);
@@ -62,19 +62,19 @@ public class RobinRoundDetailsDialog extends Dialog
         playerRatingGrid.addColumn(Player::getName).setHeader("Name");
         playerRatingGrid.addColumn(Player::getSurname).setHeader("Surname");
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsScored(player, tournament))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsScored(player, tournamentOlympic))
                 .setHeader("Goals Scored")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsLost(player, tournament))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsLost(player, tournamentOlympic))
                 .setHeader("Goals Lost")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewWonMatches(player, tournament))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewWonMatches(player, tournamentOlympic))
                 .setHeader("Won Matches")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewLostMatches(player, tournament))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewLostMatches(player, tournamentOlympic))
                 .setHeader("Lost Matches")
                 .setSortable(true);
     }
@@ -82,7 +82,7 @@ public class RobinRoundDetailsDialog extends Dialog
 
     private void loadPlayersIntoGrid()
     {
-        List<Player> players = new ArrayList<>(tournament.getPlayers());
+        List<Player> players = new ArrayList<>(tournamentOlympic.getPlayers());
         playerRatingGrid.setItems(players);
     }
 
