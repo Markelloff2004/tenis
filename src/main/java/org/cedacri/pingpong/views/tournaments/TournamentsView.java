@@ -13,7 +13,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.TournamentOlympic;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.PlayerService;
@@ -37,7 +37,7 @@ import java.util.Comparator;
 public class TournamentsView extends VerticalLayout implements TournamentManagement
 {
 
-    private final Grid<TournamentOlympic> tournamentsGrid = new Grid<>(TournamentOlympic.class, false);
+    private final Grid<BaseTournament> tournamentsGrid = new Grid<>(BaseTournament.class, false);
     private final TournamentService tournamentService;
     private final PlayerService playerService;
 
@@ -82,12 +82,12 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         tournamentsGrid.addClassName("tournaments-grid");
         tournamentsGrid.setSizeFull();
 
-        tournamentsGrid.addColumn(TournamentOlympic::getId).setHeader("ID").setSortable(true);
-        tournamentsGrid.addColumn(TournamentOlympic::getTournamentName).setHeader("Name").setSortable(true);
-        tournamentsGrid.addColumn(TournamentOlympic::getMaxPlayers).setHeader("MaxPlayers").setSortable(true);
-        tournamentsGrid.addColumn(TournamentOlympic::getTournamentType).setHeader("Type").setSortable(true);
-        tournamentsGrid.addColumn(TournamentOlympic::getTournamentStatus).setHeader("Status").setSortable(true);
-        tournamentsGrid.addColumn(TournamentOlympic::getCreatedAt).setHeader("CreatedAt").setSortable(true);
+        tournamentsGrid.addColumn(BaseTournament::getId).setHeader("ID").setSortable(true);
+        tournamentsGrid.addColumn(BaseTournament::getTournamentName).setHeader("Name").setSortable(true);
+        tournamentsGrid.addColumn(BaseTournament::getMaxPlayers).setHeader("MaxPlayers").setSortable(true);
+        tournamentsGrid.addColumn(BaseTournament::getTournamentType).setHeader("Type").setSortable(true);
+        tournamentsGrid.addColumn(BaseTournament::getTournamentStatus).setHeader("Status").setSortable(true);
+        tournamentsGrid.addColumn(BaseTournament::getCreatedAt).setHeader("CreatedAt").setSortable(true);
 
         tournamentsGrid
                 .addColumn(new ComponentRenderer<>(this::createActionButtons))
@@ -101,31 +101,31 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
         log.debug("TournamentsView grid configured with columns and actions");
     }
 
-    private HorizontalLayout createActionButtons(TournamentOlympic tournamentOlympic)
+    private HorizontalLayout createActionButtons(BaseTournament baseTournament)
     {
         Button viewButton = ViewUtils.createButton(
                 "View",
                 ViewUtils.COMPACT_BUTTON,
-                () -> showInfoTournament(tournamentOlympic)
+                () -> showInfoTournament(baseTournament)
         );
 
         Button deleteButton = ViewUtils.createSecuredButton(
                 "Delete",
                 ViewUtils.COMPACT_BUTTON,
-                () -> showDeleteTournament(tournamentOlympic),
+                () -> showDeleteTournament(baseTournament),
                 RoleEnum.ADMIN
         );
 
         HorizontalLayout layout;
 
-        if (tournamentOlympic.getTournamentStatus() != null
-                && tournamentOlympic.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
+        if (baseTournament.getTournamentStatus() != null
+                && baseTournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
         {
 
             Button editButton = ViewUtils.createSecuredButton(
                     "Edit",
                     ViewUtils.COMPACT_BUTTON,
-                    () -> showEditTournament(tournamentOlympic),
+                    () -> showEditTournament(baseTournament),
                     RoleEnum.ADMIN, RoleEnum.MANAGER
             );
 
@@ -144,7 +144,8 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     {
         tournamentsGrid.setItems(
                 tournamentService.findAllTournaments()
-                        .sorted(Comparator.comparingInt(TournamentOlympic::getId).reversed())
+                        .stream()
+                        .sorted(Comparator.comparingLong(BaseTournament::getId).reversed())
                         .toList());
         log.info("Grid data refreshed, tournaments loaded.");
     }
@@ -159,17 +160,17 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     @Override
-    public void showInfoTournament(TournamentOlympic tournamentOlympicDetails)
+    public void showInfoTournament(BaseTournament baseTournamentDetails)
     {
-        log.info("Showing tournament details for tournament: {} with Id: {}", tournamentOlympicDetails.getTournamentName(), tournamentOlympicDetails.getId());
+        log.info("Showing tournament details for tournament: {} with Id: {}", baseTournamentDetails.getTournamentName(), baseTournamentDetails.getId());
 
-        TournamentInfoDialog tournamentEditDialog = new TournamentInfoDialog(playerService, tournamentOlympicDetails);
+        TournamentInfoDialog tournamentEditDialog = new TournamentInfoDialog(playerService, baseTournamentDetails);
         tournamentEditDialog.open();
 
     }
 
     @Override
-    public void showDeleteTournament(TournamentOlympic tournamentOlympicDelete)
+    public void showDeleteTournament(BaseTournament tournamentOlympicDelete)
     {
         log.info("Deleting tournament: {} with Id: {}", tournamentOlympicDelete.getTournamentName(), tournamentOlympicDelete.getId());
 
@@ -178,12 +179,12 @@ public class TournamentsView extends VerticalLayout implements TournamentManagem
     }
 
     @Override
-    public void showEditTournament(TournamentOlympic tournamentOlympic)
+    public void showEditTournament(BaseTournament baseTournament)
     {
 
-        log.info("Editing tournament: {} with Id: {}", tournamentOlympic.getTournamentName(), tournamentOlympic.getId());
+        log.info("Editing tournament: {} with Id: {}", baseTournament.getTournamentName(), baseTournament.getId());
 
-        TournamentEditDialog tournamentEditDialog = new TournamentEditDialog(tournamentService, playerService, tournamentOlympic, this::refreshGridData);
+        TournamentEditDialog tournamentEditDialog = new TournamentEditDialog(tournamentService, playerService, baseTournament, this::refreshGridData);
         tournamentEditDialog.open();
     }
 

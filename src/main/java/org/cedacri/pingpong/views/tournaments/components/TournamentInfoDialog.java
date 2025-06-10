@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
@@ -23,7 +24,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
 
     private final ComboBox<String> statusComboBox;
 
-    public TournamentInfoDialog(PlayerService playerService, TournamentOlympic tournamentOlympic)
+    public TournamentInfoDialog(PlayerService playerService, BaseTournament tournamentOlympic)
     {
         super("Tournament Details:");
 

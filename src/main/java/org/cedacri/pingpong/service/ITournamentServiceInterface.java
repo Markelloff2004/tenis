@@ -11,9 +11,6 @@ public interface ITournamentServiceInterface {
     List<BaseTournament> findAllTournaments();
     BaseTournament findTournamentById(Long id);
     void deleteTournamentById(Long id);
-    BaseTournament startTournament(BaseTournament tournament);
 
-    void generateMatches();
-
-//        BaseTournament createTournament(BaseTournament tournament);
+    BaseTournament startTournament(BaseTournament tournamentToStart);
 }

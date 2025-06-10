@@ -4,24 +4,18 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.BaseTournament;
-import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
-import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.repository.BaseTournamentRepository;
-import org.cedacri.pingpong.utils.MatchGenerator;
-import org.cedacri.pingpong.utils.PlayerDistributer;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
 @Service
-public class TournamentService implements ITournamentServiceInterface {
+public abstract class TournamentService implements ITournamentServiceInterface {
     private final BaseTournamentRepository tournamentRepository;
 
     public TournamentService(BaseTournamentRepository tournamentRepository) {
@@ -101,19 +95,6 @@ public class TournamentService implements ITournamentServiceInterface {
         log.info("Tournament with ID: {} deleted successfully", id);
     }
 
-    @Override
-    public BaseTournament startTournament(BaseTournament tournament){
-        // This method is not implemented in the original code snippet.
-        throw new UnsupportedOperationException("Method not implemented yet");
-    }
-
-
-    @Override
-    public void generateMatches() {
-        // This method is not implemented in the original code snippet.
-        throw new UnsupportedOperationException("Method not implemented yet");
-    }
-
     protected void validateTournamentId(Long id) {
         log.debug("Validating tournament ID: {}", id);
         if (id == null) {
@@ -129,4 +110,7 @@ public class TournamentService implements ITournamentServiceInterface {
     public boolean isTournamentActive(BaseTournament tournament) {
         return tournament.getTournamentStatus().equals(TournamentStatusEnum.ONGOING);
     }
+
+    @Override
+    public abstract BaseTournament startTournament(BaseTournament baseTournament);
 }

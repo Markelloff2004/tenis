@@ -5,18 +5,12 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Score;
-import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.repository.MatchRepository;
 import org.cedacri.pingpong.utils.Constants;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service

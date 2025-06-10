@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
@@ -16,7 +17,6 @@ import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.HashSet;
@@ -32,7 +32,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog
     private final ComboBox<String> statusComboBox;
     private final Checkbox startNowCheckbox = ViewUtils.createCheckBox("Start Now");
 
-    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, TournamentOlympic tournamentOlympic, Runnable onSaveCallback)
+    public TournamentEditDialog(TournamentService tournamentService, PlayerService playerService, BaseTournament tournamentOlympic, Runnable onSaveCallback)
     {
         super("Edit Tournament");
 

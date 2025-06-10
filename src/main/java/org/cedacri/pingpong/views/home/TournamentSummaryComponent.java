@@ -5,8 +5,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class TournamentSummaryComponent extends HorizontalLayout
 {
 
-    public TournamentSummaryComponent(TournamentOlympic tournamentOlympic)
+    public TournamentSummaryComponent(BaseTournament baseTournament)
     {
         setWidthFull();
         setSpacing(true);
@@ -29,34 +29,34 @@ public class TournamentSummaryComponent extends HorizontalLayout
                 .set("box-shadow", "0px 4px 6px rgba(0, 0, 0, 0.1)");
 
         add(
-                createTournamentDetails(tournamentOlympic),
-                createDateCreatedDetails(tournamentOlympic),
-                createWinnerDetails(tournamentOlympic),
-                createInfoButton(tournamentOlympic)
+                createTournamentDetails(baseTournament),
+                createDateCreatedDetails(baseTournament),
+                createWinnerDetails(baseTournament),
+                createInfoButton(baseTournament)
         );
     }
 
-    private VerticalLayout createTournamentDetails(TournamentOlympic tournamentOlympic)
+    private VerticalLayout createTournamentDetails(BaseTournament baseTournament)
     {
         VerticalLayout details = new VerticalLayout();
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        Span name = new Span("🏆 " + tournamentOlympic.getTournamentName());
+        Span name = new Span("🏆 " + baseTournament.getTournamentName());
         name.getStyle().set("font-weight", "bold").set("font-size", "16px");
 
         details.add(name);
         return details;
     }
 
-    private VerticalLayout createDateCreatedDetails(TournamentOlympic tournamentOlympic)
+    private VerticalLayout createDateCreatedDetails(BaseTournament baseTournament)
     {
         VerticalLayout details = new VerticalLayout();
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
 
         String startedAtInfo;
-        LocalDate startedAt = tournamentOlympic.getStartedAt();
+        LocalDate startedAt = baseTournament.getStartedAt();
         if (startedAt == null)
         {
             startedAtInfo = "Pending";
@@ -72,13 +72,13 @@ public class TournamentSummaryComponent extends HorizontalLayout
         return details;
     }
 
-    private VerticalLayout createWinnerDetails(TournamentOlympic tournamentOlympic)
+    private VerticalLayout createWinnerDetails(BaseTournament baseTournament)
     {
         VerticalLayout details = new VerticalLayout();
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        Player winner = tournamentOlympic.getWinner();
+        Player winner = baseTournament.getWinner();
         Span winnerLabel = (winner != null)
                 ? ViewUtils.createPlayerLabel("🥇 " + winner.getName() + " " + winner.getSurname())
                 : ViewUtils.createPlayerLabel("No winner yet");
@@ -88,12 +88,12 @@ public class TournamentSummaryComponent extends HorizontalLayout
         return details;
     }
 
-    private Button createInfoButton(TournamentOlympic tournamentOlympic)
+    private Button createInfoButton(BaseTournament baseTournament)
     {
         Button infoButton = new Button("Show Details", event ->
         {
-            getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournamentOlympic.getId()));
-            log.info("Navigating to tournament details page, id: {}", tournamentOlympic.getId());
+            getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + baseTournament.getId()));
+            log.info("Navigating to tournament details page, id: {}", baseTournament.getId());
         });
         infoButton.addClassName("compact-button");
         infoButton.getStyle().set("font-size", "16px");

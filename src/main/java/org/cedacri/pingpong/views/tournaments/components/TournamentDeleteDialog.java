@@ -4,7 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.TournamentOlympic;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
@@ -14,7 +14,7 @@ import org.cedacri.pingpong.utils.ViewUtils;
 public class TournamentDeleteDialog extends Dialog
 {
 
-    public TournamentDeleteDialog(TournamentService tournamentService, TournamentOlympic tournamentOlympicDelete, Runnable onDeleteCallback)
+    public TournamentDeleteDialog(TournamentService tournamentService, BaseTournament tournamentOlympicDelete, Runnable onDeleteCallback)
     {
         log.info("Initializing TournamentDeleteDialog for tournament: {} with Id: {}", tournamentOlympicDelete.getTournamentName(), tournamentOlympicDelete.getId());
 

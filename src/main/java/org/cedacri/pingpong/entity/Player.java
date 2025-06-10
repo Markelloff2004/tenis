@@ -94,7 +94,7 @@ public class Player
     private Integer goalsLost = 0;
 
     @ManyToMany(mappedBy = "players", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private Set<TournamentOlympic> tournamentOlympics = new HashSet<>();
+    private Set<BaseTournament> tournaments = new HashSet<>();
 
     public Player(String name, String surname, String address, String email, String hand)
     {
@@ -112,6 +112,10 @@ public class Player
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
         return Objects.equals(id, player.id);
+    }
+
+    public void registerToTournament(BaseTournament tournamentToAdd) {
+        tournaments.add(tournamentToAdd);
     }
 
     @Override
