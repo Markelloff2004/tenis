@@ -85,7 +85,7 @@ public abstract class AbstractTournamentDialog extends Dialog
     protected void initializePlayerSets(PlayerService playerService)
     {
         availablePlayersSet.addAll(
-                playerService.getAllPlayers()
+                playerService.findAllPlayers()
                         .stream()
                         .filter(p -> !selectedPlayersSet.contains(p))
                         .collect(Collectors.toSet())

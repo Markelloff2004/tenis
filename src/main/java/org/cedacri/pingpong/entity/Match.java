@@ -38,7 +38,7 @@ public class Match
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @NotNull(message = "Round cannot be null or empty")
     @Min(value = 1, message = "Round cannot be less than 1")

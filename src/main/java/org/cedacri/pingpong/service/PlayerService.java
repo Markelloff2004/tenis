@@ -2,6 +2,7 @@ package org.cedacri.pingpong.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.Player;
 import org.cedacri.pingpong.exception.tournament.EntityDeletionException;
 import org.cedacri.pingpong.repository.PlayerRepository;
@@ -36,7 +37,7 @@ public class PlayerService
                 });
     }
 
-    public List<Player> getAllPlayers()
+    public List<Player> findAllPlayers()
     {
         log.info("Fetching list of players");
 
@@ -62,7 +63,6 @@ public class PlayerService
             throw new IllegalArgumentException("Cannot update non-existing player with ID: " + player.getId());
         }
 
-
         Player savedPlayer = playerRepository.save(player);
 
         log.debug("Successfully saved player {}", player);
@@ -70,7 +70,7 @@ public class PlayerService
     }
 
     @Transactional
-    public void deletePlayerById(Long id)
+    public void  deletePlayerById(Long id)
     {
         if (id == null)
         {
@@ -103,5 +103,4 @@ public class PlayerService
             throw new IllegalStateException("An unexpected error occurred while deleting the player with ID " + id, ex);
         }
     }
-
 }

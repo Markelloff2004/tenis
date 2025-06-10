@@ -36,7 +36,7 @@ import java.util.Comparator;
 public class PlayersView extends VerticalLayout implements PlayerViewManagement
 {
 
-    private final PlayerService playerService;
+    private final transient PlayerService playerService;
 
     private Grid<Player> playersGrid;
 
@@ -117,7 +117,7 @@ public class PlayersView extends VerticalLayout implements PlayerViewManagement
     public void showAllPlayers()
     {
         log.info("Loading all players");
-        playersGrid.setItems(playerService.getAllPlayers()
+        playersGrid.setItems(playerService.findAllPlayers()
                 .stream()
                 .sorted(Comparator.comparingInt(Player::getRating)
                         .reversed()

@@ -12,7 +12,9 @@ import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -21,12 +23,13 @@ import java.util.Set;
 //@MappedSuperclass
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "tournament_type", discriminatorType = DiscriminatorType.STRING)
  public abstract class BaseTournament {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Size(max = 100)
     @NotBlank(message = "Tournament name cannot be null or blank")
@@ -67,10 +70,13 @@ import java.util.Set;
     private Set<Player> players = new HashSet<>();
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Match> matches = new HashSet<>();
+    private List<Match> matches = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "winner_id")
     private Player winner;
 
+    public void addPlayer(Player playerToAdd) {
+       players.add(playerToAdd);
+    }
 }

@@ -1,5 +1,6 @@
 package org.cedacri.pingpong.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Match;
@@ -29,147 +30,99 @@ public class MatchService
         this.matchRepository = matchRepository;
     }
 
-    public List<Match> getMatchesByTournamentAndRound(TournamentOlympic tournamentOlympic, int round)
+
+    public Match findMatchById(Long id)
     {
-        log.debug("Fetching matches for tournament: {} and round: {}", tournamentOlympic, round);
-
-        if (tournamentOlympic == null)
+        if (id == null)
         {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
+            throw new IllegalArgumentException("Match ID cannot be null");
         }
 
-        if (round <= 0 || round == Integer.MAX_VALUE)
-        {
-            throw new IllegalArgumentException("Invalid round number");
-        }
-
-        List<Match> matches = matchRepository.findByTournamentAndRound(tournamentOlympic, round);
-
-        if (matches != null)
-        {
-            matches = matches
-                    .stream()
-                    .distinct()
-                    .sorted(Comparator.comparing(Match::getPosition)).toList();
-        }
-        else
-        {
-            matches = Collections.emptyList();
-        }
-
-        log.info("Found {} matches for tournament: {} and round: {}", matches.size(), tournamentOlympic, round);
-        return matches;
-    }
-
-    public List<Match> getMatchesByTournament(TournamentOlympic tournamentOlympic)
-    {
-
-        if (tournamentOlympic == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        log.debug("Fetching matches for tournament: {} ", tournamentOlympic.getId());
-        List<Match> matches = matchRepository.findByTournament(tournamentOlympic);
-
-        if (matches != null)
-        {
-            matches = matches
-                    .stream()
-                    .distinct()
-                    .sorted(Comparator.comparing(Match::getPosition)
-                            .thenComparing(Match::getRound))
-                    .toList();
-        }
-        else
-        {
-            matches = Collections.emptyList();
-        }
-
-
-        log.info("Found {} matches for tournament: {}", matches.size(), tournamentOlympic.getId());
-        return matches;
-    }
-
-    public List<Match> getMatchesByPlayerNameSurname(TournamentOlympic tournamentOlympic, String playerName, String playerSurname)
-    {
-        log.info("Search for match witch Player '{}' '{}'", playerName, playerSurname);
-
-        if (tournamentOlympic == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        if (playerName == null)
-        {
-            throw new IllegalArgumentException("Player Name cannot be null");
-        }
-
-        if (playerSurname == null)
-        {
-            throw new IllegalArgumentException(Constants.TOURNAMENT_CANNOT_BE_NULL);
-        }
-
-        List<Match> matchesFromTournament = matchRepository.findByTournament(tournamentOlympic);
-
-        if (matchesFromTournament == null || matchesFromTournament.isEmpty())
-        {
-            return Collections.emptyList();
-        }
-
-        List<Match> matchesWhereIsTopPlayer = matchesFromTournament.stream()
-                .filter(m -> (Objects.nonNull(m.getTopPlayer())
-                                && (m.getTopPlayer().getName().equals(playerName)
-                                && m.getTopPlayer().getSurname().equals(playerSurname))
-                        )
-                ).toList();
-
-        List<Match> matchesWhereIsBottomPlayer = matchesFromTournament.stream()
-                .filter(m -> (Objects.nonNull(m.getTopPlayer())
-                                && (m.getBottomPlayer().getName().equals(playerName)
-                                && m.getBottomPlayer().getSurname().equals(playerSurname))
-                        )
-                ).toList();
-
-        List<Match> allMatches = new ArrayList<>();
-        allMatches.addAll(matchesWhereIsTopPlayer);
-        allMatches.addAll(matchesWhereIsBottomPlayer);
-
-        return allMatches;
+        log.debug("Fetching match with ID: {}", id);
+        return matchRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Match with ID " + id + " not found"));
     }
 
     @Transactional
     public Match saveMatch(Match match)
     {
-        log.debug("Attempting to save or update match: {}", match);
-
         if (match == null)
         {
-            throw new IllegalArgumentException("Cannot save a null Match");
+            throw new IllegalArgumentException("Match cannot be null");
         }
 
-        return matchRepository.save(match);
+        if (match.getTournament() == null)
+        {
+            throw new IllegalArgumentException("Match must be associated with a tournament");
+        }
 
+        log.debug("Saving match: {}", match);
+        Match savedMatch = matchRepository.saveAndFlush(match);
+
+        log.debug("Match saved: {}", savedMatch);
+        return savedMatch;
+    }
+
+
+    private void saveAllMatches(List<Match> matches)
+    {
+        if (matches == null || matches.isEmpty())
+        {
+            throw new IllegalArgumentException("Match list cannot be null or empty");
+        }
+
+        log.debug("Saving all matches: {}", matches);
+        matchRepository.saveAll(matches);
+        log.debug("All matches saved successfully");
     }
 
     @Transactional
     public void deleteMatch(Match match)
     {
-        if (match == null || match.getId() == null)
+        if (match == null)
         {
-            log.error("Attempted to delete a null Match");
-            throw new IllegalArgumentException("Match ID cannot be null");
+            throw new IllegalArgumentException("Match cannot be null");
         }
 
-        Optional<Match> matchToDelete = matchRepository.findById(match.getId());
+        log.debug("Deleting match: {}", match);
+        matchRepository.delete(match);
+        log.debug("Match deleted: {}", match);
+    }
 
-        if (matchToDelete.isPresent())
+    public void cleanAllFutureMatches(Match match)
+    {
+        if (match == null)
         {
-            log.debug("Attempting to delete match: {}", match);
-            matchRepository.deleteById(match.getId());
-            log.debug("Match deleted: {}", match);
+            return;
         }
 
+        List<Match> matchesToUpdate = new ArrayList<>();
+        Match currMatch = match;
+
+        while (currMatch != null && currMatch.getWinner() != null)
+        {
+            currMatch.setWinner(null);
+
+            currMatch.getScore().clear();
+
+            Match nextMatch = currMatch.getNextMatch();
+            if (nextMatch != null)
+            {
+                if (currMatch.getPosition() % 2 == 1)
+                {
+                    nextMatch.setTopPlayer(null);
+                }
+                else
+                {
+                    nextMatch.setBottomPlayer(null);
+                }
+            }
+
+            matchesToUpdate.add(currMatch);
+            currMatch = nextMatch;
+        }
+
+        saveAllMatches(matchesToUpdate);
     }
 
 
@@ -233,50 +186,6 @@ public class MatchService
         }
 
         return null;
-    }
-
-    public void cleanAllFutureMatches(Match match)
-    {
-        if (match == null)
-        {
-            return;
-        }
-
-        List<Match> matchesToUpdate = new ArrayList<>();
-        Match currMatch = match;
-
-        while (currMatch != null && currMatch.getWinner() != null)
-        {
-            currMatch.setWinner(null);
-
-            currMatch.getScore().clear();
-
-            Match nextMatch = currMatch.getNextMatch();
-            if (nextMatch != null)
-            {
-                if (currMatch.getPosition() % 2 == 1)
-                {
-                    nextMatch.setTopPlayer(null);
-                }
-                else
-                {
-                    nextMatch.setBottomPlayer(null);
-                }
-            }
-
-            matchesToUpdate.add(currMatch);
-            currMatch = nextMatch;
-        }
-
-        saveAllMatches(matchesToUpdate);
-    }
-
-    private void saveAllMatches(List<Match> matches)
-    {
-        for (Match match : matches)
-        {
-            this.saveMatch(match);
-        }
     }
 
 }

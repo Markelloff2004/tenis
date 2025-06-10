@@ -3,9 +3,12 @@ package org.cedacri.pingpong.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.TournamentOlympic;
+import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
-import org.cedacri.pingpong.repository.TournamentRepository;
+import org.cedacri.pingpong.repository.BaseTournamentRepository;
 import org.cedacri.pingpong.utils.MatchGenerator;
 import org.cedacri.pingpong.utils.PlayerDistributer;
 import org.cedacri.pingpong.utils.TournamentUtils;
@@ -15,93 +18,115 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
-public class TournamentService
-{
-    private final TournamentRepository tournamentRepository;
+public class TournamentService implements ITournamentServiceInterface {
+    private final BaseTournamentRepository tournamentRepository;
 
-    public TournamentService(TournamentRepository tournamentRepository)
-    {
+    public TournamentService(BaseTournamentRepository tournamentRepository) {
         this.tournamentRepository = tournamentRepository;
     }
 
     @Transactional
-    public Stream<TournamentOlympic> findAllTournaments()
-    {
-        List<TournamentOlympic> tournamentOlympics = tournamentRepository.findAll();
-        tournamentOlympics.forEach(tournament -> Hibernate.initialize(tournament.getPlayers()));
-        return tournamentOlympics.stream().sorted(Comparator.comparing(TournamentOlympic::getCreatedAt).reversed());
+    public List<BaseTournament> findAllTournaments() {
+        log.info("Fetching all tournaments");
+
+        List<BaseTournament> tournaments = tournamentRepository.findAll();
+
+        if (tournaments.isEmpty()) {
+            log.warn("No tournaments found");
+            return List.of();
+        }
+
+        // Sort tournaments by start date
+        return tournaments.stream()
+                .sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
     }
 
-    public TournamentOlympic findTournamentById(Integer id)
-    {
+    public BaseTournament findTournamentById(Long id) {
         validateTournamentId(id);
+        log.debug("Fetching tournament with ID: {}", id);
 
-        TournamentOlympic tournamentOlympic = tournamentRepository.findById(id).
-                orElseThrow(() -> new EntityNotFoundException("Tournament with ID " + id + " not found"));
+        return tournamentRepository.findById(id)
+                .map(tournament -> {
+                    // NOTE: Check if is better to initialize players here or in the TournamentPlayerService in a method like findTournamentWithPlayers
+                    Hibernate.initialize(tournament.getPlayers());
+                    return tournament;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Tournament with ID " + id + " not found"));
+    }
 
-        Hibernate.initialize(tournamentOlympic.getPlayers());
-        return tournamentOlympic;
+    public List<BaseTournament> findAllTournamentsByType(TournamentTypeEnum tournamentType) {
+        log.debug("Fetching all tournaments of type: {}", tournamentType);
+        List<BaseTournament> tournaments = tournamentRepository.findAllByTournamentType(tournamentType);
+
+        if (tournaments.isEmpty()) {
+            log.warn("No tournaments found for type: {}", tournamentType);
+            return List.of();
+        }
+
+        // Sort tournaments by start date
+        return tournaments.stream()
+                .sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
     }
 
     @Transactional
-    public TournamentOlympic saveTournament(TournamentOlympic tournamentOlympic)
-    {
-        if (tournamentOlympic == null)
-        {
+    public BaseTournament saveTournament(BaseTournament baseTournament) {
+
+        if (baseTournament == null) {
             throw new IllegalArgumentException("Tournament cannot be null");
         }
 
-        return tournamentRepository.save(tournamentOlympic);
+        log.debug("Saving tournament: {}", baseTournament);
+        BaseTournament savedTournament = tournamentRepository.saveAndFlush(baseTournament);
+
+        log.info("Tournament saved with ID: {}", savedTournament.getId());
+        return savedTournament;
     }
 
     @Transactional
-    public void deleteTournamentById(Integer id)
-    {
+    public void deleteTournamentById(Long id) {
         validateTournamentId(id);
-        TournamentOlympic tournamentOlympicToDelete = tournamentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
+        log.debug("Deleting tournament with ID: {}", id);
 
-        tournamentOlympicToDelete.getPlayers().forEach(player -> player.getTournamentOlympics().remove(tournamentOlympicToDelete));
-        tournamentRepository.deleteById(id);
+        BaseTournament tournament = findTournamentById(id);
+        if (tournament == null) {
+            throw new EntityNotFoundException("Tournament with ID " + id + " not found");
+        }
+
+        tournamentRepository.delete(tournament);
+        log.info("Tournament with ID: {} deleted successfully", id);
     }
 
-    private static void validateTournamentId(Integer id)
-    {
-        if (id == null)
-        {
+    @Override
+    public BaseTournament startTournament(BaseTournament tournament){
+        // This method is not implemented in the original code snippet.
+        throw new UnsupportedOperationException("Method not implemented yet");
+    }
+
+
+    @Override
+    public void generateMatches() {
+        // This method is not implemented in the original code snippet.
+        throw new UnsupportedOperationException("Method not implemented yet");
+    }
+
+    protected void validateTournamentId(Long id) {
+        log.debug("Validating tournament ID: {}", id);
+        if (id == null) {
             throw new IllegalArgumentException("Tournament ID cannot be null");
         }
-        else if (id <= 0)
-        {
-            throw new IllegalArgumentException("Tournament ID cannot be 0 (zero) or bellow");
-        }
-    }
-
-    @Transactional
-    public void startTournament(TournamentOlympic tournamentOlympic) throws NotEnoughPlayersException
-    {
-
-        int minAmountPlayers = TournamentUtils.getMinimalPlayersRequired(tournamentOlympic.getTournamentType());
-
-        if (tournamentOlympic.getPlayers().size() < minAmountPlayers)
-        {
-            throw new NotEnoughPlayersException(tournamentOlympic.getPlayers().size(), minAmountPlayers);
+        if (id <= 0) {
+            throw new IllegalArgumentException("Tournament ID must be a positive number");
         }
 
-        tournamentOlympic.setStartedAt(LocalDate.now());
-        tournamentRepository.save(tournamentOlympic);
-
-        MatchGenerator matchGenerator = createMatchGenerator(tournamentOlympic);
-        matchGenerator.generateMatches(tournamentOlympic);
+        log.debug("Tournament ID {} is valid", id);
     }
 
-    MatchGenerator createMatchGenerator(TournamentOlympic tournamentOlympic)
-    {
-        return new MatchGenerator(tournamentOlympic.getSetsToWin(), tournamentOlympic.getSemifinalsSetsToWin(),
-                tournamentOlympic.getFinalsSetsToWin(), tournamentOlympic.getTournamentType(), new PlayerDistributer(), this);
+    public boolean isTournamentActive(BaseTournament tournament) {
+        return tournament.getTournamentStatus().equals(TournamentStatusEnum.ONGOING);
     }
 }

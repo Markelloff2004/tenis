@@ -17,7 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.time.LocalDate;
 import java.util.*;
 
-public class PlayerServiceTest {
+class PlayerServiceTest {
 
     @Mock
     private PlayerRepository playerRepository;
@@ -122,7 +122,7 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
             assertEquals(2, result.size());
             assertEquals(players, result);
         }
@@ -131,7 +131,7 @@ public class PlayerServiceTest {
         void testGetAll_noPlayers() {
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
             assertTrue(result.isEmpty());
         }
 
@@ -144,7 +144,7 @@ public class PlayerServiceTest {
             when(playerRepository.findAll()).thenReturn(players);
 
             long startTime = System.nanoTime();
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
             long duration = System.nanoTime() - startTime;
 
             assertEquals(10000, result.size());
@@ -155,7 +155,7 @@ public class PlayerServiceTest {
         void testGetAll_nullPlayersList() {
             when(playerRepository.findAll()).thenReturn(null);
 
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
 
             assertEquals(Collections.emptyList(), result);
         }
@@ -163,15 +163,15 @@ public class PlayerServiceTest {
         @Test
         void testGetAll_emptyCollectionFieldInPlayer() {
             Player playerWithEmptyCollection = new Player();
-            playerWithEmptyCollection.setTournamentOlympics(new HashSet<>());
+            playerWithEmptyCollection.setTournaments(new HashSet<>());
 
             List<Player> players = List.of(playerWithEmptyCollection);
             when(playerRepository.findAll()).thenReturn(players);
 
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
             assertNotNull(result);
             assertEquals(1, result.size());
-            assertTrue(result.get(0).getTournamentOlympics().isEmpty());
+            assertTrue(result.get(0).getTournaments().isEmpty());
         }
 
         @Test
@@ -180,7 +180,7 @@ public class PlayerServiceTest {
             Player player2 = new Player();
             when(playerRepository.findAll()).thenReturn(Arrays.asList(player1, player1, player2));
 
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
 
             assertEquals(3, result.size());
             assertTrue(result.contains(player1));
@@ -192,12 +192,12 @@ public class PlayerServiceTest {
             List<Player> players = Arrays.asList(new Player(), new Player());
             when(playerRepository.findAll()).thenReturn(players);
 
-            playerService.getAllPlayers();
+            playerService.findAllPlayers();
 
             playerRepository.deleteAll();
             when(playerRepository.findAll()).thenReturn(Collections.emptyList());
 
-            List<Player> result = playerService.getAllPlayers();
+            List<Player> result = playerService.findAllPlayers();
             assertTrue(result.isEmpty());
         }
     }
