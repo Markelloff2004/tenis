@@ -6,28 +6,29 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.TournamentOlympic;
-import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.entity.TournamentRoundRobin;
+import org.cedacri.pingpong.service.tournament_round_robin.TournamentRoundRobinService;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class RobinRoundDetailsDialog extends Dialog
+public class TournamentRoundRobinDetails extends Dialog
 {
 
     private final Grid<Player> playerRatingGrid = new Grid<>(Player.class, false);
 
-    private final TournamentOlympic tournamentOlympic;
+    private final TournamentRoundRobin tournamentRoundRobin;
 
-    public RobinRoundDetailsDialog(Integer tournamentId, TournamentService tournamentService)
+    public TournamentRoundRobinDetails(Long tournamentId, TournamentRoundRobinService tournamentRoundRobinService)
     {
         log.info("Initializing tournament {} Rating ", tournamentId);
 
-        this.tournamentOlympic = tournamentService.findTournamentById(tournamentId);
+        this.tournamentRoundRobin = tournamentRoundRobinService.findTournamentById(tournamentId);
 
-        setHeaderTitle(tournamentOlympic.getTournamentName() + " Rating");
+        setHeaderTitle(tournamentRoundRobin.getTournamentName() + " Rating");
         setWidth("80%");
 
         configureGrid();
@@ -50,10 +51,10 @@ public class RobinRoundDetailsDialog extends Dialog
     {
         playerRatingGrid.addColumn(player ->
                         TournamentUtils.calculateNewRating(
-                                TournamentUtils.calculateNewWonMatches(player, tournamentOlympic),
-                                TournamentUtils.calculateNewLostMatches(player, tournamentOlympic),
-                                TournamentUtils.calculateNewGoalsScored(player, tournamentOlympic),
-                                TournamentUtils.calculateNewGoalsLost(player, tournamentOlympic))
+                                TournamentUtils.calculateNewWonMatches(player, tournamentRoundRobin),
+                                TournamentUtils.calculateNewLostMatches(player, tournamentRoundRobin),
+                                TournamentUtils.calculateNewGoalsScored(player, tournamentRoundRobin),
+                                TournamentUtils.calculateNewGoalsLost(player, tournamentRoundRobin))
                 )
                 .setHeader("Rating")
                 .setSortable(true);
@@ -61,19 +62,19 @@ public class RobinRoundDetailsDialog extends Dialog
         playerRatingGrid.addColumn(Player::getName).setHeader("Name");
         playerRatingGrid.addColumn(Player::getSurname).setHeader("Surname");
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsScored(player, tournamentOlympic))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsScored(player, tournamentRoundRobin))
                 .setHeader("Goals Scored")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsLost(player, tournamentOlympic))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewGoalsLost(player, tournamentRoundRobin))
                 .setHeader("Goals Lost")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewWonMatches(player, tournamentOlympic))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewWonMatches(player, tournamentRoundRobin))
                 .setHeader("Won Matches")
                 .setSortable(true);
 
-        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewLostMatches(player, tournamentOlympic))
+        playerRatingGrid.addColumn(player -> TournamentUtils.calculateNewLostMatches(player, tournamentRoundRobin))
                 .setHeader("Lost Matches")
                 .setSortable(true);
     }
@@ -81,7 +82,7 @@ public class RobinRoundDetailsDialog extends Dialog
 
     private void loadPlayersIntoGrid()
     {
-        List<Player> players = new ArrayList<>(tournamentOlympic.getPlayers());
+        List<Player> players = new ArrayList<>(tournamentRoundRobin.getPlayers());
         playerRatingGrid.setItems(players);
     }
 

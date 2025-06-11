@@ -15,21 +15,23 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
+import org.cedacri.pingpong.service.composed_services.PlayerMatchService;
+import org.cedacri.pingpong.service.tournament_round_robin.TournamentRoundRobinService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.components.MatchComponent;
-import org.cedacri.pingpong.views.tournaments.components.RobinRoundDetailsDialog;
+import org.cedacri.pingpong.views.tournaments.components.TournamentRoundRobinDetails;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,53 +43,55 @@ import java.util.Set;
 @Route(value = "tournament/matches", layout = MainLayout.class)
 @PermitAll
 @AnonymousAllowed
-public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Integer>
+public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Long>
 {
 
     private final TournamentService tournamentService;
+    private final PlayerMatchService playerMatchService;
     private final MatchService matchService;
     private final PlayerService playerService;
 
-    private TournamentOlympic tournamentOlympic;
+    private BaseTournament baseTournament;
 
     private VerticalLayout matchContainer;
     private ComboBox<String> playerOptionsComboBox;
 
 
-    public TournamentBracketView(TournamentService tournamentService, MatchService matchService, PlayerService playerService)
+    public TournamentBracketView(TournamentService tournamentService, PlayerMatchService playerMatchService, MatchService matchService, PlayerService playerService)
     {
         this.tournamentService = tournamentService;
+        this.playerMatchService = playerMatchService;
         this.matchService = matchService;
         log.info("TournamentBracketView initialized.");
         this.playerService = playerService;
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, Integer tournamentId)
+    public void setParameter(BeforeEvent beforeEvent, Long tournamentId)
     {
         log.info("Received request to load tournament with ID {}", tournamentId);
-        tournamentOlympic = tournamentService.findTournamentById(tournamentId);
+        baseTournament = tournamentService.findTournamentById(tournamentId);
 
-        if (tournamentOlympic == null)
+        if (baseTournament == null)
         {
             log.warn("Tournament with ID {} not found", tournamentId);
             add(new H2("Tournament not found"));
             return;
         }
 
-        log.info("Tournament found : {}", tournamentOlympic);
+        log.info("Tournament found : {}", baseTournament);
         initView();
 
     }
 
     private void initView()
     {
-        log.info("Initializing view for tournament {}", tournamentOlympic.getTournamentName());
+        log.info("Initializing view for tournament {}", baseTournament.getTournamentName());
 
         add(
                 ViewUtils.createHorizontalLayout(
                         JustifyContentMode.BETWEEN,
-                        new H1(this.tournamentOlympic.getTournamentName()
+                        new H1(this.baseTournament.getTournamentName()
                         )
                 )
         );
@@ -103,11 +107,11 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private void initialLoadMatchesBasedOnTournamentType()
     {
-        if (tournamentOlympic.getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
+        if (baseTournament.getTournamentType().equals(TournamentTypeEnum.OLYMPIC))
         {
             refreshMatchesInRound(1);
         }
-        else if (tournamentOlympic.getTournamentType().equals(TournamentTypeEnum.ROBIN_ROUND))
+        else if (baseTournament.getTournamentType().equals(TournamentTypeEnum.ROBIN_ROUND))
         {
             refreshMatchesInRound("All");
         }
@@ -119,7 +123,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         HorizontalLayout buttonsLayout;
 
-        TournamentTypeEnum type = tournamentOlympic.getTournamentType();
+        TournamentTypeEnum type = baseTournament.getTournamentType();
 
         if (type == TournamentTypeEnum.OLYMPIC)
         {
@@ -134,22 +138,22 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
             buttonsLayout = createUnknownTournamentType();
         }
 
-        if (tournamentOlympic.getTournamentStatus() == TournamentStatusEnum.ONGOING)
+        if (baseTournament.getTournamentStatus() == TournamentStatusEnum.ONGOING)
         {
             buttonsLayout.add(
                     ViewUtils.createButton("End Tournament", ViewUtils.BUTTON, () ->
                     {
                         refreshTournament();
 
-                        if (TournamentUtils.isTournamentReadyToFinish(tournamentOlympic))
+                        if (TournamentUtils.isTournamentReadyToFinish(baseTournament))
                         {
                             showEndTournamentDialog();
                         }
                         else
                         {
                             NotificationManager.showErrorNotification(
-                                    Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATED + " Please assure that " +
-                                            TournamentUtils.getErrorMessageForTournamentType(tournamentOlympic)
+                                    Constants.TOURNAMENT_WINNER_CANT_BE_DETERMINATE + " Please assure that " +
+                                            TournamentUtils.getErrorMessageForTournamentType(baseTournament)
                             );
                         }
                     })
@@ -162,13 +166,13 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private void showEndTournamentDialog()
     {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Confirm end tournament: " + tournamentOlympic.getTournamentName());
+        dialog.setHeaderTitle("Confirm end tournament: " + baseTournament.getTournamentName());
         dialog.add(new Text("Are you sure you want to end the tournament?"));
 
 
         Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () ->
         {
-            TournamentUtils.checkAndUpdateTournamentWinner(tournamentOlympic, tournamentService, playerService);
+            TournamentUtils.checkAndUpdateTournamentWinner(baseTournament, tournamentService, playerService);
             dialog.close();
         });
 
@@ -187,7 +191,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
     private HorizontalLayout createRobinRoundPlayerSelection()
     {
-        Set<Player> playerList = tournamentOlympic.getPlayers();
+        Set<Player> playerList = baseTournament.getPlayers();
         List<String> playerOptions = new ArrayList<>(List.of("All"));
         playerList.forEach(p -> playerOptions.add(p.getName() + " " + p.getSurname()));
 
@@ -197,8 +201,8 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         Button openRating = ViewUtils.createButton("View Rating", ViewUtils.BUTTON, () ->
         {
-            RobinRoundDetailsDialog robinRoundDetailsDialog = new RobinRoundDetailsDialog(tournamentOlympic.getId(), tournamentService);
-            robinRoundDetailsDialog.open();
+            TournamentRoundRobinDetails tournamentRoundRobinDetails = new TournamentRoundRobinDetails(baseTournament.getId(), (TournamentRoundRobinService) tournamentService);
+            tournamentRoundRobinDetails.open();
         });
 
         return ViewUtils.createHorizontalLayout(JustifyContentMode.BETWEEN, playerOptionsComboBox, openRating);
@@ -210,7 +214,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         roundButtons.setJustifyContentMode(JustifyContentMode.START);
         List<Button> buttons = new ArrayList<>();
 
-        int roundsCount = TournamentUtils.calculateNumberOfRounds(tournamentOlympic.getMaxPlayers());
+        int roundsCount = TournamentUtils.calculateNumberOfRounds(baseTournament.getMaxPlayers());
         Map<Integer, String> specialRounds = Map.of(
                 roundsCount - 1, "Semifinals",
                 roundsCount, "Finals"
@@ -244,20 +248,23 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         if (round instanceof Integer roundInt)
         {
-            displayMatches(matchService.getMatchesByTournamentAndRound(tournamentOlympic, roundInt));
+            displayMatches( baseTournament.getMatches().stream()
+                    .filter(match -> match.getRound() == roundInt)
+                    .toList()
+            );
         }
         else if (round instanceof String roundStr)
         {
             if ("All".equals(roundStr) || roundStr.isEmpty() || roundStr.isBlank())
             {
-                displayMatches(matchService.getMatchesByTournament(tournamentOlympic));
+                displayMatches(baseTournament.getMatches());
             }
             else
             {
                 String[] playerNameSurname = roundStr.split(" ");
                 if (playerNameSurname.length == 2)
                 {
-                    displayMatches(matchService.getMatchesByPlayerNameSurname(tournamentOlympic, playerNameSurname[0], playerNameSurname[1]));
+                    displayMatches(playerMatchService.getMatchesByPlayerNameSurname(baseTournament.getMatches(), playerNameSurname[0], playerNameSurname[1]));
                 }
                 else
                 {
@@ -281,13 +288,13 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         {
             log.debug("Processed match {}", match);
 
-            MatchComponent matchLayout = new MatchComponent(match, matchService, tournamentOlympic,
+            MatchComponent matchLayout = new MatchComponent(match, matchService, baseTournament,
                     () ->
                     {
-                        if (tournamentOlympic.getTournamentType() == TournamentTypeEnum.OLYMPIC)
+                        if (baseTournament.getTournamentType() == TournamentTypeEnum.OLYMPIC)
                             refreshMatchesInRound(match.getRound());
 
-                        if (tournamentOlympic.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND)
+                        if (baseTournament.getTournamentType() == TournamentTypeEnum.ROBIN_ROUND)
                             refreshMatchesInRound(playerOptionsComboBox.getValue());
                     });
 
@@ -298,7 +305,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private void refreshTournament()
     {
         log.info("Refreshing tournament data...");
-        this.tournamentOlympic = tournamentService.findTournamentById(tournamentOlympic.getId());
+        this.baseTournament = tournamentService.findTournamentById(baseTournament.getId());
     }
 
 

@@ -28,7 +28,7 @@ public class TournamentDeleteDialog extends Dialog
                 {
                     log.debug("Delete button clicked. Attempting to delete tournament: {} with Id: {}", tournamentOlympicDelete.getTournamentName(), tournamentOlympicDelete.getId());
 
-                    int id = tournamentOlympicDelete.getId();
+                    long id = tournamentOlympicDelete.getId();
                     try
                     {
                         tournamentService.deleteTournamentById(id);

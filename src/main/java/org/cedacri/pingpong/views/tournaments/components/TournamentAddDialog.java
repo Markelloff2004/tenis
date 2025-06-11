@@ -6,15 +6,15 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.TournamentOlympic;
+import org.cedacri.pingpong.entity.TournamentRoundRobin;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
+import org.cedacri.pingpong.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.exception.tournament.NotEnoughPlayersException;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.service.TournamentService;
-import org.cedacri.pingpong.utils.Constants;
-import org.cedacri.pingpong.utils.ExceptionUtils;
-import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.ViewUtils;
+import org.cedacri.pingpong.utils.*;
 
 import java.util.HashSet;
 
@@ -57,65 +57,69 @@ public class TournamentAddDialog extends AbstractTournamentDialog
     }
 
     @Override
-    protected void onSave()
-    {
+    protected void onSave() {
+    boolean startNow = false;
 
-        TournamentOlympic tournamentOlympic = new TournamentOlympic();
-        boolean startNow;
-        try
-        {
-            startNow = startNowCheckbox.getValue();
+    log.info("Saving tournament with name: {}", tournamentNameField.getValue());
 
-            tournamentOlympic.setTournamentName(tournamentNameField.getValue());
-            tournamentOlympic.setTournamentType(typeComboBox.getValue());
-            tournamentOlympic.setTournamentStatus(TournamentStatusEnum.PENDING);
-            tournamentOlympic.setSetsToWin(setsCountComboBox.getValue());
-            tournamentOlympic.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
-            tournamentOlympic.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
-            tournamentOlympic.setPlayers(selectedPlayersSet);
-            tournamentOlympic.setMaxPlayers(TournamentUtils.calculateMaxPlayers(tournamentOlympic));
+    BaseTournament baseTournament = null;
 
-        }
-        catch (Exception e)
-        {
-            log.error("Error fetching data from Vaadin Components for saving tournament: {}", e.getMessage(), e);
-            NotificationManager.showErrorNotification(Constants.TOURNAMENT_SAVE_ERROR + ExceptionUtils.getExceptionMessage(e));
-
-            return;
-        }
-
-        try
-        {
-            tournamentOlympic = tournamentService.saveTournament(tournamentOlympic);
-
-            log.info("Tournament saved successfully: {}", tournamentOlympic.getId());
-            NotificationManager.showInfoNotification(Constants.TOURNAMENT_SAVE_SUCCESS_MESSAGE);
-        }
-        catch (IllegalArgumentException illegalArgumentException)
-        {
-            NotificationManager.showErrorNotification(Constants.TOURNAMENT_SAVE_ERROR + illegalArgumentException.getMessage());
-
-            return;
-        }
-
-        if (startNow)
-        {
-            try
-            {
-                tournamentService.startTournament(tournamentOlympic);
-
-                UI.getCurrent().navigate("tournament/matches/" + tournamentOlympic.getId());
-
-                NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
-            }
-            catch (NotEnoughPlayersException notEnoughPlayersException)
-            {
-                NotificationManager.showErrorNotification(Constants.TOURNAMENT_START_ERROR + " " + notEnoughPlayersException.getMessage());
-            }
-        }
-
-        onSaveCallback.run();
-        close();
-
+    if( typeComboBox.equals(TournamentTypeEnum.OLYMPIC) ) {
+        log.info("Tournament type is OLYMPIC, creating TournamentOlympic instance");
+        baseTournament = new TournamentOlympic();
+    } else if (typeComboBox.equals(TournamentTypeEnum.ROBIN_ROUND)) {
+        log.info("Tournament type is not OLYMPIC, creating BaseTournament instance");
+        baseTournament = new TournamentRoundRobin();
+    } else {
+        NotificationManager.showErrorNotification("Error durring create a object of class BaseTournament");
     }
+
+    try {
+        if (tournamentNameField.getValue() == null || tournamentNameField.getValue().trim().isEmpty()) {
+            NotificationManager.showErrorNotification("Tournament name is required");
+            return;
+        }
+        
+        if (selectedPlayersSet == null || selectedPlayersSet.isEmpty()) {
+            NotificationManager.showErrorNotification("At least one player must be selected");
+            return;
+        }
+        
+        startNow = Boolean.TRUE.equals(startNowCheckbox.getValue());
+        
+        // Set tournament properties with null checks
+        baseTournament.setTournamentName(tournamentNameField.getValue().trim());
+        baseTournament.setTournamentType(typeComboBox.getValue());
+        baseTournament.setTournamentStatus(TournamentStatusEnum.PENDING);
+        baseTournament.setSetsToWin(setsCountComboBox.getValue());
+//        baseTournament.setSemifinalsSetsToWin(semifinalsSetsCountComboBox.getValue());
+//        baseTournament.setFinalsSetsToWin(finalsSetsCountComboBox.getValue());
+        baseTournament.setPlayers(selectedPlayersSet);
+        baseTournament.setMaxPlayers(TournamentUtils.calculateMaxPlayers(baseTournament));
+    } catch (Exception e) {
+        log.error("Error preparing tournament data: {}", e.getMessage(), e);
+        NotificationManager.showErrorNotification(Constants.TOURNAMENT_SAVE_ERROR + ExceptionUtils.getExceptionMessage(e));
+        return;
+    }
+    
+    // Save tournament
+    try {
+        baseTournament = tournamentService.saveTournament(baseTournament);
+        log.info("Tournament saved successfully: {}", baseTournament.getId());
+        NotificationManager.showInfoNotification(Constants.TOURNAMENT_SAVE_SUCCESS_MESSAGE);
+    } catch (IllegalArgumentException e) {
+        NotificationManager.showErrorNotification(Constants.TOURNAMENT_SAVE_ERROR + e.getMessage());
+        return;
+    }
+    
+    if (startNow) {
+        tournamentService.startTournament(baseTournament);
+        UI.getCurrent().navigate("tournament/matches/" + baseTournament.getId());
+        NotificationManager.showInfoNotification(Constants.TOURNAMENT_START_SUCCESS_MESSAGE);
+    }
+    
+    // Only execute callback and close if we reach this point (success)
+    onSaveCallback.run();
+    close();
+}
 }

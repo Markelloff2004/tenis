@@ -20,18 +20,18 @@ import java.util.HashSet;
 public class TournamentInfoDialog extends AbstractTournamentDialog
 {
 
-    private final TournamentOlympic tournamentOlympic;
+    private final BaseTournament baseTournament;
 
     private final ComboBox<String> statusComboBox;
 
-    public TournamentInfoDialog(PlayerService playerService, BaseTournament tournamentOlympic)
+    public TournamentInfoDialog(PlayerService playerService, BaseTournament baseTournament)
     {
         super("Tournament Details:");
 
-        this.tournamentOlympic = tournamentOlympic;
+        this.baseTournament = baseTournament;
 
 
-        this.selectedPlayersSet = tournamentOlympic.getPlayers();
+        this.selectedPlayersSet = baseTournament.getPlayers();
         this.availablePlayersSet = new HashSet<>();
         initializePlayerSets(playerService);
         initializeFields();
@@ -46,7 +46,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
 
         log.debug("Initializing fields for editing...");
 
-        prefillFields(tournamentOlympic);
+        prefillFields(baseTournament);
         setReadOnlyForFields();
     }
 
@@ -73,7 +73,7 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
     protected HorizontalLayout createDialogButtons()
     {
 
-        if (!tournamentOlympic.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
+        if (!baseTournament.getTournamentStatus().equals(TournamentStatusEnum.PENDING))
         {
             Button saveButton = ViewUtils.createSecuredButton(
                     "Matches",
@@ -111,28 +111,28 @@ public class TournamentInfoDialog extends AbstractTournamentDialog
     {
         ComboBox<String> comboBox = new ComboBox<>("Status");
         comboBox.setItems(String.valueOf(TournamentStatusEnum.PENDING));
-        comboBox.setValue(String.valueOf(tournamentOlympic.getTournamentStatus()));
+        comboBox.setValue(String.valueOf(baseTournament.getTournamentStatus()));
         comboBox.setWidth("20%");
         comboBox.setRequired(true);
         comboBox.setReadOnly(true);
         return comboBox;
     }
 
-    private void prefillFields(TournamentOlympic tournamentOlympic)
+    private void prefillFields(BaseTournament baseTournament)
     {
         log.debug("Pre-fill fields with existing tournament data");
-        tournamentNameField.setValue(tournamentOlympic.getTournamentName());
-        typeComboBox.setValue(tournamentOlympic.getTournamentType());
-        setsCountComboBox.setValue(tournamentOlympic.getSetsToWin());
-        semifinalsSetsCountComboBox.setValue(tournamentOlympic.getSemifinalsSetsToWin());
-        finalsSetsCountComboBox.setValue(tournamentOlympic.getFinalsSetsToWin());
+        tournamentNameField.setValue(baseTournament.getTournamentName());
+        typeComboBox.setValue(baseTournament.getTournamentType());
+        setsCountComboBox.setValue(baseTournament.getSetsToWin());
+//        semifinalsSetsCountComboBox.setValue(baseTournament.getSemifinalsSetsToWin());
+//        finalsSetsCountComboBox.setValue(baseTournament.getFinalsSetsToWin());
     }
 
     @Override
     protected void onSave()
     {
-        getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + tournamentOlympic.getId()));
-        log.info("Navigating to tournament details page, id: {}", tournamentOlympic.getId());
+        getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + baseTournament.getId()));
+        log.info("Navigating to tournament details page, id: {}", baseTournament.getId());
         close();
     }
 }

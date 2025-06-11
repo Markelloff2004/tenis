@@ -9,6 +9,7 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.entity.BaseTournament;
 import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.service.TournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -50,14 +51,14 @@ public class HomeView extends VerticalLayout
 
     private void displayTournaments()
     {
-        List<TournamentOlympic> tournamentOlympics = tournamentService.findAllTournaments()
-                .sorted(
+        List<BaseTournament> tournamentOlympics = tournamentService.findAllTournaments()
+                .stream().sorted(
                         Comparator.comparing(
-                                        TournamentOlympic::getStartedAt,
+                                        BaseTournament::getStartedAt,
                                         Comparator.nullsFirst(Comparator.naturalOrder())
                                 )
                                 .thenComparing(
-                                        TournamentOlympic::getCreatedAt,
+                                        BaseTournament::getCreatedAt,
                                         Comparator.nullsFirst(Comparator.naturalOrder())
                                 )
                                 .reversed()

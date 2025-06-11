@@ -9,14 +9,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.Match;
-import org.cedacri.pingpong.entity.Player;
-import org.cedacri.pingpong.entity.Score;
-import org.cedacri.pingpong.entity.TournamentOlympic;
+import org.cedacri.pingpong.entity.*;
 import org.cedacri.pingpong.enums.RoleEnum;
 import org.cedacri.pingpong.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.utils.NotificationManager;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -28,12 +26,12 @@ import java.util.Optional;
 public class MatchComponent extends HorizontalLayout {
 
     private final MatchService matchService;
-    private final TournamentOlympic tournamentOlympic;
+    private final BaseTournament baseTournament;
     private final List<List<TextField>> scoreFields = new ArrayList<>();
 
-    public MatchComponent(Match match, MatchService matchService, TournamentOlympic tournamentOlympic, Runnable refreshMatches) {
+    public MatchComponent(Match match, MatchService matchService, BaseTournament baseTournament, Runnable refreshMatches) {
         this.matchService = matchService;
-        this.tournamentOlympic = tournamentOlympic;
+        this.baseTournament = baseTournament;
         log.info("Initializing MatchComponent for match with id {}", match.getId());
 
         configureLayout();
@@ -90,7 +88,7 @@ public class MatchComponent extends HorizontalLayout {
 
         List<Score> matchScore = match.getScore();
 
-        int setsCount = TournamentUtils.getNumsOfSetsPerMatch((TournamentOlympic) match.getTournament(), match.getRound());
+        int setsCount = TournamentUtils.getNumsOfSetsPerMatch(match);
 
         for (int i = 0; i < setsCount; i++) {
             TextField topScoreField = createScoreField(matchScore, i, true);
@@ -243,7 +241,7 @@ public class MatchComponent extends HorizontalLayout {
     }
 
     private Span getPreviousMatchWinner(Match match, boolean isTop) {
-        List<Match> previousMatches = tournamentOlympic.getMatches().stream()
+        List<Match> previousMatches = baseTournament.getMatches().stream()
                 .filter(m -> Objects.nonNull(m.getNextMatch()) && Objects.equals(m.getNextMatch().getId(), match.getId()))
                 .toList();
 

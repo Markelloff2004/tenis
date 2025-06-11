@@ -53,6 +53,9 @@ public class Match
     @Column(name = "score")
     private List<Score> score;
 
+    @Column(name = "setsToPlay", nullable = false)
+    private Integer setsToPlay;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_id", nullable = false)
     @NotNull(message = "TournamentId cannot be null")

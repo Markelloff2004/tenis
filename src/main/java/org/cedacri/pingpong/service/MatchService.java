@@ -7,6 +7,7 @@ import org.cedacri.pingpong.entity.Match;
 import org.cedacri.pingpong.entity.Score;
 import org.cedacri.pingpong.repository.MatchRepository;
 import org.cedacri.pingpong.utils.Constants;
+import org.cedacri.pingpong.utils.TournamentUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

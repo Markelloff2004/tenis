@@ -7,6 +7,7 @@ import org.cedacri.pingpong.entity.TournamentOlympic;
 import org.cedacri.pingpong.service.MatchService;
 import org.cedacri.pingpong.service.PlayerService;
 import org.cedacri.pingpong.utils.Constants;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
+@Component
 public class PlayerMatchService {
 
     private final PlayerService playerService;
