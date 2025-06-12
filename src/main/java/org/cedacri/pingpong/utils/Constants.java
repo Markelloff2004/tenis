@@ -5,33 +5,21 @@ import com.vaadin.flow.component.notification.Notification;
 import java.util.List;
 import java.util.Map;
 
-public class Constants
-{
-
-    private Constants()
-    {
-        throw new UnsupportedOperationException("Utility class should not be instantiated");
-    }
+public class Constants {
 
     public static final List<String> PLAYING_HAND = List.of("LEFT", "RIGHT");
-
     public static final String TOURNAMENT_UPDATE_SUCCESS_MESSAGE = "Tournament updated successfully";
     public static final String TOURNAMENT_UPDATE_ERROR = "Error updating tournament: ";
-
     public static final String TOURNAMENT_SAVE_SUCCESS_MESSAGE = "Tournament saved successfully";
     public static final String TOURNAMENT_SAVE_ERROR = "Error saving tournament: ";
-
     public static final String TOURNAMENT_START_SUCCESS_MESSAGE = "Tournament started successfully";
     public static final String TOURNAMENT_START_ERROR = "Error starting tournament: ";
-
     public static final String PLAYER_UPDATE_SUCCESS = "Player updated successfully";
     public static final String PLAYER_UPDATE_ERROR = "Error updating player: ";
     public static final String PLAYER_SAVE_SUCCESS = "Player saved successfully";
     public static final String PLAYER_SAVE_ERROR = "Error saving player: ";
-
     public static final String MATCH_UPDATE_SUCCESS = "Match updated successfully";
     public static final String MATCH_UPDATE_ERROR = "Error updating match: ";
-
     //Notification params
     //INFO
     public static final int INFO_NOTIFICATION_DURATION = 5000;
@@ -39,20 +27,16 @@ public class Constants
     //ERROR
     public static final int ERROR_NOTIFICATION_DURATION = 8000;
     public static final Notification.Position ERROR_NOTIFICATION_POSITION = Notification.Position.TOP_CENTER;
-
     public static final int PAGE_SIZE = 10;
     public static final int MINIMAL_POINTS_IN_SET = 11;
     public static final int MINIMAL_DIFFERENCE_OF_POINTS_IN_SET = 2;
-
     //Exceptions
     public static final String NOT_ENOUGH_PLAYERS_MESSAGE = "Not enough players!";
-
     public static final String TOURNAMENT_CANNOT_BE_NULL = "Tournament cannot be null";
     public static final int MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC = 8;
     public static final int MINIMAL_AMOUNT_OF_PLAYER_FOR_ROBIN_ROUND = 4;
     public static final String TOURNAMENT_WINNER_HAS_BEEN_DETERMINATE = "Tournament winner has been determinate: ";
     public static final String TOURNAMENT_WINNER_CANT_BE_DETERMINATE = "Tournament winner cant be determinate: Please assure that all matches are completed.";
-
     // OLYMPIC_POSITIONS maps the number of players to their predefined seeding positions
     // for the first round in an Olympic-style tournament bracket.
     public static final Map<Integer, int[]> OLYMPIC_POSITIONS = Map.of(
@@ -67,5 +51,9 @@ public class Constants
                     23, 42, 15, 50, 18, 47, 31, 34, 63, 2
             }
     );
+
+    private Constants() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
+    }
 
 }

@@ -5,18 +5,16 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import lombok.extern.slf4j.Slf4j;
-import org.cedacri.pingpong.entity.BaseTournament;
-import org.cedacri.pingpong.entity.Player;
+import org.cedacri.pingpong.model.player.Player;
+import org.cedacri.pingpong.model.tournament.BaseTournament;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.time.LocalDate;
 
 @Slf4j
-public class TournamentSummaryComponent extends HorizontalLayout
-{
+public class TournamentSummaryComponent extends HorizontalLayout {
 
-    public TournamentSummaryComponent(BaseTournament baseTournament)
-    {
+    public TournamentSummaryComponent(BaseTournament baseTournament) {
         setWidthFull();
         setSpacing(true);
         setPadding(true);
@@ -36,8 +34,7 @@ public class TournamentSummaryComponent extends HorizontalLayout
         );
     }
 
-    private VerticalLayout createTournamentDetails(BaseTournament baseTournament)
-    {
+    private VerticalLayout createTournamentDetails(BaseTournament baseTournament) {
         VerticalLayout details = new VerticalLayout();
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -49,20 +46,16 @@ public class TournamentSummaryComponent extends HorizontalLayout
         return details;
     }
 
-    private VerticalLayout createDateCreatedDetails(BaseTournament baseTournament)
-    {
+    private VerticalLayout createDateCreatedDetails(BaseTournament baseTournament) {
         VerticalLayout details = new VerticalLayout();
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
 
         String startedAtInfo;
         LocalDate startedAt = baseTournament.getStartedAt();
-        if (startedAt == null)
-        {
+        if (startedAt == null) {
             startedAtInfo = "Pending";
-        }
-        else
-        {
+        } else {
             startedAtInfo = startedAt.toString();
         }
 
@@ -72,8 +65,7 @@ public class TournamentSummaryComponent extends HorizontalLayout
         return details;
     }
 
-    private VerticalLayout createWinnerDetails(BaseTournament baseTournament)
-    {
+    private VerticalLayout createWinnerDetails(BaseTournament baseTournament) {
         VerticalLayout details = new VerticalLayout();
         details.setAlignItems(Alignment.START);
         details.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -88,8 +80,7 @@ public class TournamentSummaryComponent extends HorizontalLayout
         return details;
     }
 
-    private Button createInfoButton(BaseTournament baseTournament)
-    {
+    private Button createInfoButton(BaseTournament baseTournament) {
         Button infoButton = new Button("Show Details", event ->
         {
             getUI().ifPresent(ui -> ui.navigate("tournament/matches/" + baseTournament.getId()));

@@ -1,7 +1,5 @@
 package org.cedacri.pingpong.exception.tournament;
 
-import org.cedacri.pingpong.utils.Constants;
-
 public class UnexpectedTournamentException extends Exception {
     public UnexpectedTournamentException(String message) {
         super(message);

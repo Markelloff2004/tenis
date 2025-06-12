@@ -13,25 +13,22 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.config.security.utils.SecurityUtils;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.model.enums.RoleEnum;
 
 import java.util.List;
 
 @Slf4j
-public class ViewUtils
-{
+public class ViewUtils {
 
     public static final String BUTTON = "button";
     public static final String COLORED_BUTTON = "colored-button";
     public static final String COMPACT_BUTTON = "compact-button";
 
-    private ViewUtils()
-    {
+    private ViewUtils() {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 
-    public static Button createButton(String text, String className, Runnable clickListener)
-    {
+    public static Button createButton(String text, String className, Runnable clickListener) {
 
         log.debug("Creating button with text: '{}' and className: '{}'", text, className);
 
@@ -49,8 +46,7 @@ public class ViewUtils
     public static Button createSecuredButton(String text,
                                              String className,
                                              Runnable clickListener,
-                                             RoleEnum... allowedRoles)
-    {
+                                             RoleEnum... allowedRoles) {
         log.debug("Creating secured button with text: '{}' and className: '{}'", text, className);
 
         Button button = new Button(text);
@@ -65,29 +61,22 @@ public class ViewUtils
         return button;
     }
 
-    public static <T extends Component> void highlightSelectedComponentFromComponentsList(List<T> components, int selectedIndex, String selectedClass)
-    {
-        if (selectedIndex < 0 || selectedIndex >= components.size())
-        {
+    public static <T extends Component> void highlightSelectedComponentFromComponentsList(List<T> components, int selectedIndex, String selectedClass) {
+        if (selectedIndex < 0 || selectedIndex >= components.size()) {
             return;
         }
 
-        for (int i = 0; i < components.size(); i++)
-        {
-            if (i == selectedIndex)
-            {
+        for (int i = 0; i < components.size(); i++) {
+            if (i == selectedIndex) {
                 components.get(i).addClassName(selectedClass);
-            }
-            else
-            {
+            } else {
                 components.get(i).removeClassName(selectedClass);
             }
         }
     }
 
 
-    public static TextField createTextField(String label)
-    {
+    public static TextField createTextField(String label) {
         log.debug("Creating TextField with label: '{}'", label);
 
         TextField textField = new TextField(label);
@@ -96,8 +85,7 @@ public class ViewUtils
         return textField;
     }
 
-    public static ComboBox<String> createComboBox(String label, List<String> items)
-    {
+    public static ComboBox<String> createComboBox(String label, List<String> items) {
         log.debug("Creating ComboBox with label: '{}' and items: '{}'", label, items);
 
         ComboBox<String> comboBox = new ComboBox<>(label);
@@ -107,8 +95,7 @@ public class ViewUtils
         return comboBox;
     }
 
-    public static Checkbox createCheckBox(String label)
-    {
+    public static Checkbox createCheckBox(String label) {
         log.debug("Creating Checkbox with label: '{}' ", label);
 
         Checkbox checkbox = new Checkbox(label);
@@ -117,8 +104,7 @@ public class ViewUtils
         return checkbox;
     }
 
-    public static DatePicker createDatePicker(String label)
-    {
+    public static DatePicker createDatePicker(String label) {
         log.debug("Creating DatePicker with label: '{}'", label);
 
         DatePicker datePicker = new DatePicker(label);
@@ -127,8 +113,7 @@ public class ViewUtils
         return datePicker;
     }
 
-    public static IntegerField createIntegerField(String label)
-    {
+    public static IntegerField createIntegerField(String label) {
         log.debug("Creating IntegerField with label: '{}'", label);
 
         IntegerField integerField = new IntegerField(label);
@@ -137,8 +122,7 @@ public class ViewUtils
         return integerField;
     }
 
-    public static HorizontalLayout createHorizontalLayout(FlexComponent.JustifyContentMode justifyContentMode, com.vaadin.flow.component.Component... components)
-    {
+    public static HorizontalLayout createHorizontalLayout(FlexComponent.JustifyContentMode justifyContentMode, com.vaadin.flow.component.Component... components) {
         log.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
         HorizontalLayout layout = new HorizontalLayout(components);
         layout.setSpacing(true);
@@ -149,8 +133,7 @@ public class ViewUtils
         return layout;
     }
 
-    public static VerticalLayout createVerticalLayout(FlexComponent.JustifyContentMode justifyContentMode, com.vaadin.flow.component.Component... components)
-    {
+    public static VerticalLayout createVerticalLayout(FlexComponent.JustifyContentMode justifyContentMode, com.vaadin.flow.component.Component... components) {
         log.debug("Creating HorizontalLayout with justifyContentMode: '{}' and components: {}", justifyContentMode, components);
         VerticalLayout layout = new VerticalLayout(components);
         layout.setSpacing(true);
@@ -161,8 +144,7 @@ public class ViewUtils
         return layout;
     }
 
-    public static TextField createScoreField(Integer value)
-    {
+    public static TextField createScoreField(Integer value) {
         TextField score = new TextField();
 
         score.setMaxLength(2);
@@ -178,8 +160,7 @@ public class ViewUtils
     }
 
 
-    public static Span createPlayerLabel(String content)
-    {
+    public static Span createPlayerLabel(String content) {
         Span span = new Span(content);
 
         span.getStyle().setFontSize("18px");

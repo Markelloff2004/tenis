@@ -1,8 +1,8 @@
 package org.cedacri.pingpong.repository;
 
 import jakarta.validation.constraints.NotNull;
-import org.cedacri.pingpong.entity.BaseTournament;
-import org.cedacri.pingpong.enums.TournamentTypeEnum;
+import org.cedacri.pingpong.model.tournament.BaseTournament;
+import org.cedacri.pingpong.model.enums.TournamentTypeEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -25,7 +25,6 @@ public interface BaseTournamentRepository extends JpaRepository<BaseTournament, 
             @NotNull(message = "Tournament status cannot be null")
             TournamentTypeEnum tournamentStatus
     );
-
 
 
 }

@@ -14,11 +14,9 @@ import org.cedacri.pingpong.config.security.service.UserDetailsServiceImpl;
 @PageTitle("Login | Ping Pong")
 @AnonymousAllowed
 @PreserveOnRefresh
-public class LoginView extends VerticalLayout
-{
+public class LoginView extends VerticalLayout {
 
-    public LoginView(UserDetailsServiceImpl userDetailsService)
-    {
+    public LoginView(UserDetailsServiceImpl userDetailsService) {
 
         setSizeFull();
         setAlignItems(Alignment.CENTER);
@@ -39,8 +37,7 @@ public class LoginView extends VerticalLayout
             String username = event.getUsername();
             String password = event.getPassword();
 
-            if (!userDetailsService.existUserByUsernameAndPassword(username, password))
-            {
+            if (!userDetailsService.existUserByUsernameAndPassword(username, password)) {
                 loginForm.setError(true);
             }
         });
@@ -52,8 +49,7 @@ public class LoginView extends VerticalLayout
         add(container);
     }
 
-    private LoginI18n createLoginI18n()
-    {
+    private LoginI18n createLoginI18n() {
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.getForm().setTitle("Login");
         i18n.getForm().setUsername("Username");

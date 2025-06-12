@@ -1,23 +1,15 @@
 package org.cedacri.pingpong.config.security.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.cedacri.pingpong.enums.RoleEnum;
+import org.cedacri.pingpong.config.security.model.enums.RoleEnum;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "roles")
-public class Role
-{
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

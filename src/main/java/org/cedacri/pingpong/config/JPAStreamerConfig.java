@@ -9,21 +9,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class JPAStreamerConfig
-{
+public class JPAStreamerConfig {
 
 
     Logger log = LoggerFactory.getLogger(JPAStreamerConfig.class);
 
     @Bean
-    public JPAStreamer jpaStreamer(EntityManagerFactory entityManagerFactory)
-    {
+    public JPAStreamer jpaStreamer(EntityManagerFactory entityManagerFactory) {
         return JPAStreamer.of(entityManagerFactory);
     }
 
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         log.info("JPA Streamer configuration initialized");
     }
 }
