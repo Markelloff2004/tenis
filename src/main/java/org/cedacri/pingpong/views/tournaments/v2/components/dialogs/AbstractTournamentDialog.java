@@ -2,6 +2,7 @@ package org.cedacri.pingpong.views.tournaments.v2.components.dialogs;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -48,6 +49,7 @@ public abstract class AbstractTournamentDialog extends Dialog {
     protected ComboBox<SetsTypesEnum> setsCountComboBox;
     protected Grid<Player> selectedPlayersGrid;
     protected Grid<Player> availablePlayersGrid;
+    protected Checkbox startNowCheckbox;
 
     protected BaseTournament tournament;
 
@@ -145,9 +147,10 @@ public abstract class AbstractTournamentDialog extends Dialog {
     }
 
     protected HorizontalLayout createDialogButtons() {
+        startNowCheckbox = ViewUtils.createCheckBox("Start Now");
         Button saveButton = ViewUtils.createButton("Save", ViewUtils.COLORED_BUTTON, this::onSave);
         Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, this::closeDialog);
-        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, saveButton, cancelButton);
+        return ViewUtils.createHorizontalLayout(FlexComponent.JustifyContentMode.CENTER, startNowCheckbox, saveButton, cancelButton);
     }
 
     protected void refreshGrids() {

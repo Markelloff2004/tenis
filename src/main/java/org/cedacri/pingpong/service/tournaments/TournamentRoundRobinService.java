@@ -19,7 +19,7 @@ import java.util.*;
 
 @Slf4j
 @Service("tournamentRoundRobinService")
-public class TournamentRoundRobinService extends BaseTournamentService<TournamentRoundRobin> implements ITournamentOperations<TournamentRoundRobin> {
+public class TournamentRoundRobinService extends BaseTournamentService implements ITournamentOperations {
 
     public TournamentRoundRobinService(BaseTournamentRepository baseTournamentRepository) {
         super(baseTournamentRepository);
@@ -29,7 +29,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     public List<TournamentRoundRobin> findAllTournamentsOfType() {
         log.info("Fetching all Round Robin tournaments");
 
-        List<TournamentRoundRobin> tournamentRoundRobinList = getTournamentRepository().findAllByTournamentType(TournamentTypeEnum.ROUND_ROBIN).stream().filter(TournamentRoundRobin.class::isInstance).map(TournamentRoundRobin.class::cast).sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
+        List<TournamentRoundRobin> tournamentRoundRobinList = super.findAllTournaments().stream().filter(TournamentRoundRobin.class::isInstance).map(TournamentRoundRobin.class::cast).sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
 
         if (tournamentRoundRobinList.isEmpty()) {
             log.warn("No Olympic tournaments found");
@@ -40,7 +40,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     }
 
     @Override
-    public void validateTournament(TournamentRoundRobin tournamentRobinRound) {
+    public void validateTournament(BaseTournament tournamentRobinRound) {
         if (tournamentRobinRound == null) {
             throw new IllegalArgumentException("Tournament cannot be null");
         }
@@ -59,7 +59,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     @SneakyThrows
     @Transactional
     @Override
-    public TournamentRoundRobin startTournament(TournamentRoundRobin tournamentRobinRound) {
+    public TournamentRoundRobin startTournament(BaseTournament tournamentRobinRound) {
 
         log.info("Starting a Robin Round Tournament: {}", tournamentRobinRound.getTournamentName());
 
@@ -70,7 +70,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
             tournamentRobinRound.setTournamentStatus(TournamentStatusEnum.ONGOING);
             tournamentRobinRound.setStartedAt(java.time.LocalDate.now());
 
-            TournamentRoundRobin savedTournament = createTournament(tournamentRobinRound);
+            TournamentRoundRobin savedTournament = (TournamentRoundRobin) createTournament(tournamentRobinRound);
 
             log.info("Robin Round Tournament started successfully.");
             return savedTournament;
@@ -85,9 +85,8 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     }
 
     @Override
-    public void generateMatches(TournamentRoundRobin tournamentRobinRound) {
-        //TODO: Change this to a more efficient algorithm that will include grouping players in groups of 4 or 8 [watch in Teams condition]
-        log.debug("Generating robin round matches for tournament: {} {}", tournamentRobinRound.getId(), tournamentRobinRound.getTournamentName());
+    public void generateMatches(BaseTournament tournamentRobinRound) {
+         log.debug("Generating robin round matches for tournament: {} {}", tournamentRobinRound.getId(), tournamentRobinRound.getTournamentName());
 
         List<Player> players = new ArrayList<>(tournamentRobinRound.getPlayers());
         List<Match> allMatches = new ArrayList<>();
@@ -111,7 +110,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     }
 
     @Override
-    public Player determineTournamentWinner(TournamentRoundRobin tournamentRoundRobin) {
+    public Player determineTournamentWinner(BaseTournament tournamentRoundRobin) {
         log.debug("Determining winner for tournament: {}", tournamentRoundRobin.getId());
 
         if (allMatchesHasBeenPlayed(tournamentRoundRobin)) {
@@ -119,7 +118,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
             return null;
         }
 
-        List<Player> rankedPlayers = calculatePlayerRankings(tournamentRoundRobin);
+        List<Player> rankedPlayers = calculatePlayerRankings((TournamentRoundRobin) tournamentRoundRobin);
 
         if (rankedPlayers.isEmpty()) {
             log.warn("No players found in the tournament: {}", tournamentRoundRobin.getId());
@@ -134,7 +133,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     }
 
     @Override
-    public void endTournament(TournamentRoundRobin tournament) {
+    public void endTournament(BaseTournament tournament) {
         log.info("Ending tournament: {}", tournament.getTournamentName());
 
         if (tournament.getTournamentStatus() != TournamentStatusEnum.ONGOING) {
@@ -157,7 +156,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
                 throw new IllegalStateException("Cannot end tournament: no winner found");
             }
 
-            getTournamentRepository().save(tournament);
+            super.updateTournament(tournament);
         } else {
             log.warn("Cannot end tournament {}: not all matches have been played", tournament.getTournamentName());
             throw new IllegalStateException("Cannot end tournament: not all matches have been played");
@@ -185,7 +184,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     }
 
     @Override
-    public boolean allMatchesHasBeenPlayed(TournamentRoundRobin tournament) {
+    public boolean allMatchesHasBeenPlayed(BaseTournament tournament) {
         return tournament.getMatches().stream().noneMatch(m -> m.getWinner() == null);
     }
 }

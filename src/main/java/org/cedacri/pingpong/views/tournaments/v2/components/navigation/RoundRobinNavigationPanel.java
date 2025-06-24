@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
 import org.cedacri.pingpong.model.tournament.TournamentRoundRobin;
 import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
+import org.cedacri.pingpong.service.tournaments.UnifiedTournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 import java.util.ArrayList;
@@ -15,14 +16,14 @@ import java.util.function.Consumer;
 
 public class RoundRobinNavigationPanel extends HorizontalLayout implements TournamentNavigation {
     private final BaseTournament tournament;
-    private final BaseTournamentService<TournamentRoundRobin> tournamentService;
+    private final UnifiedTournamentService tournamentService;
     private ComboBox<String> playerComboBox;
     private String currentSelection = "All";
     private Consumer<Object> selectionListener;
 
     public RoundRobinNavigationPanel(
             BaseTournament tournament,
-            BaseTournamentService<TournamentRoundRobin> tournamentService
+            UnifiedTournamentService tournamentService
     ) {
         this.tournament = tournament;
         this.tournamentService = tournamentService;

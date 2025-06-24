@@ -4,13 +4,11 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
 import org.cedacri.pingpong.service.players.PlayerService;
-import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 
 public class TournamentInfoDialog extends AbstractTournamentDialog {
 
-    public TournamentInfoDialog(BaseTournamentService<BaseTournament> tournamentService,
-                                PlayerService playerService,
+    public TournamentInfoDialog(PlayerService playerService,
                                 BaseTournament tournament) {
         super("Tournament Details", playerService, false, tournament);
 

@@ -11,6 +11,7 @@ import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
 import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
+import org.cedacri.pingpong.service.tournaments.UnifiedTournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,11 @@ import java.util.List;
 @PermitAll
 public class HomeView extends VerticalLayout {
 
-    private final BaseTournamentService<BaseTournament> tournamentService;
+    private final UnifiedTournamentService tournamentService;
     private final VerticalLayout tournamentContainer = new VerticalLayout();
 
     @Autowired
-    public HomeView(BaseTournamentService<BaseTournament> tournamentService) {
+    public HomeView(UnifiedTournamentService tournamentService) {
         this.tournamentService = tournamentService;
 
         log.info("HomeView initialized.");
@@ -48,7 +49,7 @@ public class HomeView extends VerticalLayout {
     }
 
     private void displayTournaments() {
-        List<BaseTournament> tournamentList = tournamentService.findAllTournaments()
+        List<BaseTournament> tournamentList = tournamentService.getDefaultCrudService().findAllTournaments()
                 .stream().sorted(
                         Comparator.comparing(
                                         BaseTournament::getStartedAt,

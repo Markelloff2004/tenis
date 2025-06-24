@@ -3,19 +3,17 @@ package org.cedacri.pingpong.views.tournaments.v2.components.dialogs;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
 import org.cedacri.pingpong.service.players.PlayerService;
-import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
+import org.cedacri.pingpong.service.tournaments.UnifiedTournamentService;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
-
-import java.util.stream.Collectors;
 
 @Slf4j
 public class TournamentEditDialog extends AbstractTournamentDialog {
 
-    private final BaseTournamentService<BaseTournament> tournamentService;
+    private final UnifiedTournamentService tournamentService;
     private final Runnable saveCallback;
 
-    public TournamentEditDialog(BaseTournamentService<BaseTournament> tournamentService,
+    public TournamentEditDialog(UnifiedTournamentService tournamentService,
                                 PlayerService playerService,
                                 BaseTournament tournament,
                                 Runnable saveCallback) {
@@ -37,7 +35,7 @@ public class TournamentEditDialog extends AbstractTournamentDialog {
         updatedTournament.setId(tournament.getId());
 
         try {
-            tournamentService.updateTournament(updatedTournament);
+            tournamentService.getDefaultCrudService().updateTournament(updatedTournament);
             closeDialog();
             NotificationManager.showInfoNotification("Tournament updated successfully");
             saveCallback.run();

@@ -12,17 +12,13 @@ import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
-@Service
-public class BaseTournamentService<T extends BaseTournament> implements ITournamentCrud<T>{
+@Service("baseTournamentService")
+public class BaseTournamentService implements ITournamentCrud{
 
     private final BaseTournamentRepository tournamentRepository;
 
     protected BaseTournamentService(BaseTournamentRepository tournamentRepository) {
         this.tournamentRepository = tournamentRepository;
-    }
-
-    protected BaseTournamentRepository getTournamentRepository() {
-        return this.tournamentRepository;
     }
 
     // ITournamentCrud Implementation
@@ -53,41 +49,36 @@ public class BaseTournamentService<T extends BaseTournament> implements ITournam
 
     @Transactional
     @Override
-    public T findTournamentById(Long id) {
+    public BaseTournament findTournamentById(Long id) {
         validateId(id);
         log.debug("Fetching tournament with ID: {}", id);
 
         BaseTournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tournament with ID " + id + " not found"));
 
-//        try {
-//            Hibernate.initialize(tournament.getPlayers());
-//            Hibernate.initialize(tournament.getMatches());
-//        } catch (Exception ex) {
-//            log.error(ex.getMessage(), ex);
-//        }
+        return tournament;
 
-        return castToType(tournament, id);
+//        return castToType(tournament, id);
     }
 
     @Transactional
     @Override
-    public T createTournament(T tournament) {
+    public BaseTournament createTournament(BaseTournament tournament) {
         validateTournamentNotNull(tournament);
         log.debug("Creating tournament: {}", tournament);
 
-        T savedTournament = tournamentRepository.save(tournament);
+        BaseTournament savedTournament = tournamentRepository.save(tournament);
         log.info("Tournament created with ID: {}", savedTournament.getId());
         return savedTournament;
     }
 
     @Transactional
     @Override
-    public T updateTournament(T tournament) {
+    public BaseTournament updateTournament(BaseTournament tournament) {
         validateTournamentForUpdate(tournament);
         log.debug("Updating tournament with ID: {}", tournament.getId());
 
-        T updatedTournament = tournamentRepository.save(tournament);
+        BaseTournament updatedTournament = tournamentRepository.save(tournament);
         log.info("Tournament updated with ID: {}", updatedTournament.getId());
         return updatedTournament;
     }
@@ -113,32 +104,32 @@ public class BaseTournamentService<T extends BaseTournament> implements ITournam
         }
     }
 
-    protected void validateTournamentNotNull(T tournament) {
+    protected void validateTournamentNotNull(BaseTournament tournament) {
         if (tournament == null) {
             throw new IllegalArgumentException("Tournament cannot be null");
         }
     }
 
-    protected void validateTournamentForUpdate(T tournament) {
+    protected void validateTournamentForUpdate(BaseTournament tournament) {
         validateTournamentNotNull(tournament);
         if (tournament.getId() == null) {
             throw new IllegalArgumentException("Tournament ID cannot be null for update");
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private T castToType(BaseTournament tournament, Long id) {
-        try {
-            return (T) tournament;
-        } catch (ClassCastException e) {
-            String errorMessage = String.format(
-                    "Type mismatch for tournament ID %d. Expected: %s, Actual: %s",
-                    id,
-                    this.getClass().getSimpleName(),
-                    tournament.getClass().getSimpleName()
-            );
-            log.error(errorMessage, e);
-            throw new IllegalArgumentException(errorMessage, e);
-        }
-    }
+//    @SuppressWarnings("unchecked")
+//    private BaseTournament castToType(BaseTournament tournament, Long id) {
+//        try {
+//            return (T) tournament;
+//        } catch (ClassCastException e) {
+//            String errorMessage = String.format(
+//                    "Type mismatch for tournament ID %d. Expected: %s, Actual: %s",
+//                    id,
+//                    this.getClass().getSimpleName(),
+//                    tournament.getClass().getSimpleName()
+//            );
+//            log.error(errorMessage, e);
+//            throw new IllegalArgumentException(errorMessage, e);
+//        }
+//    }
 }

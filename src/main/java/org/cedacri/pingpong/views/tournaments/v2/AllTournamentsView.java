@@ -2,7 +2,6 @@ package org.cedacri.pingpong.views.tournaments.v2;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
@@ -19,7 +18,7 @@ import org.cedacri.pingpong.config.security.model.enums.RoleEnum;
 import org.cedacri.pingpong.model.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
 import org.cedacri.pingpong.service.players.PlayerService;
-import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
+import org.cedacri.pingpong.service.tournaments.UnifiedTournamentService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.v2.components.dialogs.TournamentAddDialog;
@@ -39,9 +38,9 @@ public class AllTournamentsView extends VerticalLayout {
 
     private final Grid<BaseTournament> tournamentsGrid = new Grid<>(BaseTournament.class, false);
     private final transient PlayerService playerService;
-    private final transient BaseTournamentService<BaseTournament> tournamentService;
+    private final transient UnifiedTournamentService tournamentService;
 
-    public AllTournamentsView(BaseTournamentService<BaseTournament> tournamentService, PlayerService playerService) {
+    public AllTournamentsView(UnifiedTournamentService tournamentService, PlayerService playerService) {
         this.tournamentService = tournamentService;
         this.playerService = playerService;
 
@@ -134,7 +133,7 @@ public class AllTournamentsView extends VerticalLayout {
     }
 
     private void refreshGridData() {
-        tournamentsGrid.setItems(tournamentService.findAllTournaments());
+        tournamentsGrid.setItems(tournamentService.getDefaultCrudService().findAllTournaments());
 
         log.info("Grid data refreshed, tournaments loaded.");
     }
@@ -151,7 +150,7 @@ public class AllTournamentsView extends VerticalLayout {
     public void showInfoTournament(BaseTournament baseTournamentDetails) {
         log.info("Showing tournament details for tournament: {} with Id: {}", baseTournamentDetails.getTournamentName(), baseTournamentDetails.getId());
 
-        TournamentInfoDialog tournamentInfoDialog = new TournamentInfoDialog(tournamentService, playerService, baseTournamentDetails);
+        TournamentInfoDialog tournamentInfoDialog = new TournamentInfoDialog(playerService, baseTournamentDetails);
         tournamentInfoDialog.open();
 
         log.info("Tournament info dialog opened for tournament: {} with Id: {}", baseTournamentDetails.getTournamentName(), baseTournamentDetails.getId());

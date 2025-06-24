@@ -4,11 +4,11 @@ import org.cedacri.pingpong.model.tournament.BaseTournament;
 
 import java.util.List;
 
-public interface ITournamentCrud<T extends BaseTournament> {
+public interface ITournamentCrud {
     List<BaseTournament> findAllTournaments();
-    T findTournamentById(Long id);
-    T createTournament(T tournament);
-    T updateTournament(T tournament);
+    BaseTournament findTournamentById(Long id);
+    BaseTournament createTournament(BaseTournament tournament);
+    BaseTournament updateTournament(BaseTournament tournament);
     void deleteTournamentById(Long id);
 }
 

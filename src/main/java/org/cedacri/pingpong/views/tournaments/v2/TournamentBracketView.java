@@ -17,16 +17,11 @@ import org.cedacri.pingpong.model.enums.TournamentStatusEnum;
 import org.cedacri.pingpong.model.enums.TournamentTypeEnum;
 import org.cedacri.pingpong.model.match.Match;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
-import org.cedacri.pingpong.model.tournament.TournamentOlympic;
-import org.cedacri.pingpong.model.tournament.TournamentRoundRobin;
 import org.cedacri.pingpong.service.matches.MatchService;
 import org.cedacri.pingpong.service.players.PlayerService;
-import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
-import org.cedacri.pingpong.service.tournaments.TournamentOlympicService;
-import org.cedacri.pingpong.service.tournaments.TournamentRoundRobinService;
+import org.cedacri.pingpong.service.tournaments.UnifiedTournamentService;
 import org.cedacri.pingpong.utils.Constants;
 import org.cedacri.pingpong.utils.NotificationManager;
-import org.cedacri.pingpong.utils.TournamentUtils;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
 import org.cedacri.pingpong.views.tournaments.v2.components.matches.MatchComponent;
@@ -44,9 +39,7 @@ import java.util.List;
 @AnonymousAllowed
 public class TournamentBracketView extends VerticalLayout implements HasUrlParameter<Long> {
 
-    private final BaseTournamentService<BaseTournament> tournamentService;
-    private final TournamentOlympicService tournamentOlympicService;
-    private final TournamentRoundRobinService tournamentRoundRobinService;
+    private final UnifiedTournamentService tournamentService;
     private final MatchService matchService;
     private final PlayerService playerService;
 
@@ -54,14 +47,11 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     private TournamentNavigation navigationComponent;
     private VerticalLayout matchContainer;
 
-    public TournamentBracketView(BaseTournamentService<BaseTournament> tournamentService, TournamentOlympicService tournamentOlympicService,
-                                 TournamentRoundRobinService tournamentRoundRobinService,
+    public TournamentBracketView(UnifiedTournamentService tournamentService,
                                  MatchService matchService,
                                  PlayerService playerService) {
 
         this.tournamentService = tournamentService;
-        this.tournamentOlympicService = tournamentOlympicService;
-        this.tournamentRoundRobinService = tournamentRoundRobinService;
         this.matchService = matchService;
         this.playerService = playerService;
         log.info("TournamentBracketView initialized.");
@@ -70,7 +60,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long tournamentId) {
         log.info("Received request to load tournament with ID {}", tournamentId);
-        baseTournament = tournamentService.findTournamentById(tournamentId);
+        baseTournament = tournamentService.getDefaultCrudService().findTournamentById(tournamentId);
 
         if (baseTournament == null) {
             log.warn("Tournament with ID {} not found", tournamentId);
@@ -81,16 +71,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         log.info("Tournament found: {}", baseTournament);
         initView();
     }
-
-    private BaseTournamentService<?> getTournamentService() {
-        if (baseTournament.getTournamentType() == TournamentTypeEnum.OLYMPIC) {
-            return tournamentOlympicService;
-        } else if (baseTournament.getTournamentType() == TournamentTypeEnum.ROUND_ROBIN) {
-            return tournamentRoundRobinService;
-        }
-        throw new IllegalArgumentException("Unsupported tournament type");
-    }
-
     private void initView() {
         log.info("Initializing view for tournament {}", baseTournament.getTournamentName());
         removeAll();
@@ -127,7 +107,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         if (type == TournamentTypeEnum.OLYMPIC) {
             navigationComponent = new OlympicNavigationPanel(baseTournament);
         } else if (type == TournamentTypeEnum.ROUND_ROBIN) {
-            navigationComponent = new RoundRobinNavigationPanel(baseTournament, (BaseTournamentService<TournamentRoundRobin>) getTournamentService());
+            navigationComponent = new RoundRobinNavigationPanel(baseTournament, tournamentService);
         } else {
             return new Span("Tournament type not supported");
         }
@@ -142,7 +122,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
                 refreshTournament();
 
                 try {
-                    if (isTournamentReadyToFinish()) {
+                    if (tournamentService.isReadyToEndTournament(baseTournament)) {
                         showEndTournamentDialog();
                     } else {
                         NotificationManager.showErrorNotification(
@@ -158,15 +138,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         }
     }
 
-    private boolean isTournamentReadyToFinish() {
-        if (baseTournament.getTournamentType() == TournamentTypeEnum.OLYMPIC) {
-            return tournamentOlympicService.allMatchesHasBeenPlayed((TournamentOlympic) baseTournament);
-        } else if (baseTournament.getTournamentType() == TournamentTypeEnum.ROUND_ROBIN) {
-            return tournamentRoundRobinService.allMatchesHasBeenPlayed((TournamentRoundRobin) baseTournament);
-        }
-        return false;
-    }
-
     private void showEndTournamentDialog() {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Confirm end tournament: " + baseTournament.getTournamentName());
@@ -174,7 +145,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
 
         Button confirmButton = ViewUtils.createButton("Confirm", ViewUtils.COLORED_BUTTON, () -> {
             try {
-                endTournament();
+                tournamentService.endTournament(baseTournament);
                 dialog.close();
                 refreshTournament();
             } catch (IllegalStateException e) {
@@ -186,16 +157,6 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
         Button cancelButton = ViewUtils.createButton("Cancel", ViewUtils.BUTTON, dialog::close);
         dialog.add(new HorizontalLayout(confirmButton, cancelButton));
         dialog.open();
-    }
-
-    private void endTournament() {
-        if (baseTournament.getTournamentType() == TournamentTypeEnum.OLYMPIC) {
-            tournamentOlympicService.endTournament((TournamentOlympic) baseTournament);
-        } else if (baseTournament.getTournamentType() == TournamentTypeEnum.ROUND_ROBIN) {
-            tournamentRoundRobinService.endTournament((TournamentRoundRobin) baseTournament);
-        } else {
-            throw new IllegalStateException("Unsupported tournament type");
-        }
     }
 
     private void refreshMatches(Object selection) {
@@ -247,7 +208,7 @@ public class TournamentBracketView extends VerticalLayout implements HasUrlParam
     }
 
     private void refreshTournament() {
-        this.baseTournament = getTournamentService().findTournamentById(baseTournament.getId());
+        this.baseTournament = tournamentService.getDefaultCrudService().findTournamentById(baseTournament.getId());
         if (navigationComponent != null) {
             navigationComponent.refresh();
         }

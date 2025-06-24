@@ -18,7 +18,7 @@ import java.util.*;
 
 @Slf4j
 @Service("tournamentOlympicService")
-public class TournamentOlympicService extends BaseTournamentService<TournamentOlympic> implements ITournamentOperations<TournamentOlympic> {
+public class TournamentOlympicService extends BaseTournamentService implements ITournamentOperations {
 
     public TournamentOlympicService(BaseTournamentRepository baseTournamentRepository) {
         super(baseTournamentRepository);
@@ -28,7 +28,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     public List<TournamentOlympic> findAllTournamentsOfType() {
         log.info("Fetching all Olympic tournaments");
 
-        List<TournamentOlympic> tournamentOlympicList = getTournamentRepository().findAllByTournamentType(TournamentTypeEnum.OLYMPIC).stream().filter(TournamentOlympic.class::isInstance).map(TournamentOlympic.class::cast).sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
+        List<TournamentOlympic> tournamentOlympicList = super.findAllTournaments().stream().filter(TournamentOlympic.class::isInstance).map(TournamentOlympic.class::cast).sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
 
         if (tournamentOlympicList.isEmpty()) {
             log.warn("No Olympic tournaments found");
@@ -39,7 +39,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     }
 
     @Override
-    public void validateTournament(TournamentOlympic tournamentOlympic) {
+    public void validateTournament(BaseTournament tournamentOlympic) {
         if (tournamentOlympic == null) {
             throw new IllegalArgumentException("Tournament cannot be null");
         }
@@ -58,7 +58,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     @SneakyThrows
     @Transactional
     @Override
-    public TournamentOlympic startTournament(TournamentOlympic tournamentOlympic) {
+    public TournamentOlympic startTournament(BaseTournament tournamentOlympic) {
         log.info("Starting an Olympic Tournament: {}", tournamentOlympic.getTournamentName());
 
         try {
@@ -66,11 +66,11 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
 
             generateMatches(tournamentOlympic);
 
-            distributePlayersInFirstRound(tournamentOlympic);
+            distributePlayersInFirstRound((TournamentOlympic) tournamentOlympic);
 
-            handleWalkoverPlayers(tournamentOlympic);
+            handleWalkoverPlayers((TournamentOlympic) tournamentOlympic);
 
-            TournamentOlympic savedTournament = createTournament(tournamentOlympic);
+            TournamentOlympic savedTournament = (TournamentOlympic) createTournament(tournamentOlympic);
 
             log.info("Olympic Tournament started successfully.");
             return savedTournament;
@@ -86,7 +86,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     }
 
     @Override
-    public void generateMatches(TournamentOlympic tournamentOlympic) {
+    public void generateMatches(BaseTournament tournamentOlympic) {
 
         log.debug("Generating olympic bracket for tournament: {} {}", tournamentOlympic.getId(), tournamentOlympic.getTournamentName());
 
@@ -110,7 +110,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     }
 
     @Override
-    public Player determineTournamentWinner(TournamentOlympic tournament) {
+    public Player determineTournamentWinner(BaseTournament tournament) {
         return tournament.getMatches().stream()
                 //TODO: Need to check if the final match is actually the match Round=1, Position=1 of the tournament
                 .filter(m -> m.getRound() == 1 && m.getPosition() == 1).map(Match::getWinner).findAny().orElse(null);
@@ -118,7 +118,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     }
 
     @Override
-    public void endTournament(TournamentOlympic tournament) {
+    public void endTournament(BaseTournament tournament) {
         log.info("Ending tournament: {}", tournament.getTournamentName());
 
         if (tournament.getTournamentStatus() != TournamentStatusEnum.ONGOING) {
@@ -141,7 +141,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
                 throw new IllegalStateException("No winner determined for tournament: " + tournament.getTournamentName());
             }
 
-            getTournamentRepository().save(tournament);
+            super.updateTournament(tournament);
         } else {
             log.warn("Cannot end tournament {}: not all matches have been played", tournament.getTournamentName());
             throw new IllegalStateException("Cannot end tournament: not all matches have been played");
@@ -151,7 +151,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     }
 
     @Override
-    public boolean allMatchesHasBeenPlayed(TournamentOlympic tournament) {
+    public boolean allMatchesHasBeenPlayed(BaseTournament tournament) {
         return tournament.getMatches().stream().noneMatch(m -> m.getWinner() == null);
     }
 
@@ -233,7 +233,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
         return rounds;
     }
 
-    private List<Match> generateMatchesForRound(int round, int totalRounds, TournamentOlympic tournament, Map<Integer, List<Match>> existingRounds) {
+    private List<Match> generateMatchesForRound(int round, int totalRounds, BaseTournament tournament, Map<Integer, List<Match>> existingRounds) {
         List<Match> matches = new ArrayList<>();
         int matchesInRound = calculateMatchesInRound(round, totalRounds);
 
@@ -269,7 +269,7 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
     }
 
 
-    private Match createMatch(int round, int position, Match nextMatch, TournamentOlympic tournamentOlympic) {
+    private Match createMatch(int round, int position, Match nextMatch, BaseTournament tournamentOlympic) {
         return Match.builder().round(round).position(position).nextMatch(nextMatch).tournament(tournamentOlympic).build();
     }
 

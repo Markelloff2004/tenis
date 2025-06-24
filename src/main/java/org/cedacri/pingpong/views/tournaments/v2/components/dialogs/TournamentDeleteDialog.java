@@ -5,7 +5,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import lombok.extern.slf4j.Slf4j;
 import org.cedacri.pingpong.model.tournament.BaseTournament;
-import org.cedacri.pingpong.service.tournaments.BaseTournamentService;
+import org.cedacri.pingpong.service.tournaments.UnifiedTournamentService;
 import org.cedacri.pingpong.utils.ExceptionUtils;
 import org.cedacri.pingpong.utils.NotificationManager;
 import org.cedacri.pingpong.utils.ViewUtils;
@@ -13,7 +13,7 @@ import org.cedacri.pingpong.utils.ViewUtils;
 @Slf4j
 public class TournamentDeleteDialog extends Dialog {
 
-    public TournamentDeleteDialog(BaseTournamentService<BaseTournament> tournamentService,
+    public TournamentDeleteDialog(UnifiedTournamentService tournamentService,
                                   BaseTournament tournament,
                                   Runnable deleteCallback) {
         setHeaderTitle("Delete Tournament");
@@ -29,12 +29,12 @@ public class TournamentDeleteDialog extends Dialog {
         ));
     }
 
-    private Button createDeleteButton(BaseTournamentService<BaseTournament> tournamentService,
+    private Button createDeleteButton(UnifiedTournamentService tournamentService,
                                       BaseTournament tournament,
                                       Runnable callback) {
         return ViewUtils.createButton("Delete", ViewUtils.COLORED_BUTTON, () -> {
             try {
-                tournamentService.deleteTournamentById(tournament.getId());
+                tournamentService.getDefaultCrudService().deleteTournamentById(tournament.getId());
                 callback.run();
                 close();
                 NotificationManager.showInfoNotification("Tournament deleted successfully");
