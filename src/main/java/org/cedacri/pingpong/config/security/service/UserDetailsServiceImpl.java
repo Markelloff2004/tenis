@@ -1,5 +1,7 @@
 package org.cedacri.pingpong.config.security.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.cedacri.pingpong.config.security.model.User;
 import org.cedacri.pingpong.config.security.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -7,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 

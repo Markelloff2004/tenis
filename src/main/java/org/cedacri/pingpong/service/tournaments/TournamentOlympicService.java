@@ -18,7 +18,7 @@ import java.util.*;
 
 @Slf4j
 @Service("tournamentOlympicService")
-public class TournamentOlympicService extends BaseTournamentService<TournamentOlympic> {
+public class TournamentOlympicService extends BaseTournamentService<TournamentOlympic> implements ITournamentOperations<TournamentOlympic> {
 
     public TournamentOlympicService(BaseTournamentRepository baseTournamentRepository) {
         super(baseTournamentRepository);
@@ -338,10 +338,5 @@ public class TournamentOlympicService extends BaseTournamentService<TournamentOl
         } else if (topPlayer == null && bottomPlayer != null) {
             match.setWinner(bottomPlayer);
         }
-    }
-
-    public boolean isTournamentReadyToFinish(TournamentOlympic tournamentOlympic) {
-        // All matches have been played
-        return tournamentOlympic.getMatches().stream().allMatch(m -> m.getWinner() != null);
     }
 }

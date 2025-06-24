@@ -74,14 +74,14 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
                 ViewUtils.createSecuredButton(
                         "Tournament",
                         "transparent-button",
-                        () -> navigateTo("tournaments"),
-                        RoleEnum.ADMIN, RoleEnum.MANAGER
+                        () -> navigateTo("tournaments")
+                        ,RoleEnum.ADMIN, RoleEnum.MANAGER
 
                 ),
                 ViewUtils.createSecuredButton("Players",
                         "transparent-button",
-                        () -> navigateTo("players"),
-                        RoleEnum.ADMIN, RoleEnum.MANAGER
+                        () -> navigateTo("players")
+                        ,RoleEnum.ADMIN, RoleEnum.MANAGER
                 )
         );
 

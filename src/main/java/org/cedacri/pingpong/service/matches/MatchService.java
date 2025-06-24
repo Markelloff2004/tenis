@@ -150,4 +150,7 @@ public class MatchService {
         return null;
     }
 
+    public List<Match> getMatchesByPlayerNameSurname(List<Match> matches, String name, String surname) {
+        return null;
+    }
 }

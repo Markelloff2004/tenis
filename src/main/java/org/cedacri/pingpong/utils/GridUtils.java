@@ -46,4 +46,12 @@ public class GridUtils {
     }
 
 
+    public static Grid<Player> createPlayerGrid(Set<Player> playerSet, String componentName) {
+        Grid<Player> grid = new Grid<>(Player.class, false);
+        grid.setItems(playerSet);
+        grid.setId(componentName);
+        grid.setColumnReorderingAllowed(true);
+
+        return grid;
+    }
 }

@@ -23,6 +23,7 @@ public class SecurityConfig extends VaadinWebSecurity {
                         .requestMatchers("/tournaments", "/tournament/**", "/tournament/matches", "/players")
                         .hasAnyRole(RoleEnum.ADMIN.name(), RoleEnum.MANAGER.name())
                         .requestMatchers("/VAADIN/**", "/frontend/**", "/images/**", "/line-awesome/**", "/styles/**").permitAll()
+                        .requestMatchers("/", "/vaadinServlet/**", "/HILLA/**").permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form

@@ -62,7 +62,7 @@ public abstract class BaseTournament {
     @Column(name = "started_at")
     private LocalDate startedAt;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(
             name = "tournament_players",
             joinColumns = @JoinColumn(name = "tournament_id"),
@@ -70,7 +70,7 @@ public abstract class BaseTournament {
     )
     private Set<Player> players = new HashSet<>();
 
-    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "tournament", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matches = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.REFRESH})
@@ -80,4 +80,8 @@ public abstract class BaseTournament {
     public void addPlayer(Player playerToAdd) {
         players.add(playerToAdd);
     }
+
+    @PrePersist
+    @PreUpdate
+    protected abstract void calculateMaxPlayers();
 }

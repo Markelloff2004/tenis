@@ -16,11 +16,10 @@ import org.cedacri.pingpong.utils.TournamentUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service("tournamentRoundRobinService")
-public class TournamentRoundRobinService extends BaseTournamentService<TournamentRoundRobin> {
+public class TournamentRoundRobinService extends BaseTournamentService<TournamentRoundRobin> implements ITournamentOperations<TournamentRoundRobin> {
 
     public TournamentRoundRobinService(BaseTournamentRepository baseTournamentRepository) {
         super(baseTournamentRepository);
@@ -30,7 +29,7 @@ public class TournamentRoundRobinService extends BaseTournamentService<Tournamen
     public List<TournamentRoundRobin> findAllTournamentsOfType() {
         log.info("Fetching all Round Robin tournaments");
 
-        List<TournamentRoundRobin> tournamentRoundRobinList = getTournamentRepository().findAllByTournamentType(TournamentTypeEnum.ROBIN_ROUND).stream().filter(TournamentRoundRobin.class::isInstance).map(TournamentRoundRobin.class::cast).sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
+        List<TournamentRoundRobin> tournamentRoundRobinList = getTournamentRepository().findAllByTournamentType(TournamentTypeEnum.ROUND_ROBIN).stream().filter(TournamentRoundRobin.class::isInstance).map(TournamentRoundRobin.class::cast).sorted(Comparator.comparing(BaseTournament::getStartedAt, Comparator.nullsLast(Comparator.naturalOrder()))).toList();
 
         if (tournamentRoundRobinList.isEmpty()) {
             log.warn("No Olympic tournaments found");

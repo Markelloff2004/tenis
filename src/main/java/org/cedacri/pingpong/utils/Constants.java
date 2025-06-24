@@ -32,6 +32,7 @@ public class Constants {
     public static final int MINIMAL_DIFFERENCE_OF_POINTS_IN_SET = 2;
     //Exceptions
     public static final String NOT_ENOUGH_PLAYERS_MESSAGE = "Not enough players!";
+    public static final String TO_MUCH_PLAYERS_MESSAGE = "To much players!";
     public static final String TOURNAMENT_CANNOT_BE_NULL = "Tournament cannot be null";
     public static final int MINIMAL_AMOUNT_OF_PLAYER_FOR_OLYMPIC = 8;
     public static final int MINIMAL_AMOUNT_OF_PLAYER_FOR_ROBIN_ROUND = 4;

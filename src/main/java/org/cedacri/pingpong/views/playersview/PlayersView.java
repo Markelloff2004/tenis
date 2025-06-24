@@ -18,7 +18,6 @@ import org.cedacri.pingpong.model.player.Player;
 import org.cedacri.pingpong.service.players.PlayerService;
 import org.cedacri.pingpong.utils.ViewUtils;
 import org.cedacri.pingpong.views.MainLayout;
-import org.cedacri.pingpong.views.interfaces.PlayerViewManagement;
 import org.cedacri.pingpong.views.playersview.components.PlayerDeleteDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerEditDialog;
 import org.cedacri.pingpong.views.playersview.components.PlayerInfoDialog;
